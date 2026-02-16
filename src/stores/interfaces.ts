@@ -1,0 +1,36 @@
+
+// 🧩 Interfaces
+export interface Governorate {
+    id: number,
+    name: string,
+    cities: City[]
+}
+
+export interface City {
+    id: number,
+    name: string,
+    governorate_id: number;
+    description: string,
+    areas: Area[]
+}
+
+export interface Area {
+    id: number,
+    name: string,
+    city_id: number;
+    description: string,
+    streets: Street[]
+}
+
+export interface Street {
+    id: number,
+    name: string,
+    area_id: number;
+    description: string,
+}
+
+export interface Building {
+    id: number,
+    name: string,
+    street_id: number;
+}
