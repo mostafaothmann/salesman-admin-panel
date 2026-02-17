@@ -2,14 +2,8 @@ import { create } from 'zustand';
 import axios from 'axios';
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { apiSalesman } from '../api';
+import { Salesman } from '../salesman-store-interfaces';
 
-
-// 🧩 Interfaces
-export interface Salesman {
-    id: number;
-    first_name: string;
-    last_name: string;
-}
 
 interface DataStore {
     dataSalesmans: Salesman[] | undefined;

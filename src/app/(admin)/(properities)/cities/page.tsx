@@ -149,7 +149,6 @@ export default function CititesPage() {
         },
         {
             title: "",
-            fixed: "right",
             key: "id",
             render: (_: any, record: any) => (
                 <Space size="middle">
@@ -160,7 +159,6 @@ export default function CititesPage() {
                     >
                         Delete
                     </Button>
-
                     <Button
                         type="default"
                         onClick={() => { OpenEditModal(record.id); }}
@@ -180,7 +178,7 @@ export default function CititesPage() {
     ];
 
     return <div>
-        <Button type="primary" onClick={() => downloadExcel()}>
+        <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
             تنزيل
         </Button>
 
@@ -189,6 +187,7 @@ export default function CititesPage() {
             title="إضافة مدينة جديدة"
             open={open}
             onOk={() => handleAdd()}
+            okButtonProps={{ variant: "outlined", color: "purple" }}
             onCancel={() => emptyFields()}
             mask={false}
         >
@@ -243,6 +242,7 @@ export default function CititesPage() {
         <Modal
             title="تعديل مدينة"
             open={open1}
+            okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
             confirmLoading={loading}   // ✅ spinner on OK button
@@ -293,6 +293,8 @@ export default function CititesPage() {
             title="تفاصيل مدينة"
             open={open3}
             onOk={() => emptyFields()}
+            okButtonProps={{ variant: "outlined", color: "cyan" }}
+
             onCancel={() => { setOpen3(false); emptyFields() }}
             confirmLoading={loading}   // ✅ spinner on OK button
             mask={false}
@@ -314,7 +316,11 @@ export default function CititesPage() {
             <Dropdown
                 menu={{ items: items }}
                 trigger={['click']}
-            />
+            >
+                <Button className="px-4 py-2 border rounded">
+                    المناطق 
+                </Button>
+            </Dropdown>
         </Modal>
 
         {/*Delete Modal*/}
@@ -330,10 +336,12 @@ export default function CititesPage() {
         >
         </Modal>
 
-        <Button type="primary" onClick={() => setOpen(true)}>
+        <Button variant="solid" color="purple" onClick={() => setOpen(true)}>
             إضافة
         </Button>
 
-        <Table columns={columns} dataSource={dataCities} />
+        <Table
+            scroll={{ x: "max-content" }}
+            columns={columns} dataSource={dataCities} />
     </div>
 }

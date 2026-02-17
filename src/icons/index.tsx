@@ -58,9 +58,13 @@ import ChartBigIcon from "./chart-bar-big.svg"
 import ChartDecreasingIcon from "./chart-bar-decreasing.svg"
 import ChartColumnIcon from "./chart-column-big.svg"
 import ChartScatterIcon from "./chart-scatter.svg"
+import DirectionsIcon from "./directions.svg"
+import FirstAidKitIcon from "./first-aid-kit.svg"
 
 
 export {
+  FirstAidKitIcon,
+  DirectionsIcon,
   Building2Icon,
   ChartScatterIcon,
   ChartBigIcon,

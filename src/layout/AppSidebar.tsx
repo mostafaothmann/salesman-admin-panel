@@ -10,6 +10,8 @@ import {
   BuildingIcon,
   CalenderIcon,
   ChevronDownIcon,
+  DirectionsIcon,
+  FirstAidKitIcon,
   GridIcon,
   GroupIcon,
   HorizontaLDots,
@@ -31,70 +33,37 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
+
   {
     icon: <GridIcon />,
     name: "Dashboard",
     subItems: [{ name: "Global Statistics", path: "/", pro: false }],
   },
-
   {
-    icon: <BuildingIcon />,
-    name: "Properities",
+    icon: <FirstAidKitIcon />,
+    name: "طبي",
     subItems: [
-      { name: "Properities", path: "/properties", pro: false }
-      ,
-      { name: "Properties Types", path: "/properties-types", pro: false }
-      ,
-      { name: "Ownering Types", path: "/ownering-types", pro: false }
-      ,
-      { name: "Work Types", path: "/work-types", pro: false }
-
-    ],
-
-  },
-  {
-    icon: <GroupIcon />,
-    name: "Customers",
-    subItems: [
-      { name: "Customers", path: "/customers", pro: false }
-    ],
-  },
-  {
-    icon: <Building2Icon />,
-    name: "Companies",
-    subItems: [
-      { name: "Companies", path: "/companies", pro: false },
-      { name: "Types Of Companies", path: "/companies-types", pro: false }
-
-    ],
-
-  },
-  {
-    icon: <ToolCaseIcon />,
-    name: "Materials",
-    subItems: [
-      { name: "Materials", path: "/materials", pro: false },
-      { name: "Types Of Materials", path: "/materials-types", pro: false }
-    ],
-  },
-  {
-    icon: <ToolCaseIcon />,
-    name: "Salesman",
-    subItems: [
-      { name: "Field Salesmans", path: "/field-salesman", pro: false },
-      //{ name: "Electronic Salesmans", path: "/materials-types", pro: false }
+      { name: "اختصاصات طبية", path: "/specializations", pro: false },
     ],
   }
   ,
   {
-    icon: <ToolCaseIcon />,
+    icon: <BuildingIcon />,
+    name: "",
+    subItems: [
+      { name: "الكل", path: "/salesman", pro: false },
+      { name: "مندوبين ميدانيين", path: "/field-salesman", pro: false }
+    ],
+  }
+  ,
+  {
+    icon: <DirectionsIcon />,
     name: "أماكن",
     subItems: [
       { name: "المحافظات", path: "/governorates", pro: false },
       { name: "المدن", path: "/cities", pro: false },
       { name: "المناطق", path: "/areas", pro: false },
       { name: "الشوراع", path: "/streets", pro: false },
-      { name: "الأبنية", path: "/buildings", pro: false }
     ],
   }
 ];
@@ -284,15 +253,21 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 right-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-        ${isExpanded || isMobileOpen
-          ? "w-[290px]"
-          : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
+      className={`fixed top-0 right-0 mt-16 lg:mt-0 z-50 h-screen
+  flex flex-col bg-white dark:bg-gray-900 text-gray-900
+  transition-all duration-300 ease-in-out
+  border-l border-gray-200 dark:border-gray-800
+
+  ${isExpanded || isHovered || isMobileOpen
+          ? "w-[190px]"
+          : "w-[90px]"
         }
-        ${isMobileOpen ? "translate-x-0" : "-translate-x-0"}
-        lg:translate-x-0`}
+
+  ${isMobileOpen
+          ? "translate-x-0"
+          : "translate-x-full lg:translate-x-0"
+        }
+  `}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

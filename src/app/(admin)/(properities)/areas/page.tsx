@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 
 import { AutoComplete, Button, Dropdown, Input, Menu, Modal, Space, Table, Tag, Upload } from "antd";
@@ -8,8 +8,8 @@ import { Company, useCompanyDataStore } from "../../../../stores/companiesStore/
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 
 
-export default function CititesPage() {
-    const { dataAreas, getCitiesData, addArea, dataCities, editArea, deleteArea } = usePlacesStore();
+export default function AreasPage() {
+    const { dataAreas, getAreasData, addArea, dataCities, editArea, deleteArea } = usePlacesStore();
 
 
     //Add Modal
@@ -45,15 +45,15 @@ export default function CititesPage() {
         await editArea(editedId, { name: name, description: description, city_id: city_id });
         setLoading(false);
         setOpenEditModal(false);
-        getCitiesData();
+        getAreasData();
     }
 
     //addType function
     async function handleAdd() {
         setCityId(city_id + 1);
-        console.log({name,description,city_id})
+        console.log({ name, description, city_id })
         await addArea({ name, description, city_id })
-        getCitiesData();
+        getAreasData();
         setName("");
         setSearchText("");
         setDescription("")
@@ -90,7 +90,6 @@ export default function CititesPage() {
         const area = dataAreas?.find(
             item => item.id === id
         );
-        console.log()
         setName(area?.name || "");
         setDescription(area?.description || "");
         console.log(area)
@@ -102,7 +101,7 @@ export default function CititesPage() {
     async function handleDelete(id: number) {
         setLoading2(true);
         await deleteArea(id);
-        getCitiesData();
+        getAreasData();
         setLoading2(false);
         setOpenDeleteModal(false);
     }
@@ -114,7 +113,7 @@ export default function CititesPage() {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
         XLSX.writeFile(workbook, "Cities.xlsx");
     };
-    useEffect(() => { getCitiesData(); }, []);
+    useEffect(() => { getAreasData(); }, []);
     const columns = [
         {
             title: "الرقم",
@@ -180,7 +179,8 @@ export default function CititesPage() {
     ];
 
     return <div>
-        <Button type="primary" onClick={() => downloadExcel()}>
+        <Button variant="solid" color="purple"
+         onClick={() => downloadExcel()}>
             تنزيل
         </Button>
 
@@ -312,7 +312,11 @@ export default function CititesPage() {
             <Dropdown
                 menu={{ items: items }}
                 trigger={['click']}
-            />
+            >
+                <Button className="px-4 py-2 border rounded">
+                    الشوراع
+                </Button>
+            </Dropdown>
         </Modal>
 
         {/*Delete Modal*/}
@@ -328,7 +332,9 @@ export default function CititesPage() {
         >
         </Modal>
 
-        <Button type="primary" onClick={() => setOpen(true)}>
+        <Button
+            variant="solid" color="purple"
+             onClick={() => setOpen(true)}>
             إضافة
         </Button>
 
