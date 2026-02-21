@@ -1,17 +1,16 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, Menu, Modal, Space, Table, Tag, Upload } from "antd";
+import { AutoComplete, Button, Dropdown, Input, Modal, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { Company, useCompanyDataStore } from "../../../../stores/companiesStore/data.store";
-import { usePlacesStore } from "../../../../stores/placesStore/data.store";
-import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
+import { useTypeStore } from "../../../../stores/typesStore/data.store";
+import { Type } from "../../../../stores/types-store-interfaces";
 
 
-export default function SpecializationsPage() {
-    const { getSpecializationsData, dataSpecializations, typesForSpecialization,
-        getTypesForSpecializationData, deleteSpecialization, editSpecialization, addSpecialization } = useMedicalStore();
+export default function GroupTypesPage() {
+    const { dataGroupTypes, addGroupType, editGroupType, getGroupTypesData, deleteGroupType } = useTypeStore();
+
 
     //Add Modal
     const { TextArea } = Input;
@@ -19,7 +18,6 @@ export default function SpecializationsPage() {
     const [id, setId] = useState(0);
     const [description, setDescription] = useState("");
     const [open, setOpen] = useState(false);
-    const [governorate_id, setGovernorateId] = useState(1);
     const [searchText, setSearchText] = useState("");
 
     //Edit Modal
@@ -34,26 +32,24 @@ export default function SpecializationsPage() {
 
     //Show Modal 
     const [shownId, setShownId] = useState(0);
-    const [openShowModal, setOpenShowModal] = useState(false);
+    const [open3, setOpen3] = useState(false);
     const [loading3, setLoading3] = useState(false);
     const [items, setItems] = useState([])
-    const [typesItems, setTypesItems] = useState([])
 
 
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editSpecialization(editedId, { name: name });
+        await editGroupType(editedId, { name: name, description: description });
         setLoading(false);
         setOpenEditModal(false);
-        getSpecializationsData();
+        getGroupTypesData();
     }
 
     //addType function
     async function handleAdd() {
-        setGovernorateId(governorate_id + 1);
-        await addSpecialization({ name })
-        getSpecializationsData();
+        await addGroupType({ name, description })
+        getGroupTypesData();
         setName("");
         setSearchText("");
         setDescription("")
@@ -63,17 +59,17 @@ export default function SpecializationsPage() {
     const emptyFields = () => {
         setName("");
         setSearchText("");
-        setGovernorateId(-1);
         setDescription("")
         setOpen(false)
     }
     //editModal
     const OpenEditModal = (id: number) => {
         setEditedId(id);
-        const specialization = dataSpecializations?.find(
+        const city = dataGroupTypes?.find(
             item => item.id === id
         );
-        setName(specialization?.name || "");
+        setName(city?.name || "");
+        setDescription(city?.description || "");
         setOpenEditModal(true);
     }
     //deleteModal
@@ -82,35 +78,34 @@ export default function SpecializationsPage() {
         setOpenDeleteModal(true);
     }
     //showModal
-    const OpenShowModal = (id: number) => {
-        const specialization = dataSpecializations?.find(
+    const openShowModal = (id: number) => {
+        const groupType = dataGroupTypes?.find(
             item => item.id === id
         );
         console.log()
-        setName(specialization?.name || "");
-        setItems(specialization?.cities?.map(e => { return { key: e.id, label: e.name } }) || [])
-        getTypesForSpecializationData(specialization.id);
-        setTypesItems(typesForSpecialization.map(e => { return { key: e.id, label: e.name } }) || [])
-        setOpenShowModal(true);
+        setName(groupType?.name || "");
+        setDescription(groupType?.description || "");
+        setItems(groupType?.types?.map(e => { return { key: e.id, label: e.name } }) || [])
+        setOpen3(true);
     }
 
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteSpecialization(id);
-        getSpecializationsData();
+        await deleteGroupType(id);
+        getGroupTypesData();
         setLoading2(false);
         setOpenDeleteModal(false);
     }
 
     //downloadExcele
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataSpecializations ?? []);
+        const worksheet = XLSX.utils.json_to_sheet(dataGroupTypes ?? []);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
         XLSX.writeFile(workbook, "Cities.xlsx");
     };
-    useEffect(() => { getSpecializationsData(); }, []);
+    useEffect(() => { getGroupTypesData(); }, []);
     const columns = [
         {
             title: "الرقم",
@@ -118,19 +113,26 @@ export default function SpecializationsPage() {
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
         {
-            title: "الاختصاص",
+            title: "المجموعة",
             dataIndex: "name",
             sorter: (a: any, b: any) => a.name.localeCompare(b.name),
         },
+        ,
         {
             title: "الوصف",
-            dataIndex: "description"
+            dataIndex: "description",
+        },
+        {
+            title: "عدد الأصناف",
+            dataIndex: "types",
+            sorter: (a: any, b: any) => Number(a.types.length) - Number(a.types.length),
+            render: (value: Type[]) => { return value.map(e=><div>{e.name}</div> ) }
         },
         {
             title: "تاريخ الإضافة",
             dataIndex: "created_at",
             sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
-            render: (value: string) => { return value?.slice(0, 10) }
+            render: (value: string) => { return value.slice(0, 10) }
         },
         {
             title: "",
@@ -153,7 +155,7 @@ export default function SpecializationsPage() {
                     <Button
                         variant="solid"
                         color="cyan"
-                        onClick={() => OpenShowModal(record.id)}
+                        onClick={() => openShowModal(record.id)}
                     >
                         Show
                     </Button>
@@ -169,33 +171,26 @@ export default function SpecializationsPage() {
 
         {/*Adding Modal*/}
         <Modal
-            title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
-                    <span> إضافة اختصاص</span>
-                </div>
-            }
+            title="إضافة مجموعة جديدة"
             open={open}
             onOk={() => handleAdd()}
             okButtonProps={{ variant: "outlined", color: "purple" }}
             onCancel={() => emptyFields()}
             mask={false}
         >
-            <div >
-                <h3>
-                    اسم الاختصاص
-                </h3>
+            <div className="grid grid-cols-12 gap-2">
+                <div className="grid grid-cols-12 sm:col-span-12  col-span-12 gap-2">
+                    <div className="md:col-span-6 col-span-12">
+                        <Input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="اسم المجموعة"
+                        />
+                    </div>
+
+                </div>
             </div>
-            <Input
-                className="w-full"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الاختصاص"
-            />
-            <div>
-                <h3>
-                    الوصف
-                </h3>
-            </div>
+
             <TextArea
                 value={description}
                 style={{ maxWidth: '100%' }}
@@ -205,81 +200,62 @@ export default function SpecializationsPage() {
             />
         </Modal>
         <Modal
-            title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span> تعديل اختصاص</span>
-                </div>
-            }
+            title="تعديل مجموعة"
             open={open1}
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // spinner on OK button
+            confirmLoading={loading}   // ✅ spinner on OK button
             mask={false}
         >
-            <div>
-                <h3>
-                    اسم الاختصاص
-                </h3>
-            </div>
             <Input
-                className="w-full"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الاختصاص"
+                placeholder="اسم المجموعة"
             />
+            <TextArea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                placeholder="الوصف"
+            />
+
         </Modal>
 
         {/* Show Modal */}
         <Modal
-            title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span>تفاصيل الاختصاص</span>
-                </div>
-            }
-            open={openShowModal}
+            title="تفاصيل مجموعة"
+            open={open3}
             onOk={() => emptyFields()}
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
-            onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   //  spinner on OK button
+            onCancel={() => { setOpen3(false); emptyFields() }}
+            confirmLoading={loading}   // ✅ spinner on OK button
             mask={false}
         >
-            <div>
-                <h3>
-                    اسم الاختصاص
-                </h3>
-            </div>
             <Input
                 disabled
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الاختصاص"
+                placeholder="اسم المجموعة"
             />
-            <div>
-                <h3>
-                    الأطباء
-                </h3>
-            </div>
+            <TextArea
+                disabled
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                placeholder="الوصف"
+            />
+
             <Dropdown
                 menu={{ items: items }}
                 trigger={['click']}
             >
-                <Button className="px-4 py-2 border rounded w-full" color="cyan" variant="outlined">
-                    الأطباء
-                </Button>
-            </Dropdown>
-            <div>
-                <h3>
-                    الأصناف المناسبة
-                </h3>
-            </div>
-            <Dropdown
-                menu={{ items: typesItems }}
-                trigger={['click']}
-            >
-                <Button className="px-4 py-2 border rounded w-full" color="cyan" variant="outlined">
-                    الأصناف المناسبة
+                <Button
+                    variant="outlined"
+                    color="cyan"
+                    className="px-4 py-2 border rounded w-full">
+                    الأصناف
                 </Button>
             </Dropdown>
         </Modal>
@@ -303,6 +279,6 @@ export default function SpecializationsPage() {
 
         <Table
             scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataSpecializations} />
+            columns={columns} dataSource={dataGroupTypes} />
     </div>
 }

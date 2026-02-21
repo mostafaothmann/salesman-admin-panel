@@ -15,11 +15,19 @@ export default function SpecializationsPage() {
 
     //Add Modal
     const { TextArea } = Input;
-    const [name, setName] = useState("");
-    const [id, setId] = useState(0);
-    const [description, setDescription] = useState("");
+    const [first_name, setFirstName] = useState("");
+    const [last_name, setLastName] = useState("");
+    const [admin_description, setAdminDescription] = useState("");
+    const [salesman_description, setSalesmanDescription] = useState("");
     const [open, setOpen] = useState(false);
+    const [city_id, setCityId] = useState(1);
     const [governorate_id, setGovernorateId] = useState(1);
+    const [area_id, setAreaId] = useState(1);
+    const [street_id, setStreet] = useState(1);
+    const [specialization_id, setSpecializationI] = useState(1);
+    const [street_id, setStreet] = useState(1);
+
+
     const [searchText, setSearchText] = useState("");
 
     //Edit Modal

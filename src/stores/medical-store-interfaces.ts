@@ -76,7 +76,6 @@ export interface Doctor {
     sex: string,
     wife_husband_first_name: string;
     wife_husband_last_name: string;
-    doctorVisits: DoctorVisit[]
 }
 
 
@@ -266,8 +265,9 @@ export interface AddingPharmacist {
 }
 
 export interface AddingSpecializationType {
-    first_name: string,
-    last_name: string,
+    specialization_id: number;
+    status: string;
+    type_id: number;
 }
 
 export interface AddingSpecialization {

@@ -1,10 +1,10 @@
 "use client";
-import Checkbox from "@/components/form/input/Checkbox";
-import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
-import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
+
+import { Checkbox, Input } from "antd";
+import { ChevronLeftIcon,EyeIcon } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
+import { EyeCloseIcon } from "../../icons";
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -88,9 +88,9 @@ export default function SignUpForm() {
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* <!-- First Name --> */}
                   <div className="sm:col-span-1">
-                    <Label>
+                    <label>
                       First Name<span className="text-error-500">*</span>
-                    </Label>
+                    </label>
                     <Input
                       type="text"
                       id="fname"
@@ -100,9 +100,9 @@ export default function SignUpForm() {
                   </div>
                   {/* <!-- Last Name --> */}
                   <div className="sm:col-span-1">
-                    <Label>
+                    <label>
                       Last Name<span className="text-error-500">*</span>
-                    </Label>
+                    </label>
                     <Input
                       type="text"
                       id="lname"
@@ -113,9 +113,9 @@ export default function SignUpForm() {
                 </div>
                 {/* <!-- Email --> */}
                 <div>
-                  <Label>
+                  <label>
                     Email<span className="text-error-500">*</span>
-                  </Label>
+                  </label>
                   <Input
                     type="email"
                     id="email"
@@ -125,9 +125,9 @@ export default function SignUpForm() {
                 </div>
                 {/* <!-- Password --> */}
                 <div>
-                  <Label>
+                  <label>
                     Password<span className="text-error-500">*</span>
-                  </Label>
+                  </label>
                   <div className="relative">
                     <Input
                       placeholder="Enter your password"

@@ -15,11 +15,6 @@ import {
   GridIcon,
   GroupIcon,
   HorizontaLDots,
-  ListIcon,
-  PageIcon,
-  PieChartIcon,
-  PlugInIcon,
-  TableIcon,
   ToolCaseIcon,
   UserCircleIcon,
 } from "../icons/index";
@@ -36,23 +31,60 @@ const navItems: NavItem[] = [
 
   {
     icon: <GridIcon />,
-    name: "Dashboard",
-    subItems: [{ name: "Global Statistics", path: "/", pro: false }],
+    name: "روح الأرض",
+    subItems: [{ name: "إحصائيات عامة", path: "/", pro: false }],
+  },
+  ,
+  {
+    icon: <ToolCaseIcon />,
+    name: "الأصناف",
+    subItems: [
+      { name: "مجموعات الأصناف", path: "/group-types", pro: false },
+      { name: "الأصناف", path: "/types", pro: false },
+      { name: "حالات الشفاء", path: "/recovery-cases", pro: false },
+    ],
   },
   {
     icon: <FirstAidKitIcon />,
     name: "طبي",
     subItems: [
       { name: "اختصاصات طبية", path: "/specializations", pro: false },
+      { name: "الأطباء", path: "/doctors", pro: false },
+      { name: "الصيادلة", path: "/pharmacists", pro: false },
+      { name: "الجمعيات", path: "/associations", pro: false },
+    ],
+  }
+  ,
+  {
+    icon: <UserCircleIcon />,
+    name: "المندوبين",
+    subItems: [
+      { name: "الكل", path: "/salesman", pro: false },
+      { name: "مندوبين علميين", path: "/commercial-salesmans", pro: false },
+      { name: "مندوبين تجاريين", path: "/sientafic-salesmans", pro: false },
     ],
   }
   ,
   {
     icon: <BuildingIcon />,
-    name: "",
+    name: "online",
     subItems: [
-      { name: "الكل", path: "/salesman", pro: false },
-      { name: "مندوبين ميدانيين", path: "/field-salesman", pro: false }
+      { name: "المندوبين", path: "/salesman", pro: false },
+      { name: "زبائن", path: "/commercial-salesmans", pro: false },
+      { name: "طلبات", path: "/sientafic-salesmans", pro: false },
+    ],
+  }
+  ,
+  {
+    icon: <BuildingIcon />,
+    name: "فواتير",
+    subItems: [
+      { name: "فواتير", path: "/salesman", pro: false },
+      { name: "مرتجعات", path: "/sientafic-salesmans", pro: false },
+      { name: "فواتير أون لاين", path: "/commercial-salesmans", pro: false },
+      { name: "عروض مباعة", path: "/commercial-salesmans", pro: false },
+      { name: "منتجات مباعة", path: "/commercial-salesmans", pro: false },
+
     ],
   }
   ,

@@ -1,10 +1,11 @@
-import { DoctorSample, DoctorVisit } from "./medical-store-interfaces";
+import { DoctorSample, DoctorVisit, PharmacistSample } from "./medical-store-interfaces";
 
 // 🧩 Interfaces
 export interface GroupType {
     id: number,
     name: string,
     description: string,
+    types: Type[]
 }
 
 export interface Ingredient {
@@ -37,7 +38,7 @@ export interface RecoveryCaseImage {
 
 export interface Type {
     id: number,
-    group_type_id: number;
+    grouptype_id: number;
     name: string,
     quantity: number,
     brand: string,
@@ -45,12 +46,38 @@ export interface Type {
     price_for_piece: number;
     price_for_sale: number;
     percentage: number;
-    manufacturing_date: Date;
     type: number,
     online_percentage: number;
-    samples: DoctorSample[],
-    doctorVisits: DoctorVisit[],
-    recoveryCases: RecoveryCase[]
+}
+
+export interface Product {
+    id: number,
+    order_id: number;
+    type_id: number,
+    return_discount: number,
+    return_quantity: number,
+    price_for_piece: number;
+    base_quantity: number;
+    total_price: number;
+    total_quantity: number,
+    has_return: boolean,
+    total_percentage: number;
+}
+
+export interface OnlineProduct {
+    id: number,
+    order_id: number;
+    type_id: number,
+    quantity: number,
+    price_for_piece: number;
+    total_price: number;
+    total_percentage: number;
+}
+
+export interface BaseOffer {
+    type_id: number,
+    number_of_gifts: number;
+    number_of_pieces: number;
 }
 
 //for Adding/Edititng
@@ -95,4 +122,31 @@ export interface AddingType {
     manufacturing_date: Date;
     type: number,
     online_percentage: number;
+}
+
+export interface AddingProduct {
+    order_id: number;
+    type_id: number,
+    return_discount: number,
+    return_quantity: number,
+    price_for_piece: number;
+    base_quantity: number;
+    total_price: number;
+    total_quantity: number,
+    has_return: boolean,
+    total_percentage: number;
+}
+
+export interface AddingOnlineProduct {
+    order_id: number;
+    type_id: number,
+    quantity: number,
+    price_for_piece: number;
+    total_price: number;
+    total_percentage: number;
+}
+
+export interface AddingBaseOffer {
+    number_of_gifts: number;
+    number_of_pieces: number;
 }

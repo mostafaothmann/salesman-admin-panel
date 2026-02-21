@@ -5,9 +5,9 @@ import React from "react";
 import GridShape from "../../../../components/common/GridShape";
 
 export const metadata: Metadata = {
-  title: "Next.js Error 404 | EmaarAdmin - Next.js Dashboard Template",
+  title: "Next.js Error 404 | RohAlaradAdmin - Next.js Dashboard Template",
   description:
-    "This is Next.js Error 404 page for EmaarAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    "This is Next.js Error 404 page for RohAlaradAdmin - Next.js Tailwind CSS Admin Dashboard Template",
 };
 
 export default function Error404() {

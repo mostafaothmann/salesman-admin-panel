@@ -1,7 +1,7 @@
 // api.ts
 import axios from 'axios';
 import { useAuthStore } from './customersStore/auth.store';
-const url = `http://192.168.1.104:3000`
+const url = `http://192.168.1.103:3000`
 
 
 //for RohAlarad

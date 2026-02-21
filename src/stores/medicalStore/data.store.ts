@@ -3,15 +3,14 @@ import axios from 'axios';
 import { useAuthStore } from '../customersStore/auth.store';
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { apiCity, apiSpecialization, apiSpecializationType } from '../apis';
-import { City, Governorate, AddingCity, AddingGovernorate } from '../places-store-Interfaces';
-import { AddingSpecialization, AddingSpecializationType, SpecializationType } from '../medical-store-interfaces';
+import {  AddingSpecialization, AddingSpecializationType, Specialization, SpecializationType } from '../medical-store-interfaces';
 import { Type } from '../types-store-interfaces';
 
 
 
 interface DataStore {
-    dataSpecializations: Governorate[] | undefined;
-    specializationD: Governorate,
+    dataSpecializations: Specialization[] | undefined;
+    specializationD: Specialization,
 
     dataSpecializationTypes: SpecializationType[] | undefined;
     specializationTypeD: SpecializationType,
@@ -49,7 +48,7 @@ export const useMedicalStore = create<DataStore>()(
             typesForSpecialization:null,
             loading: false,
             error: null,
-            // Get Governorates Data
+            // Get Specializations Data
             getSpecializationsData: async () => {
                 set({ loading: true, error: null });
                 try {
@@ -270,9 +269,9 @@ export const useMedicalStore = create<DataStore>()(
             },
         }),
         {
-            name: 'places-data-storage',
+            name: 'medical-data-storage',
             storage: createJSONStorage(() => localStorage),
-            //partialize: (state) => ({ data: state.dataGovernorates })
+            //partialize: (state) => ({ data: state.dataSpecializations })
         } // AsyncStorage (React Native)
     )
 );

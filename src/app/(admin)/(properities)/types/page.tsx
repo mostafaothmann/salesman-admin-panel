@@ -1,17 +1,22 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, Menu, Modal, Space, Table, Tag, Upload } from "antd";
+import { Button, Dropdown, Input, Modal, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { Company, useCompanyDataStore } from "../../../../stores/companiesStore/data.store";
-import { usePlacesStore } from "../../../../stores/placesStore/data.store";
-import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
+import { useTypeStore } from "../../../../stores/typesStore/data.store";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 
-export default function SpecializationsPage() {
-    const { getSpecializationsData, dataSpecializations, typesForSpecialization,
-        getTypesForSpecializationData, deleteSpecialization, editSpecialization, addSpecialization } = useMedicalStore();
+export default function TypesPage() {
+    const { dataTypes, dataGroupTypes, deleteType, getTypesData, editType, addType } = useTypeStore();
+    const router = useRouter();
+    //showModal
+    const openShowModal = (id: number) => {
+        router.push(`/types/${id}`);
+    }
+
 
     //Add Modal
     const { TextArea } = Input;
@@ -19,7 +24,6 @@ export default function SpecializationsPage() {
     const [id, setId] = useState(0);
     const [description, setDescription] = useState("");
     const [open, setOpen] = useState(false);
-    const [governorate_id, setGovernorateId] = useState(1);
     const [searchText, setSearchText] = useState("");
 
     //Edit Modal
@@ -34,26 +38,24 @@ export default function SpecializationsPage() {
 
     //Show Modal 
     const [shownId, setShownId] = useState(0);
-    const [openShowModal, setOpenShowModal] = useState(false);
+    const [open3, setOpen3] = useState(false);
     const [loading3, setLoading3] = useState(false);
     const [items, setItems] = useState([])
-    const [typesItems, setTypesItems] = useState([])
 
 
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editSpecialization(editedId, { name: name });
+        await editType(editedId, { name: name, description: description });
         setLoading(false);
         setOpenEditModal(false);
-        getSpecializationsData();
+        getTypesData();
     }
 
     //addType function
     async function handleAdd() {
-        setGovernorateId(governorate_id + 1);
-        await addSpecialization({ name })
-        getSpecializationsData();
+        await addType({ name, description })
+        getTypesData();
         setName("");
         setSearchText("");
         setDescription("")
@@ -63,17 +65,17 @@ export default function SpecializationsPage() {
     const emptyFields = () => {
         setName("");
         setSearchText("");
-        setGovernorateId(-1);
         setDescription("")
         setOpen(false)
     }
     //editModal
     const OpenEditModal = (id: number) => {
         setEditedId(id);
-        const specialization = dataSpecializations?.find(
+        const type = dataTypes?.find(
             item => item.id === id
         );
-        setName(specialization?.name || "");
+        setName(type?.name || "");
+        setDescription(type?.description || "");
         setOpenEditModal(true);
     }
     //deleteModal
@@ -81,36 +83,24 @@ export default function SpecializationsPage() {
         setDelitedID(id);
         setOpenDeleteModal(true);
     }
-    //showModal
-    const OpenShowModal = (id: number) => {
-        const specialization = dataSpecializations?.find(
-            item => item.id === id
-        );
-        console.log()
-        setName(specialization?.name || "");
-        setItems(specialization?.cities?.map(e => { return { key: e.id, label: e.name } }) || [])
-        getTypesForSpecializationData(specialization.id);
-        setTypesItems(typesForSpecialization.map(e => { return { key: e.id, label: e.name } }) || [])
-        setOpenShowModal(true);
-    }
 
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteSpecialization(id);
-        getSpecializationsData();
+        await deleteType(id);
+        getTypesData();
         setLoading2(false);
         setOpenDeleteModal(false);
     }
 
     //downloadExcele
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataSpecializations ?? []);
+        const worksheet = XLSX.utils.json_to_sheet(dataTypes ?? []);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "الأصناف");
+        XLSX.writeFile(workbook, "الأصناف.xlsx");
     };
-    useEffect(() => { getSpecializationsData(); }, []);
+    useEffect(() => { getTypesData() }, []);
     const columns = [
         {
             title: "الرقم",
@@ -118,20 +108,49 @@ export default function SpecializationsPage() {
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
         {
-            title: "الاختصاص",
+            title: "الصنف",
             dataIndex: "name",
             sorter: (a: any, b: any) => a.name.localeCompare(b.name),
         },
         {
-            title: "الوصف",
-            dataIndex: "description"
+            title: "مجموعة الصنف",
+            dataIndex: "grouptype_id",
+            sorter: (a: any, b: any) => Number(a.grouptype_id) - Number(b.grouptype_id),
+            render: (value: number) => {
+                return dataGroupTypes.find(e => e.id == Number(value)).name;
+            }
+        },
+        {
+            title: "السعر",
+            dataIndex: "price_for_piece",
+        }
+        ,
+        {
+            title: "الكمية",
+            dataIndex: "quantity",
+        },
+        {
+            title: "ربح المندوب الميداني",
+            dataIndex: "percentage",
+            sorter: (a: any, b: any) => Number(a.percentage) - Number(a.percentage),
+        },
+        {
+            title: "ربح المندوب الأونلاين",
+            dataIndex: "online_percentage",
+            sorter: (a: any, b: any) => a.online_percentage.localeCompare(b.online_percentage),
         },
         {
             title: "تاريخ الإضافة",
             dataIndex: "created_at",
             sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
-            render: (value: string) => { return value?.slice(0, 10) }
+            render: (value: string) => { return value.slice(0, 10) }
         },
+        /*         {
+                    title: "تاريخ بداية التصنيع",
+                    dataIndex: "manufacturing_date",
+                    sorter: (a: any, b: any) => a.manufacturing_date.localeCompare(b.manufacturing_date),
+                    render: (value1: string) => { return value1.slice(0, 10) }
+                }, */
         {
             title: "",
             key: "id",
@@ -153,7 +172,7 @@ export default function SpecializationsPage() {
                     <Button
                         variant="solid"
                         color="cyan"
-                        onClick={() => OpenShowModal(record.id)}
+                        onClick={() => openShowModal(record.id)}
                     >
                         Show
                     </Button>
@@ -169,33 +188,26 @@ export default function SpecializationsPage() {
 
         {/*Adding Modal*/}
         <Modal
-            title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
-                    <span> إضافة اختصاص</span>
-                </div>
-            }
+            title="إضافة صنف جديد"
             open={open}
             onOk={() => handleAdd()}
             okButtonProps={{ variant: "outlined", color: "purple" }}
             onCancel={() => emptyFields()}
             mask={false}
         >
-            <div >
-                <h3>
-                    اسم الاختصاص
-                </h3>
+            <div className="grid grid-cols-12 gap-2">
+                <div className="grid grid-cols-12 sm:col-span-12  col-span-12 gap-2">
+                    <div className="md:col-span-6 col-span-12">
+                        <Input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="اسم الصنف"
+                        />
+                    </div>
+
+                </div>
             </div>
-            <Input
-                className="w-full"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الاختصاص"
-            />
-            <div>
-                <h3>
-                    الوصف
-                </h3>
-            </div>
+
             <TextArea
                 value={description}
                 style={{ maxWidth: '100%' }}
@@ -205,83 +217,51 @@ export default function SpecializationsPage() {
             />
         </Modal>
         <Modal
-            title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span> تعديل اختصاص</span>
-                </div>
-            }
+            title="تعديل الصنف"
             open={open1}
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // spinner on OK button
+            confirmLoading={loading}   // ✅ spinner on OK button
             mask={false}
         >
-            <div>
-                <h3>
-                    اسم الاختصاص
-                </h3>
-            </div>
             <Input
-                className="w-full"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الاختصاص"
+                placeholder="اسم الصنف"
             />
+            <TextArea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                placeholder="الصنف"
+            />
+
         </Modal>
 
         {/* Show Modal */}
         <Modal
-            title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span>تفاصيل الاختصاص</span>
-                </div>
-            }
-            open={openShowModal}
+            title="تفاصيل الصنف"
+            open={open3}
             onOk={() => emptyFields()}
             okButtonProps={{ variant: "outlined", color: "cyan" }}
-
-            onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   //  spinner on OK button
+            onCancel={() => { setOpen3(false); emptyFields() }}
+            confirmLoading={loading}   // ✅ spinner on OK button
             mask={false}
         >
-            <div>
-                <h3>
-                    اسم الاختصاص
-                </h3>
-            </div>
             <Input
                 disabled
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الاختصاص"
+                placeholder="اسم الصنف"
             />
-            <div>
-                <h3>
-                    الأطباء
-                </h3>
-            </div>
-            <Dropdown
-                menu={{ items: items }}
-                trigger={['click']}
-            >
-                <Button className="px-4 py-2 border rounded w-full" color="cyan" variant="outlined">
-                    الأطباء
-                </Button>
-            </Dropdown>
-            <div>
-                <h3>
-                    الأصناف المناسبة
-                </h3>
-            </div>
-            <Dropdown
-                menu={{ items: typesItems }}
-                trigger={['click']}
-            >
-                <Button className="px-4 py-2 border rounded w-full" color="cyan" variant="outlined">
-                    الأصناف المناسبة
-                </Button>
-            </Dropdown>
+            <TextArea
+                disabled
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                placeholder="الوصف"
+            />
         </Modal>
 
         {/*Delete Modal*/}
@@ -303,6 +283,6 @@ export default function SpecializationsPage() {
 
         <Table
             scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataSpecializations} />
+            columns={columns} dataSource={dataTypes} />
     </div>
 }

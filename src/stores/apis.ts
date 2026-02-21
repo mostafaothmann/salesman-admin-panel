@@ -381,7 +381,7 @@ apiSalesman.interceptors.request.use(
 
 //for GroupTypes
 export const apiGroupType = axios.create({
-  baseURL: `${url}/group_type`,
+  baseURL: `${url}/group-type`,
   headers: { 'Content-Type': 'application/json' },
 });
 

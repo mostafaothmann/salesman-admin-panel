@@ -1,5 +1,5 @@
-import SignUpForm from "@/components/auth/SignUpForm";
 import { Metadata } from "next";
+import SignUpForm from "../../../../components/auth/SignUpForm";
 
 export const metadata: Metadata = {
   title: "Next.js SignUp Page | EmaarAdmin - Next.js Dashboard Template",
