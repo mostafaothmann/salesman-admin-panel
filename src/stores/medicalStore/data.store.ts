@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import axios from 'axios';
 import { useAuthStore } from '../customersStore/auth.store';
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { apiCity, apiSpecialization, apiSpecializationType } from '../apis';
-import {  AddingSpecialization, AddingSpecializationType, Specialization, SpecializationType } from '../medical-store-interfaces';
+import { apiCity, apiDoctor, apiSpecialization, apiSpecializationType } from '../apis';
+import { AddingDoctor, AddingSpecialization, AddingSpecializationType, Doctor, FilterDoctorProps, Specialization, SpecializationType } from '../medical-store-interfaces';
 import { Type } from '../types-store-interfaces';
 
 
@@ -15,7 +15,12 @@ interface DataStore {
     dataSpecializationTypes: SpecializationType[] | undefined;
     specializationTypeD: SpecializationType,
 
-    typesForSpecialization:Type[] | undefined;
+    dataDoctors: Doctor[];
+    doctorD: Doctor;
+
+    filteredDataDoctors: Doctor[];
+
+    typesForSpecialization: Type[] | undefined;
 
     loading: boolean;
     error: string | null;
@@ -23,7 +28,7 @@ interface DataStore {
     //for Specializations
     getSpecializationsData: () => Promise<void>;
     getSpecializationData: (id: number) => Promise<void>;
-    getTypesForSpecializationData :(id:number) =>Promise <void>;
+    getTypesForSpecializationData: (id: number) => Promise<void>;
     addSpecialization: (specialization: AddingSpecialization) => Promise<void>;
     deleteSpecialization: (id: number) => Promise<void>;
     editSpecialization: (id: number, specialization: AddingSpecialization) => Promise<void>;
@@ -35,6 +40,14 @@ interface DataStore {
     deleteSpecializationType: (id: number) => Promise<void>;
     editSpecializationType: (id: number, specializationType: AddingSpecializationType) => Promise<void>;
 
+    //for Doctors
+    getDoctorsData: () => Promise<void>;
+    getDoctorData: (id: number) => Promise<void>;
+    // getVisitsForDoctor: (id: number) => Promise<void>;
+    addDoctor: (doctor: AddingDoctor) => Promise<void>;
+    deleteDoctor: (id: number) => Promise<void>;
+    editDoctor: (id: number, doctor: AddingDoctor) => Promise<void>;
+    getFilteredDataDoctors: (filters: FilterDoctorProps) => Promise<void>;
 
 }
 //gettig the token from Auth Store 
@@ -45,7 +58,7 @@ export const useMedicalStore = create<DataStore>()(
             //Specializations
             dataSpecializations: undefined,
             specializationD: null,
-            typesForSpecialization:null,
+            typesForSpecialization: null,
             loading: false,
             error: null,
             // Get Specializations Data
@@ -267,7 +280,158 @@ export const useMedicalStore = create<DataStore>()(
                     });
                 }
             },
+
+
+
+
+
+
+
+
+
+
+
+            //SpecializationTypes
+            dataDoctors: undefined,
+            doctorD: null,
+            filteredDataDoctors: undefined,
+            // Get ALL Specialization Types
+            getDoctorsData: async () => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiDoctor.get(``);
+                    const dataDoctors = res.data;
+
+                    set({ dataDoctors, loading: false });
+                    return dataDoctors;
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Loading Doctor ",
+                        loading: false,
+                    });
+                }
+            },
+
+            // Get ONE Doctor Type
+            getDoctorData: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiDoctor.get(`/${id}`);
+                    const doctorD = res.data;
+
+                    set({ doctorD, loading: false });
+                    return doctorD;
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Loading Doctor",
+                        loading: false,
+                    });
+                }
+            },
+
+
+            // Delete Doctor
+            deleteDoctor: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    await apiDoctor.delete(`/${id}`);
+
+                    set((state) => ({
+                        dataDoctors: state.dataDoctors?.filter((a) => a.id !== id
+                        ),
+                        loading: false,
+                    }));
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Deleting Doctor Type",
+                        loading: false,
+                    });
+                }
+            },
+
+            // Edit Specialization Type
+            editDoctor: async (
+                id: number,
+                doctor: AddingDoctor
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiDoctor.patch(
+                        `/${id}`,
+                        doctor
+                    );
+
+                    if (res.status === 200 || res.status === 201) {
+                        set({ loading: false });
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Editing Specialization Type",
+                        loading: false,
+                    });
+                }
+            },
+
+            // Add New Doctor Type
+            addDoctor: async (
+                doctor: AddingDoctor
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiDoctor.post(
+                        ``,
+                        doctor
+                    );
+
+                    if (res.status === 201) {
+                        set({ loading: false });
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Adding Doctor",
+                        loading: false,
+                    });
+                }
+            },
+
+            //Get Filtered Data
+            getFilteredDataDoctors: async (
+                filters: FilterDoctorProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiDoctor.post(
+                        `/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+                        const filteredDataDoctors = res.data;
+                        set({ filteredDataDoctors, loading: false });
+                        return filteredDataDoctors;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Adding Doctor",
+                        loading: false,
+                    });
+                }
+            },
+
+
         }),
+
         {
             name: 'medical-data-storage',
             storage: createJSONStorage(() => localStorage),

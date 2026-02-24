@@ -131,7 +131,7 @@ export default function AreasPage() {
             dataIndex: "city_id",
             sorter: (a: any, b: any) => Number(a.city_id) - Number(b.city_id),
             render: (value: number) => {
-                return dataCities.find(e => e.id == Number(value)).name;
+                return dataCities.find(e => e.id == Number(value))?.name;
             }
         },
         ,

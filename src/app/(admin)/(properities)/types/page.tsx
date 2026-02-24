@@ -1,12 +1,11 @@
 "use client";
 
 
-import { Button, Dropdown, Input, Modal, Space, Table } from "antd";
+import { Button, Input, Modal, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 
 export default function TypesPage() {
@@ -35,12 +34,6 @@ export default function TypesPage() {
     const [delitedID, setDelitedID] = useState(0);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [loading2, setLoading2] = useState(false);
-
-    //Show Modal 
-    const [shownId, setShownId] = useState(0);
-    const [open3, setOpen3] = useState(false);
-    const [loading3, setLoading3] = useState(false);
-    const [items, setItems] = useState([])
 
 
     //handleEdit
@@ -117,17 +110,20 @@ export default function TypesPage() {
             dataIndex: "grouptype_id",
             sorter: (a: any, b: any) => Number(a.grouptype_id) - Number(b.grouptype_id),
             render: (value: number) => {
-                return dataGroupTypes.find(e => e.id == Number(value)).name;
+                return dataGroupTypes?.find(e => e.id == Number(value))?.name;
             }
         },
         {
             title: "السعر",
             dataIndex: "price_for_piece",
+            sorter: (a: any, b: any) => Number(a.price_for_piece) - Number(b.price_for_piece),
+
         }
         ,
         {
             title: "الكمية",
             dataIndex: "quantity",
+            sorter: (a: any, b: any) => Number(a.quantity) - Number(b.quantity),
         },
         {
             title: "ربح المندوب الميداني",
@@ -172,7 +168,10 @@ export default function TypesPage() {
                     <Button
                         variant="solid"
                         color="cyan"
-                        onClick={() => openShowModal(record.id)}
+                        onClick={() => {
+                            console.log(record.id)
+                            openShowModal(record.id)
+                        }}
                     >
                         Show
                     </Button>
@@ -237,31 +236,6 @@ export default function TypesPage() {
                 placeholder="الصنف"
             />
 
-        </Modal>
-
-        {/* Show Modal */}
-        <Modal
-            title="تفاصيل الصنف"
-            open={open3}
-            onOk={() => emptyFields()}
-            okButtonProps={{ variant: "outlined", color: "cyan" }}
-            onCancel={() => { setOpen3(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
-            mask={false}
-        >
-            <Input
-                disabled
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الصنف"
-            />
-            <TextArea
-                disabled
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
         </Modal>
 
         {/*Delete Modal*/}

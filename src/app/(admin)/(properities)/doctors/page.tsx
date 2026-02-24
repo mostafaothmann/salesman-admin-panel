@@ -1,18 +1,19 @@
 "use client";
 
-
-import { AutoComplete, Button, Dropdown, Input, Menu, Modal, Space, Table, Tag, Upload } from "antd";
+import { AutoComplete, Button, DatePicker, Divider, Dropdown, Input, Menu, Modal, Slider, SliderSingleProps, Space, Table, Tag, TimePicker, TimePickerProps, Upload } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { Company, useCompanyDataStore } from "../../../../stores/companiesStore/data.store";
-import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
-
+import dayjs from 'dayjs';
+import { usePlacesStore } from "../../../../stores/placesStore/data.store";
+import { useRouter } from "next/navigation";
 
 export default function SpecializationsPage() {
-    const { getSpecializationsData, dataSpecializations, typesForSpecialization,
-        getTypesForSpecializationData, deleteSpecialization, editSpecialization, addSpecialization } = useMedicalStore();
-
+    const { getDoctorsData, filteredDataDoctors, getFilteredDataDoctors, addDoctor, deleteDoctor, getSpecializationsData, dataSpecializations, dataDoctors, doctorD } = useMedicalStore();
+    const { dataGovernorates, getGovernoratesData, getCitiesData, getAreasData, getStreetsData, dataCities, dataAreas, dataStreets } = usePlacesStore()
+    const router = useRouter();
+    const dataTable = []
+    const [filtered, setFiltered] = useState(false)
     //Add Modal
     const { TextArea } = Input;
     const [first_name, setFirstName] = useState("");
@@ -23,102 +24,300 @@ export default function SpecializationsPage() {
     const [city_id, setCityId] = useState(1);
     const [governorate_id, setGovernorateId] = useState(1);
     const [area_id, setAreaId] = useState(1);
-    const [street_id, setStreet] = useState(1);
-    const [specialization_id, setSpecializationI] = useState(1);
-    const [street_id, setStreet] = useState(1);
+    const [street_id, setStreetId] = useState(1);
+    const [specialization_id, setSpecializationId] = useState(1);
+    const [classificationId, setClassificationId] = useState(1);
+    const [loyaltyId, setLoyaltyId] = useState(0);
+    const [birth_date, setBirthDate] = useState("");
+    const [sexId, setSexId] = useState(0);
+    const [phone_number, setPhoneNumber] = useState("");
+    const [telephone_number, setTelephoneNumber] = useState("");
+    const [wife_husband_first_name, setWifeHusbandFirstName] = useState("");
+    const [wife_husband_last_name, setWifeHusbandLastName] = useState("");
+    const [graduation_university, setGraduationUniversity] = useState("");
+    const [graduation_country, setGraduationCountry] = useState("");
+    const [searchTextSpecilization, setSearchTextSpecilization] = useState("");
+    const [searchTextClassification, setSearchTextClassification] = useState("");
+    const [searchTextLoyalty, setSearchTextLoyalty] = useState("");
+    const [searchTextSex, setSearchTextSex] = useState("");
+    const [searchTextGovernorate, setSearchTextGovernorate] = useState("");
+    const [searchTextCity, setSearchTextCity] = useState("");
+    const [searchTextArea, setSearchTextArea] = useState("");
+    const [searchTextStreet, setSearchTextStreet] = useState("");
 
 
-    const [searchText, setSearchText] = useState("");
 
-    //Edit Modal
-    const [open1, setOpenEditModal] = useState(false);
-    const [editedId, setEditedId] = useState(0)
-    const [loading, setLoading] = useState(false);
+    //for AddingModal 
+    const [optionsSpecializations, setOptionsSpecializations] = useState(dataSpecializations?.map(e => { return { value: e.id, label: e.name } }));
+    const [optionsGovernorates, setOptionsGovernorates] = useState(dataGovernorates?.map(e => { return { value: e.id, label: e.name } }) || []);
+    const [optionsCities, setOptionsCities] = useState([])
+    const [optionsAreas, setOptionsAreas] = useState([])
+    const area = dataAreas?.find(
+        item => item.id === area_id)
+    const [optionsStreets, setOptionsStreets] = useState([])
+
+    const optionsSex = [
+        { value: 1, label: 'ذكر' },
+        { value: 2, label: 'أنثى' }]
+    const optionsLoyalty = [
+        { value: 1, label: 'مخلص جدا' },
+        { value: 2, label: 'مخلص' },
+        { value: 3, label: 'عادي' },
+        { value: 4, label: 'غير مخلص' },
+        { value: 5, label: 'سيء جدا' }
+    ]
+    const optionsClassification = [
+        { value: 1, label: 'مهم جدا' },
+        { value: 2, label: 'مهم' },
+        { value: 3, label: 'عادي' },
+        { value: 4, label: 'سيء' },
+        { value: 5, label: 'سيء جدا' }]
+
+    const firstStartTime = dayjs('12:08:23', 'HH:mm:ss');
+    const firstEndTime = dayjs('12:08:23', 'HH:mm:ss');
+    const secondStartTime = dayjs('12:08:23', 'HH:mm:ss');
+    const secondEndTime = dayjs('12:08:23', 'HH:mm:ss');
+    const favouriteStartTime = dayjs('12:08:23', 'HH:mm:ss');
+    const favouriteEndTime = dayjs('12:08:23', 'HH:mm:ss');
+
+    const [first_time_opening, setFirstTimeOpening] = useState(firstStartTime.toString());
+    const [first_time_closing, setFirstTimeClosing] = useState(firstEndTime.toString());
+    const [second_time_opening, setSecondTimeOpening] = useState(secondStartTime.toString());
+    const [second_time_closing, setSecondTimeClosing] = useState(secondEndTime.toString());
+    const [favourite_time_opening, setFavouriteTimeOpening] = useState(favouriteStartTime.toString());
+    const [favourite_time_closing, setFavouriteTimeClosing] = useState(favouriteEndTime.toString());
+    const onChangeFirstTimeOpening: TimePickerProps['onChange'] = (time, timeString) => {
+        setFirstTimeOpening(timeString)
+    };
+    const onChangeFirstTimeClosing: TimePickerProps['onChange'] = (time, timeString) => {
+        setFirstTimeClosing(timeString)
+    };
+    const onChangeSecondTimeOpening: TimePickerProps['onChange'] = (time, timeString) => {
+        setSecondTimeOpening(timeString)
+    };
+    const onChangeSecondTimeClosing: TimePickerProps['onChange'] = (time, timeString) => {
+        setSecondTimeClosing(timeString)
+    };
+    const onChangeFavouriteTimeOpening: TimePickerProps['onChange'] = (time, timeString) => {
+        setFavouriteTimeOpening(timeString)
+    };
+    const onChangeFavouriteTimeClosing: TimePickerProps['onChange'] = (time, timeString) => {
+        setFavouriteTimeClosing(timeString)
+    };
+
 
     //Delete Modal 
     const [delitedID, setDelitedID] = useState(0);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [loading2, setLoading2] = useState(false);
 
-    //Show Modal 
-    const [shownId, setShownId] = useState(0);
-    const [openShowModal, setOpenShowModal] = useState(false);
+    //Filter Modal 
+    const [openFilterModal, setOpenFilterModal] = useState(false);
     const [loading3, setLoading3] = useState(false);
-    const [items, setItems] = useState([])
-    const [typesItems, setTypesItems] = useState([])
 
-
-    //handleEdit
-    async function handleEdit() {
-        setLoading(true);
-        await editSpecialization(editedId, { name: name });
-        setLoading(false);
-        setOpenEditModal(false);
-        getSpecializationsData();
+    //showModal
+    const openShowModal = (id: number) => {
+        router.push(`/doctors/${id}`);
     }
 
-    //addType function
+
+    async function changeOpenModalAdd() {
+        await getSpecializationsData(); await getGovernoratesData();
+        setOptionsSpecializations(dataSpecializations?.map(e => { return { value: e.id, label: e.name } }));
+        setOptionsGovernorates(dataGovernorates?.map(e => { return { value: e.id, label: e.name } }) || []);
+        setOpen(true);
+    }
+    //addDoctor Function
     async function handleAdd() {
         setGovernorateId(governorate_id + 1);
-        await addSpecialization({ name })
-        getSpecializationsData();
-        setName("");
-        setSearchText("");
-        setDescription("")
+        setSpecializationId(specialization_id + 1);
+        setCityId(city_id + 1)
+        setAreaId(area_id + 1)
+        setStreetId(street_id + 1)
+        console.log({
+            first_name: first_name,
+            last_name: last_name,
+            favourite_time_opening: favourite_time_opening,
+            favourite_time_closing: favourite_time_closing,
+            first_work_time_opening: first_time_opening,
+            first_work_time_closing: first_time_closing,
+            second_work_time_opening: second_time_opening,
+            second_work_time_closing: second_time_closing,
+            governorate_id: governorate_id,
+            city_id: city_id,
+            street_id: street_id,
+            area_id: area_id,
+            specialization_id: specialization_id,
+            graduation_country: graduation_country,
+            graduation_university: graduation_university,
+            birth_date: birth_date,
+            classification: classificationId,
+            loyalty: loyaltyId,
+            admin_description: admin_description,
+            salesman_description: salesman_description,
+            sex: sexId,
+            wife_husband_first_name: wife_husband_first_name,
+            wife_husband_last_name: wife_husband_first_name,
+            phone_number: phone_number,
+            telephone_number: telephone_number
+        })
+        await addDoctor({
+            first_name: first_name,
+            last_name: last_name,
+            favourite_time_opening: favourite_time_opening,
+            favourite_time_closing: favourite_time_closing,
+            first_work_time_opening: first_time_opening,
+            first_work_time_closing: first_time_closing,
+            second_work_time_opening: second_time_opening,
+            second_work_time_closing: second_time_closing,
+            governorate_id: governorate_id,
+            city_id: city_id,
+            street_id: street_id,
+            area_id: area_id,
+            specialization_id: specialization_id,
+            graduation_country: graduation_country,
+            graduation_university: graduation_university,
+            birth_date: birth_date,
+            classification: classificationId,
+            loyalty: loyaltyId,
+            admin_description: admin_description,
+            salesman_description: salesman_description,
+            sex: sexId,
+            wife_husband_first_name: wife_husband_first_name,
+            wife_husband_last_name: wife_husband_first_name,
+            phone_number: phone_number,
+            telephone_number: telephone_number
+        })
+        getDoctorsData();
+        setBirthDate("");
+        setFirstName("");
+        setLastName("");
+        setGraduationUniversity("");
+        setWifeHusbandFirstName("");
+        setWifeHusbandLastName("");
+        setTelephoneNumber("");
+        setPhoneNumber("");
+        setSearchTextSpecilization("");
+        setSearchTextLoyalty("");
+        setSearchTextClassification("");
+        setSearchTextSex("");
+        setSearchTextGovernorate("");
+        setSearchTextCity("");
+        setSearchTextArea("");
+        setSearchTextStreet("");
+        setAdminDescription("");
+        setSalesmanDescription("");
         setOpen(false)
     }
+
+
     //emptyFields function
     const emptyFields = () => {
-        setName("");
-        setSearchText("");
-        setGovernorateId(-1);
-        setDescription("")
+        setFirstName("");
+        setLastName("");
+        setBirthDate("")
+        setGraduationUniversity("");
+        setWifeHusbandFirstName("")
+        setWifeHusbandLastName("")
+        setTelephoneNumber("");
+        setPhoneNumber("");
+        setSearchTextSpecilization("");
+        setSearchTextLoyalty("");
+        setSearchTextClassification("");
+        setSearchTextSex("");
+        setSearchTextGovernorate("");
+        setSearchTextCity("");
+        setSearchTextArea("");
+        setSearchTextStreet("");
+        setAdminDescription("");
+        setSalesmanDescription("");
+        setGraduationCountry("");
+        setGraduationCountry("")
         setOpen(false)
     }
-    //editModal
-    const OpenEditModal = (id: number) => {
-        setEditedId(id);
-        const specialization = dataSpecializations?.find(
-            item => item.id === id
-        );
-        setName(specialization?.name || "");
-        setOpenEditModal(true);
+
+    //Filter Modal 
+    const [filter_first_name, setFilterFirstName] = useState("")
+    const [filter_last_name, setFilterLastName] = useState("")
+    const [filter_min_age, setFilterMinAge] = useState(-1)
+    const [filter_max_age, setFilterMaxAge] = useState(101)
+    const [filter_min_classification, setFilterMinClassification] = useState(-1)
+    const [filter_max_classification, setFilterMaxClassification] = useState(6)
+    const [filter_min_loyalty, setFilterMinLoyalty] = useState(-1)
+    const [filter_max_loyalty, setFilterMaxLoyalty] = useState(6)
+    const [filter_specialization_id, setFilterSpecializationId] = useState(0)
+    const [filter_governorate_id, setFilterGovernorateId] = useState(0)
+    const [filter_city_id, setFilterCityId] = useState(0)
+    const [filter_area_id, setFilterAreaId] = useState(0)
+    const [filter_street_id, setFilterStreetId] = useState(0)
+    const marks: SliderSingleProps['marks'] = {
+        0: 'سيء جدا',
+        1: 'سيء',
+        2: 'عادي',
+        3: 'مهم',
+        5: {
+            style: {
+                color: '#f50',
+            },
+            label: <strong>مهم جدا</strong>,
+        },
+    };
+    const OpenFilterModal = () => {
+        if (!filtered) {
+            getSpecializationsData();
+            setOptionsSpecializations(dataSpecializations?.map(e => { return { value: e.id, label: e.name } }));
+            setOpenFilterModal(true);
+        }
+        else {
+            setFiltered(false);
+        }
+    }
+    const getFilteredData = () => {
+        getFilteredDataDoctors({
+            filter_first_name,
+            filter_last_name,
+            filter_max_age,
+            filter_min_age,
+            filter_min_classification,
+            filter_max_classification,
+            filter_min_loyalty,
+            filter_max_loyalty,
+            filter_governorate_id,
+            filter_area_id,
+            filter_city_id,
+            filter_specialization_id,
+            filter_street_id
+        })
+        setFiltered(true);
+    }
+    const handleFilter = () => {
+        getFilteredData();
+        setOpenFilterModal(false)
     }
     //deleteModal
     const OpenDeleteModal = (id: number) => {
         setDelitedID(id);
         setOpenDeleteModal(true);
     }
-    //showModal
-    const OpenShowModal = (id: number) => {
-        const specialization = dataSpecializations?.find(
-            item => item.id === id
-        );
-        console.log()
-        setName(specialization?.name || "");
-        setItems(specialization?.cities?.map(e => { return { key: e.id, label: e.name } }) || [])
-        getTypesForSpecializationData(specialization.id);
-        setTypesItems(typesForSpecialization.map(e => { return { key: e.id, label: e.name } }) || [])
-        setOpenShowModal(true);
-    }
 
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteSpecialization(id);
-        getSpecializationsData();
+        await deleteDoctor(id);
+        getDoctorsData();
         setLoading2(false);
         setOpenDeleteModal(false);
     }
 
     //downloadExcele
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataSpecializations ?? []);
+        const worksheet = XLSX.utils.json_to_sheet(dataDoctors ?? []);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "الأطباء");
+        XLSX.writeFile(workbook, "الأطباء.xlsx");
     };
-    useEffect(() => { getSpecializationsData(); }, []);
+    useEffect(() => { getDoctorsData(); }, []);
+
     const columns = [
         {
             title: "الرقم",
@@ -126,20 +325,73 @@ export default function SpecializationsPage() {
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
         {
+            title: "الاسم",
+            dataIndex: "first_name",
+            sorter: (a: any, b: any) => a.first_name.localeCompare(b.first_name),
+        },
+        {
+            title: "اسم العائلة",
+            dataIndex: "last_name",
+            sorter: (a: any, b: any) => a.last_name.localeCompare(b.last_name),
+        },
+        {
             title: "الاختصاص",
-            dataIndex: "name",
-            sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+            dataIndex: "specialization_id",
+            sorter: (a: any, b: any) => Number(a.specialization_id) - Number(b.specialization_id),
+            render: (value: number) => {
+                return dataSpecializations?.find(e => e.id == Number(value))?.name;
+            }
         },
         {
-            title: "الوصف",
-            dataIndex: "description"
+            title: "التصنيف",
+            dataIndex: "classification",
+            sorter: (a: any, b: any) => Number(a.classification) - Number(b.classification),
+            render: (value: number) => {
+                return optionsClassification?.find(e => e.value == Number(value))?.label;
+            }
         },
         {
-            title: "تاريخ الإضافة",
-            dataIndex: "created_at",
-            sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
-            render: (value: string) => { return value?.slice(0, 10) }
+            title: "الولاء",
+            dataIndex: "loyalty",
+            sorter: (a: any, b: any) => Number(a.loyalty) - Number(b.loyalty),
+            render: (value: number) => {
+                return optionsLoyalty?.find(e => e.value == Number(value))?.label;
+            }
         },
+        {
+            title: "المدينة",
+            dataIndex: "city_id",
+            sorter: (a: any, b: any) => Number(a.city_id) - Number(b.city_id),
+            render: (value: number) => {
+                return dataCities?.find(e => e.id == Number(value))?.name;
+            }
+        },
+        {
+            title: "المنطقة",
+            dataIndex: "area_id",
+            sorter: (a: any, b: any) => Number(a.area_id) - Number(b.area_id),
+            render: (value: number) => {
+                return dataAreas?.find(e => e.id == Number(value))?.name;
+            }
+        },
+        {
+            title: "الشارع",
+            dataIndex: "street_id",
+            sorter: (a: any, b: any) => Number(a.street_id) - Number(b.street_id),
+            render: (value: number) => {
+                return dataStreets?.find(e => e.id == Number(value))?.name;
+            }
+        },
+        {
+            title: "رقم الهاتف",
+            dataIndex: "phone_number"
+        },
+        /*  {
+             title: "تاريخ الإضافة",
+             dataIndex: "created_at",
+             sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
+             render: (value: string) => { return value?.slice(0, 10) }
+         }, */
         {
             title: "",
             key: "id",
@@ -153,15 +405,9 @@ export default function SpecializationsPage() {
                         Delete
                     </Button>
                     <Button
-                        type="default"
-                        onClick={() => { OpenEditModal(record.id); }}
-                    >
-                        Edit
-                    </Button>
-                    <Button
                         variant="solid"
                         color="cyan"
-                        onClick={() => OpenShowModal(record.id)}
+                        onClick={() => openShowModal(record.id)}
                     >
                         Show
                     </Button>
@@ -174,123 +420,494 @@ export default function SpecializationsPage() {
         <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
             تنزيل
         </Button>
+        <Button variant="solid" color="purple" onClick={() => OpenFilterModal()}>
+            فلترة
+        </Button>
+
 
         {/*Adding Modal*/}
         <Modal
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
-                    <span> إضافة اختصاص</span>
+                    <span> إضافة طبيب</span>
                 </div>
             }
             open={open}
-            onOk={() => handleAdd()}
+            onOk={() => { handleAdd(); }}
             okButtonProps={{ variant: "outlined", color: "purple" }}
             onCancel={() => emptyFields()}
             mask={false}
         >
-            <div >
-                <h3>
-                    اسم الاختصاص
-                </h3>
-            </div>
-            <Input
-                className="w-full"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الاختصاص"
-            />
-            <div>
-                <h3>
-                    الوصف
-                </h3>
-            </div>
-            <TextArea
-                value={description}
-                style={{ maxWidth: '100%' }}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
-        </Modal>
-        <Modal
-            title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span> تعديل اختصاص</span>
+            <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-6 xl:col-span-4">
+                    <h3>
+                        الاسم الأول :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={first_name}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder=" الاسم الأول "
+                    />
                 </div>
-            }
-            open={open1}
-            okButtonProps={{ variant: "outlined", color: "blue" }}
-            onOk={() => handleEdit()}
-            onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // spinner on OK button
-            mask={false}
-        >
-            <div>
-                <h3>
-                    اسم الاختصاص
-                </h3>
+                <div className="col-span-6 xl:col-span-4">
+                    <h3>
+                        الاسم الثاني :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={last_name}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder=" الاسم الثاني "
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-4">
+                    <div>
+                        <h3>
+                            الاختصاص :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsSpecializations}
+                        placeholder="الاختصاص"
+                        // what user sees & types
+                        value={searchTextSpecilization}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextSpecilization(text);
+                            setSpecializationId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+
+                            setSpecializationId(option.value);                 // ID
+                            setSearchTextSpecilization(option?.label as string);
+
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+
+                <div className="col-span-6 xl:col-span-4">
+                    <div>
+                        <h3>
+                            التصنيف :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsClassification}
+                        placeholder="التصنيف"
+                        // what user sees & types
+                        value={searchTextClassification}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextClassification(text);
+                            setClassificationId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setClassificationId(option.value);                 // ID
+                            setSearchTextClassification(option?.label as string);  // show name
+
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-12 xl:col-span-4">
+                    <h3>
+                        رقم الهاتف  :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={phone_number}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="رقم الهاتف"
+                    />
+                </div>
+
+
+                <div className="col-span-12 xl:col-span-4">
+                    <h3>
+                        رقم الأرضي  :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={telephone_number}
+                        onChange={(e) => setTelephoneNumber(e.target.value)}
+                        placeholder="  رقم الأرضي "
+                    />
+                </div>
+
+                <div className="col-span-12 xl:col-span-4">
+                    <h3>
+                        تاريخ الولادة  :
+                    </h3>
+                    <DatePicker className="w-full"
+                        value={birth_date}
+                        onChange={(e) => setBirthDate(e)}
+                        placeholder="تاريخ الولادة " />
+                </div>
+
+
+                <div className="col-span-6 xl:col-span-4">
+                    <div>
+                        <h3>
+                            الجنس :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsSex}
+                        placeholder="الجنس"
+                        // what user sees & types
+                        value={searchTextSex}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextSex(text);
+                            setSexId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setSexId(option.value);                 // ID
+                            setSearchTextSex(option?.label as string);  // show name
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+
+                <div className="col-span-6 xl:col-span-4">
+                    <div>
+                        <h3>
+                            الولاء :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsLoyalty}
+                        placeholder="الولاء"
+                        // what user sees & types
+                        value={searchTextLoyalty}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextLoyalty(text);
+                            setLoyaltyId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setLoyaltyId(option.value);                 // ID
+                            setSearchTextLoyalty(option?.label as string);  // show name
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
+                    <div className="col-span-12">
+                        <h3>
+                            موعد الدوام  الأول :
+                        </h3>
+                    </div>
+                    <div className="col-span-6 xl:col-span-6">
+                        <h4>من :</h4>
+                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeFirstTimeOpening} />
+                    </div>
+
+                    <div className="col-span-6 xl:col-span-6">
+                        <h4>إلى :</h4>
+                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeFirstTimeClosing} />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
+                    <div className="col-span-12">
+                        <h3>
+                            موعد الدوام  الثاني :
+                        </h3>
+                    </div>
+                    <div className="col-span-6 xl:col-span-6">
+                        <h3>من :</h3>
+                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeSecondTimeOpening} />
+                    </div>
+                    <div className="col-span-6 xl:col-span-6">
+                        <h4>إلى :</h4>
+                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeSecondTimeClosing} />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
+                    <div className="col-span-12">
+                        <h3>
+                            موعد الزيارة المفضل :
+                        </h3>
+                    </div>
+                    <div className="col-span-6 xl:col-span-6">
+                        <h3>من :</h3>
+                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeFavouriteTimeOpening} />
+                    </div>
+                    <div className="col-span-6 xl:col-span-6">
+                        <h4>إلى :</h4>
+                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeFavouriteTimeClosing} />
+                    </div>
+                </div>
+
+                <div className="col-span-6 xl:col-span-3">
+                    <div>
+                        <h3>
+                            المحافظة :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsGovernorates}
+                        placeholder="المحافظة"
+                        // what user sees & types
+                        value={searchTextGovernorate}
+                        // typing updates text
+                        onChange={(text) => {
+                            getCitiesData()
+                            setSearchTextGovernorate(text);
+                            setSearchTextCity("");
+                            setSearchTextArea("");
+                            setSearchTextStreet("");
+                            setGovernorateId(undefined); // clear ID while typing
+                            setCityId(undefined); // clear ID while typing
+                            setAreaId(undefined); // clear ID while typing
+                            setStreetId(undefined); // clear ID while typing
+                            const governorate = dataGovernorates?.find(
+                                item => item.id === governorate_id)
+                            setOptionsCities(governorate?.cities.map(e => { return { value: e.id, label: e.name } }) || [])
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            getCitiesData()
+                            setGovernorateId(option.value);                 // ID
+                            setSearchTextGovernorate(option?.label as string);  // show name
+                            const governorate = dataGovernorates?.find(
+                                item => item.id === governorate_id)
+                            setOptionsCities(governorate?.cities.map(e => { return { value: e.id, label: e.name } }) || [])
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-3">
+                    <div>
+                        <h3>
+                            المدينة :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsCities}
+                        placeholder="المدينة"
+                        // what user sees & types
+                        value={searchTextCity}
+                        // typing updates text
+                        onChange={(text) => {
+                            getAreasData()
+                            setSearchTextCity(text);
+                            setSearchTextArea("");
+                            setSearchTextStreet("");
+                            setCityId(undefined); // clear ID while typing
+                            setAreaId(undefined); // clear ID while typing
+                            setStreetId(undefined); // clear ID while typing
+                            const city = dataCities?.find(
+                                item => item.id === city_id)
+                            setOptionsAreas(city?.areas.map(e => { return { value: e.id, label: e.name } }) || [])
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            getAreasData()
+                            setCityId(option.value);                 // ID
+                            setSearchTextCity(option?.label as string);  // show name
+                            const city = dataCities?.find(
+                                item => item.id === city_id)
+                            setOptionsAreas(city?.areas.map(e => { return { value: e.id, label: e.name } }) || [])
+
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-3">
+                    <div>
+                        <h3>
+                            المنطقة :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsAreas}
+                        placeholder="المنطقة"
+                        // what user sees & types
+                        value={searchTextArea}
+                        // typing updates text
+                        onChange={(text) => {
+                            getStreetsData()
+                            setSearchTextArea(text);
+                            setSearchTextStreet("");
+                            setAreaId(undefined); // clear ID while typing
+                            setStreetId(undefined); // clear ID while typing
+                            const area = dataAreas?.find(
+                                item => item.id === area_id)
+                            setOptionsStreets(area?.streets.map(e => { return { value: e.id, label: e.name } }) || [])
+
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            getStreetsData()
+                            setAreaId(option.value);                 // ID
+                            setSearchTextArea(option?.label as string);  // show name
+                            const area = dataAreas?.find(
+                                item => item.id === area_id)
+                            setOptionsStreets(area?.streets.map(e => { return { value: e.id, label: e.name } }) || [])
+
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-3">
+                    <div>
+                        <h3>
+                            الشارع :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsStreets}
+                        placeholder="الشارع"
+                        // what user sees & types
+                        value={searchTextStreet}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextStreet(text);
+                            setStreetId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setStreetId(option.value);                 // ID
+                            setSearchTextStreet(option?.label as string);  // show name
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-6">
+                    <h3>
+                        بلد التخرج:
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={graduation_country}
+                        onChange={(e) => setGraduationCountry(e.target.value)}
+                        placeholder="بلد التخرج"
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-6">
+                    <h3>
+                        جامعة التخرج:
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={graduation_university}
+                        onChange={(e) => setGraduationUniversity(e.target.value)}
+                        placeholder="جامعة التخرج"
+                    />
+                </div>
+
+
+                <div className="col-span-6 xl:col-span-6">
+                    <h3>
+                        اسم الزوج/الزوجة الأول:
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={wife_husband_first_name}
+                        onChange={(e) => setWifeHusbandFirstName(e.target.value)}
+                        placeholder="اسم الزوج/الزوجة الأول"
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-6">
+                    <h3>
+                        اسم الزوج/الزوجة الثاني:
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={wife_husband_last_name}
+                        onChange={(e) => setWifeHusbandLastName(e.target.value)}
+                        placeholder="اسم الزوج/الزوجة الثاني"
+                    />
+                </div>
+
+                <div className="col-span-12">
+                    <h3>
+                        وصف الإدارة :
+                    </h3>
+                    <TextArea
+                        value={admin_description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setAdminDescription(e.target.value)}
+                        rows={4}
+                        placeholder="وصف الإدارة"
+                    />
+                </div>
+
+                <div className="col-span-12">
+                    <h3>
+                        وصف المندوبين :
+                    </h3>
+                    <TextArea
+                        value={salesman_description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setSalesmanDescription(e.target.value)}
+                        rows={4}
+                        placeholder="وصف المندوبين"
+                    />
+                </div>
             </div>
-            <Input
-                className="w-full"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الاختصاص"
-            />
         </Modal>
 
-        {/* Show Modal */}
-        <Modal
-            title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span>تفاصيل الاختصاص</span>
-                </div>
-            }
-            open={openShowModal}
-            onOk={() => emptyFields()}
-            okButtonProps={{ variant: "outlined", color: "cyan" }}
-
-            onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   //  spinner on OK button
-            mask={false}
-        >
-            <div>
-                <h3>
-                    اسم الاختصاص
-                </h3>
-            </div>
-            <Input
-                disabled
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الاختصاص"
-            />
-            <div>
-                <h3>
-                    الأطباء
-                </h3>
-            </div>
-            <Dropdown
-                menu={{ items: items }}
-                trigger={['click']}
-            >
-                <Button className="px-4 py-2 border rounded w-full" color="cyan" variant="outlined">
-                    الأطباء
-                </Button>
-            </Dropdown>
-            <div>
-                <h3>
-                    الأصناف المناسبة
-                </h3>
-            </div>
-            <Dropdown
-                menu={{ items: typesItems }}
-                trigger={['click']}
-            >
-                <Button className="px-4 py-2 border rounded w-full" color="cyan" variant="outlined">
-                    الأصناف المناسبة
-                </Button>
-            </Dropdown>
-        </Modal>
 
         {/*Delete Modal*/}
         <Modal
@@ -305,12 +922,92 @@ export default function SpecializationsPage() {
         >
         </Modal>
 
-        <Button variant="solid" color="purple" onClick={() => setOpen(true)}>
+        {/*Filter Modal*/}
+        <Modal
+            title="فلترة النتائج"
+            open={openFilterModal}
+            onOk={() => handleFilter()}
+            onCancel={() => setOpenFilterModal(false)}
+            confirmLoading={loading3}
+            mask={false}
+
+            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+        >
+
+            <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-6 xl:col-span-4">
+                    <h3>
+                        الاسم الأول :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={filter_first_name}
+                        onChange={(e) => setFilterFirstName(e.target.value)}
+                        placeholder=" الاسم الأول "
+                    />
+                </div>
+                <div className="col-span-6 xl:col-span-4">
+                    <h3>
+                        الاسم الثاني :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={filter_last_name}
+                        onChange={(e) => setFilterLastName(e.target.value)}
+                        placeholder=" الاسم الثاني "
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-4">
+                    <div>
+                        <h3>
+                            الاختصاص :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsSpecializations}
+                        placeholder="الاختصاص"
+                        // what user sees & types
+                        value={searchTextSpecilization}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextSpecilization(text);
+                            setFilterSpecializationId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setFilterSpecializationId(option.value);                 // ID
+                            setSearchTextSpecilization(option?.label as string);
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+
+                <div className="col-span-12 xl:col-span-12">
+                    <div>
+                        <h3>
+                            التصنيف :
+                        </h3>
+                    </div>
+                    <Slider min={0} max={5} range marks={marks} step={1} defaultValue={[0, 4]} />
+
+                </div>
+            </div>
+        </Modal>
+
+        <Button variant="solid" color="purple" onClick={() => changeOpenModalAdd()}>
             إضافة
         </Button>
 
         <Table
             scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataSpecializations} />
+            columns={columns}
+            dataSource={filtered ? filteredDataDoctors : dataDoctors} />
     </div>
 }

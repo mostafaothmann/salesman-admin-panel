@@ -7,6 +7,7 @@ import * as XLSX from "xlsx";
 import { Company, useCompanyDataStore } from "../../../../stores/companiesStore/data.store";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
+import { Doctor } from "../../../../stores/medical-store-interfaces";
 
 
 export default function SpecializationsPage() {
@@ -88,7 +89,7 @@ export default function SpecializationsPage() {
         );
         console.log()
         setName(specialization?.name || "");
-        setItems(specialization?.cities?.map(e => { return { key: e.id, label: e.name } }) || [])
+        setItems(specialization?.doctors?.map(e => { return { key: e.id, label: e.first_name } }) || [])
         getTypesForSpecializationData(specialization.id);
         setTypesItems(typesForSpecialization.map(e => { return { key: e.id, label: e.name } }) || [])
         setOpenShowModal(true);
@@ -121,6 +122,12 @@ export default function SpecializationsPage() {
             title: "الاختصاص",
             dataIndex: "name",
             sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+        },
+        {
+            title: "عدد الأطباء",
+            dataIndex: "doctors",
+            sorter: (a: any, b: any) => Number(a.types.length) - Number(a.types.length),
+            render: (value: Doctor[]) => { return value.length }
         },
         {
             title: "الوصف",

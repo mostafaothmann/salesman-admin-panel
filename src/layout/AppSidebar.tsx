@@ -77,6 +77,15 @@ const navItems: NavItem[] = [
   ,
   {
     icon: <BuildingIcon />,
+    name: "الزيارات",
+    subItems: [
+      { name: "زيارات الأطباء", path: "/doctors-visits", pro: false },
+      { name: "زيارات الصيادلة", path: "/pharmacists-visits", pro: false },
+    ],
+  }
+  ,
+  {
+    icon: <BuildingIcon />,
     name: "فواتير",
     subItems: [
       { name: "فواتير", path: "/salesman", pro: false },
@@ -346,7 +355,7 @@ const AppSidebar: React.FC = () => {
                   }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
+                 "nothing"
                 ) : (
                   <HorizontaLDots />
                 )}
