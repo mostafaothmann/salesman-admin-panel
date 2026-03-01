@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Button, Input, Modal, Space, Table } from "antd";
+import { AutoComplete, Button, DatePicker, Input, InputNumber, Modal, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
@@ -9,21 +9,53 @@ import { useRouter } from "next/navigation";
 
 
 export default function TypesPage() {
-    const { dataTypes, dataGroupTypes, deleteType, getTypesData, editType, addType } = useTypeStore();
+    const { dataTypes, dataGroupTypes, getGroupTypesData, deleteType, getTypesData, editType, addType } = useTypeStore();
     const router = useRouter();
     //showModal
     const openShowModal = (id: number) => {
         router.push(`/types/${id}`);
     }
 
-
     //Add Modal
     const { TextArea } = Input;
     const [name, setName] = useState("");
     const [id, setId] = useState(0);
-    const [description, setDescription] = useState("");
+    const [admin_description, setAdminDescription] = useState("");
+    const [salesman_description, setSalesmanDescription] = useState("");
     const [open, setOpen] = useState(false);
     const [searchText, setSearchText] = useState("");
+    const [searchTextBrand, setSearchTextBrand] = useState("");
+    const [searchTextType, setSearchTextType] = useState("");
+
+    const [brand, setBrand] = useState("");
+    const [quantity, setQuantity] = useState(0);
+    const [percentage, setPercentage] = useState(0);
+    const [online_percentage, setOnlinePercentage] = useState(0);
+    const [price_for_sale, setPriceForSale] = useState(0)
+    const [price_for_piece, setPriceForPiece] = useState(0)
+    const [manufacturing_date, setManufacturingDate] = useState("");
+    const [grouptype_id, setGroupTypeId] = useState(0)
+    const [type, setType] = useState(0)
+
+    const [optionsGroupTypes, setOptionsGroupTypes] = useState(dataGroupTypes?.map(e => { return { value: e.id, label: e.name } }));
+    const optionsBrand = [
+        { value: 'روح الأرض', label: 'روح الأرض' },
+        { value: 'كوزيت', label: 'كوزيت' },
+        { value: "ماكس بيل", label: "ماكس بيل" },
+    ]
+
+    const optionsType = [
+        { value: 1, label: 'أونلاين' },
+        { value: 2, label: 'ميداني' },
+        { value: 3, label: 'ميداني و أونلاين' },
+        { value: 4, label: 'غير مصنف حاليا' },
+    ]
+
+    async function changeOpenModalAdd() {
+        await getGroupTypesData();
+        setOptionsGroupTypes(dataGroupTypes?.map(e => { return { value: e.id, label: e.name } }));
+        setOpen(true);
+    }
 
     //Edit Modal
     const [open1, setOpenEditModal] = useState(false);
@@ -36,30 +68,44 @@ export default function TypesPage() {
     const [loading2, setLoading2] = useState(false);
 
 
-    //handleEdit
+/*     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editType(editedId, { name: name, description: description });
+        await editType(editedId, { name: name });
         setLoading(false);
         setOpenEditModal(false);
         getTypesData();
-    }
+    } */
 
     //addType function
     async function handleAdd() {
-        await addType({ name, description })
+        console.log(
+            {
+                name, admin_description, grouptype_id,salesman_description,
+                brand: searchTextBrand, type, manufacturing_date, quantity,
+                percentage, price_for_piece, price_for_sale,
+                online_percentage
+            }
+        )
+        await addType({
+            name, admin_description, salesman_description, grouptype_id,
+            brand, type, manufacturing_date, quantity,
+            percentage, price_for_piece, price_for_sale,
+            online_percentage
+        })
         getTypesData();
-        setName("");
-        setSearchText("");
-        setDescription("")
+        emptyFields();
         setOpen(false)
     }
     //emptyFields function
     const emptyFields = () => {
         setName("");
         setSearchText("");
-        setDescription("")
-        setOpen(false)
+        setSearchTextBrand("");
+        setAdminDescription("");
+        setSalesmanDescription("");
+        setBrand("");
+        setOpen(false);
     }
     //editModal
     const OpenEditModal = (id: number) => {
@@ -68,7 +114,7 @@ export default function TypesPage() {
             item => item.id === id
         );
         setName(type?.name || "");
-        setDescription(type?.description || "");
+        setAdminDescription(type?.admin_description || "");
         setOpenEditModal(true);
     }
     //deleteModal
@@ -117,7 +163,6 @@ export default function TypesPage() {
             title: "السعر",
             dataIndex: "price_for_piece",
             sorter: (a: any, b: any) => Number(a.price_for_piece) - Number(b.price_for_piece),
-
         }
         ,
         {
@@ -159,12 +204,12 @@ export default function TypesPage() {
                     >
                         Delete
                     </Button>
-                    <Button
+                  {/*   <Button
                         type="default"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
                         Edit
-                    </Button>
+                    </Button> */}
                     <Button
                         variant="solid"
                         color="cyan"
@@ -195,27 +240,221 @@ export default function TypesPage() {
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
-                <div className="grid grid-cols-12 sm:col-span-12  col-span-12 gap-2">
-                    <div className="md:col-span-6 col-span-12">
-                        <Input
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="اسم الصنف"
-                        />
-                    </div>
-
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        اسم الصنف :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم الصنف"
+                    />
                 </div>
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        مجموعة الصنف :
+                    </h3>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsGroupTypes}
+                        placeholder="مجموعة الصنف"
+                        // what user sees & types
+                        value={searchText}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchText(text);
+                            setGroupTypeId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setGroupTypeId(option.value);                 // ID
+                            setSearchText(option?.label as string);  // show name
+                        }}
+
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        براند الصنف :
+                    </h3>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsBrand}
+                        placeholder="براند الصنف"
+
+                        // what user sees & types
+                        value={searchTextBrand}
+
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextBrand(text);
+                            setBrand(text);
+                        }}
+
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setBrand(option.value);                 // ID
+                            setSearchTextBrand(option?.label as string);  // show name
+                        }}
+
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        الكمية  :
+                    </h3>
+                    <InputNumber
+                        value={quantity}
+                        type={"number"}
+                        style={{ width: '100%' }}
+                        min={0}
+                        onChange={(e) => setQuantity(e)}
+                        placeholder="الكمية"
+                    />
+                </div>
+
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        تكلفة الإنتاج  :
+                    </h3>
+                    <InputNumber
+                        value={price_for_piece}
+                        type={"number"}
+                        style={{ width: '100%' }}
+                        min={0}
+                        onChange={(e) => setPriceForPiece(e)}
+                        placeholder="نسبة المندوب"
+                    />
+                </div>
+
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        سعر المبيع :
+                    </h3>
+                    <InputNumber
+                        value={price_for_sale}
+                        type={"number"}
+                        style={{ width: '100%' }}
+                        min={0}
+                        onChange={(e) => setPriceForSale(e)}
+                        placeholder="نسبة المندوب"
+                    />
+                </div>
+
+
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        نسبة المندوب  :
+                    </h3>
+                    <InputNumber
+                        value={percentage}
+                        type={"number"}
+                        style={{ width: '100%' }}
+                        min={0}
+                        onChange={(e) => setPercentage(e)}
+                        placeholder="نسبة المندوب"
+                    />
+                </div>
+
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        نسبة المندوب الأونلاين :
+                    </h3>
+                    <InputNumber
+                        value={online_percentage}
+                        type={"number"}
+                        style={{ width: '100%' }}
+                        min={0}
+                        onChange={(e) => setOnlinePercentage(e)}
+                        placeholder="نسبة المندوب الأونلاين"
+                    />
+                </div>
+
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        تاريخ بداية الصنع :
+                    </h3>
+                    <DatePicker className="w-full"
+                        style={{ width: '100%' }}
+                        value={manufacturing_date}
+                        onChange={(e) => setManufacturingDate(e)}
+                        placeholder="تاريخ بداية الصنع" />
+                </div>
+
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        مجموعة الصنف :
+                    </h3>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsType}
+                        placeholder="مجموعة الصنف"
+                        // what user sees & types
+                        value={searchTextType}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextType(text);
+                            setType(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setType(option.value);                 // ID
+                            setSearchTextType(option?.label as string);  // show name
+                        }}
+
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-12">
+                    <h3>
+                        وصف المندوبين :
+                    </h3>
+                    <TextArea
+                        value={salesman_description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setSalesmanDescription(e.target.value)}
+                        rows={4}
+                        placeholder="وصف المندوبين"
+                    />
+                </div>
+
+                <div className="col-span-12 ">
+                    <h3>
+                        وصف الإدارة :
+                    </h3>
+                    <TextArea
+                        value={admin_description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setAdminDescription(e.target.value)}
+                        rows={4}
+                        placeholder="وصف الإدارة"
+                    />
+                </div>
+
             </div>
 
-            <TextArea
-                value={description}
-                style={{ maxWidth: '100%' }}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
+
         </Modal>
-        <Modal
+
+     {/*    <Modal
             title="تعديل الصنف"
             open={open1}
             okButtonProps={{ variant: "outlined", color: "blue" }}
@@ -236,7 +475,7 @@ export default function TypesPage() {
                 placeholder="الصنف"
             />
 
-        </Modal>
+        </Modal> */}
 
         {/*Delete Modal*/}
         <Modal
@@ -251,7 +490,7 @@ export default function TypesPage() {
         >
         </Modal>
 
-        <Button variant="solid" color="purple" onClick={() => setOpen(true)}>
+        <Button variant="solid" color="purple" onClick={() => changeOpenModalAdd()}>
             إضافة
         </Button>
 

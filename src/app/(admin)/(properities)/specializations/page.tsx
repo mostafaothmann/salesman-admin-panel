@@ -1,11 +1,9 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, Menu, Modal, Space, Table, Tag, Upload } from "antd";
+import { Button, Dropdown, Input, Modal, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { Company, useCompanyDataStore } from "../../../../stores/companiesStore/data.store";
-import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
 import { Doctor } from "../../../../stores/medical-store-interfaces";
 
@@ -91,7 +89,7 @@ export default function SpecializationsPage() {
         setName(specialization?.name || "");
         setItems(specialization?.doctors?.map(e => { return { key: e.id, label: e.first_name } }) || [])
         getTypesForSpecializationData(specialization.id);
-        setTypesItems(typesForSpecialization.map(e => { return { key: e.id, label: e.name } }) || [])
+        setTypesItems(typesForSpecialization?.map(e => { return { key: e.id, label: e.name } }) || [])
         setOpenShowModal(true);
     }
 

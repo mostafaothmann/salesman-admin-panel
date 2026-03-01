@@ -1,10 +1,9 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, Menu, Modal, Space, Table, Tag, Upload } from "antd";
+import { AutoComplete, Button,  Modal, Table,  Space, Input } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { Company, useCompanyDataStore } from "../../../../stores/companiesStore/data.store";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 
 
@@ -38,7 +37,7 @@ export default function StreetsPage() {
     const [items, setItems] = useState([])
 
     //options for Area auto complete
-    const options = dataAreas.map(e => { return { value: e.id, label: e.name } })
+    const options = dataAreas?.map(e => { return { value: e.id, label: e.name } })
 
     //handleEdit
     async function handleEdit() {
@@ -77,8 +76,8 @@ export default function StreetsPage() {
         );
         setName(street?.name || "");
         setDescription(street?.description || "");
-        dataStreets.find(e => e.id == Number(street?.id))?.area_id
-        setSearchText(dataAreas.find(e => e.id == dataStreets.find(e => e.id == Number(street?.id))?.area_id).name)
+        dataStreets?.find(e => e.id == Number(street?.id))?.area_id
+        setSearchText(dataAreas?.find(e => e.id == dataStreets?.find(e => e.id == Number(street?.id))?.area_id).name)
         setOpenEditModal(true);
     }
     //deleteModal
@@ -132,7 +131,7 @@ export default function StreetsPage() {
             dataIndex: "area_id",
             sorter: (a: any, b: any) => Number(a.area_id) - Number(b.area_id),
             render: (value: number) => {
-                return dataAreas.find(e => e.id == Number(value)).name;
+                return dataAreas?.find(e => e.id == Number(value))?.name;
             }
         },
         ,

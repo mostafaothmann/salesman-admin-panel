@@ -7,12 +7,18 @@ import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
 import dayjs from 'dayjs';
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 import { useRouter } from "next/navigation";
+import Map from "../../../../sharedComponents/maps/map/Map";
 
-export default function SpecializationsPage() {
-    const { getDoctorsData, filteredDataDoctors, getFilteredDataDoctors, addDoctor, deleteDoctor, getSpecializationsData, dataSpecializations, dataDoctors, doctorD } = useMedicalStore();
+export default function DoctorsPage() {
+    const { getDoctorsData, filteredDataDoctors, filter_total, total, lastPage, getFilteredDataDoctors, addDoctor, deleteDoctor, getSpecializationsData, dataSpecializations, dataDoctors, doctorD } = useMedicalStore();
     const { dataGovernorates, getGovernoratesData, getCitiesData, getAreasData, getStreetsData, dataCities, dataAreas, dataStreets } = usePlacesStore()
     const router = useRouter();
-    const dataTable = []
+    //table constants
+    const [page, setPage] = useState(1)
+    const [filter_page, setFilterPage] = useState(1)
+    const [limit, setLimit] = useState(10)
+    const [pageSize, setPageSize] = useState(10)
+
     const [filtered, setFiltered] = useState(false)
     //Add Modal
     const { TextArea } = Input;
@@ -106,6 +112,14 @@ export default function SpecializationsPage() {
     };
 
 
+
+    //Location Modal 
+    const [locationId, setlocationId] = useState(0);
+    const [openLocationModal, setOpenLocationModal] = useState(false);
+    // const [loading4, setLoading4] = useState(false);
+    const [lan, setLan] = useState(0);
+    const [lat, setLat] = useState(0);
+
     //Delete Modal 
     const [delitedID, setDelitedID] = useState(0);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -120,13 +134,13 @@ export default function SpecializationsPage() {
         router.push(`/doctors/${id}`);
     }
 
-
     async function changeOpenModalAdd() {
         await getSpecializationsData(); await getGovernoratesData();
         setOptionsSpecializations(dataSpecializations?.map(e => { return { value: e.id, label: e.name } }));
         setOptionsGovernorates(dataGovernorates?.map(e => { return { value: e.id, label: e.name } }) || []);
         setOpen(true);
     }
+
     //addDoctor Function
     async function handleAdd() {
         setGovernorateId(governorate_id + 1);
@@ -134,33 +148,6 @@ export default function SpecializationsPage() {
         setCityId(city_id + 1)
         setAreaId(area_id + 1)
         setStreetId(street_id + 1)
-        console.log({
-            first_name: first_name,
-            last_name: last_name,
-            favourite_time_opening: favourite_time_opening,
-            favourite_time_closing: favourite_time_closing,
-            first_work_time_opening: first_time_opening,
-            first_work_time_closing: first_time_closing,
-            second_work_time_opening: second_time_opening,
-            second_work_time_closing: second_time_closing,
-            governorate_id: governorate_id,
-            city_id: city_id,
-            street_id: street_id,
-            area_id: area_id,
-            specialization_id: specialization_id,
-            graduation_country: graduation_country,
-            graduation_university: graduation_university,
-            birth_date: birth_date,
-            classification: classificationId,
-            loyalty: loyaltyId,
-            admin_description: admin_description,
-            salesman_description: salesman_description,
-            sex: sexId,
-            wife_husband_first_name: wife_husband_first_name,
-            wife_husband_last_name: wife_husband_first_name,
-            phone_number: phone_number,
-            telephone_number: telephone_number
-        })
         await addDoctor({
             first_name: first_name,
             last_name: last_name,
@@ -188,7 +175,7 @@ export default function SpecializationsPage() {
             phone_number: phone_number,
             telephone_number: telephone_number
         })
-        getDoctorsData();
+        getDoctorsData(page, limit);
         setBirthDate("");
         setFirstName("");
         setLastName("");
@@ -272,10 +259,12 @@ export default function SpecializationsPage() {
             setFiltered(false);
         }
     }
-    const getFilteredData = () => {
+    const getFilteredData = (page: number, limit: number) => {
         getFilteredDataDoctors({
             filter_first_name,
             filter_last_name,
+            page,
+            limit,
             filter_max_age,
             filter_min_age,
             filter_min_classification,
@@ -291,7 +280,7 @@ export default function SpecializationsPage() {
         setFiltered(true);
     }
     const handleFilter = () => {
-        getFilteredData();
+        getFilteredData(page, limit);
         setOpenFilterModal(false)
     }
     //deleteModal
@@ -304,10 +293,23 @@ export default function SpecializationsPage() {
     async function handleDelete(id: number) {
         setLoading2(true);
         await deleteDoctor(id);
-        getDoctorsData();
+        getDoctorsData(page, limit);
         setLoading2(false);
         setOpenDeleteModal(false);
     }
+
+
+    //location 
+    async function OpenLocationModal(id: number) {
+        const doctor = dataDoctors.find(e => e.id == id)
+        console.log(doctor)
+        console.log(id)
+        setLan(Number(doctor?.lan));
+        setLat(Number(doctor?.lat));
+        // setLoading4(true);
+        setOpenLocationModal(true);
+    }
+
 
     //downloadExcele
     const downloadExcel = () => {
@@ -316,7 +318,7 @@ export default function SpecializationsPage() {
         XLSX.utils.book_append_sheet(workbook, worksheet, "الأطباء");
         XLSX.writeFile(workbook, "الأطباء.xlsx");
     };
-    useEffect(() => { getDoctorsData(); }, []);
+    useEffect(() => { getDoctorsData(page, limit); }, []);
 
     const columns = [
         {
@@ -397,12 +399,20 @@ export default function SpecializationsPage() {
             key: "id",
             render: (_: any, record: any) => (
                 <Space size="middle">
+
                     <Button
                         type="default"
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
                         Delete
+                    </Button>
+                    <Button
+                        type="primary"
+                        variant="outlined"
+                        onClick={() => { OpenLocationModal(record.id); }}
+                    >
+                        Location
                     </Button>
                     <Button
                         variant="solid"
@@ -697,7 +707,7 @@ export default function SpecializationsPage() {
                             setStreetId(undefined); // clear ID while typing
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
-                            setOptionsCities(governorate?.cities.map(e => { return { value: e.id, label: e.name } }) || [])
+                            setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
                         // when user selects from dropdown
                         onSelect={(value, option) => {
@@ -706,7 +716,7 @@ export default function SpecializationsPage() {
                             setSearchTextGovernorate(option?.label as string);  // show name
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
-                            setOptionsCities(governorate?.cities.map(e => { return { value: e.id, label: e.name } }) || [])
+                            setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
                         filterOption={(inputValue, option) =>
                             (option?.label as string)
@@ -739,7 +749,7 @@ export default function SpecializationsPage() {
                             setStreetId(undefined); // clear ID while typing
                             const city = dataCities?.find(
                                 item => item.id === city_id)
-                            setOptionsAreas(city?.areas.map(e => { return { value: e.id, label: e.name } }) || [])
+                            setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
                         // when user selects from dropdown
                         onSelect={(value, option) => {
@@ -748,7 +758,7 @@ export default function SpecializationsPage() {
                             setSearchTextCity(option?.label as string);  // show name
                             const city = dataCities?.find(
                                 item => item.id === city_id)
-                            setOptionsAreas(city?.areas.map(e => { return { value: e.id, label: e.name } }) || [])
+                            setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
 
                         }}
                         filterOption={(inputValue, option) =>
@@ -780,7 +790,7 @@ export default function SpecializationsPage() {
                             setStreetId(undefined); // clear ID while typing
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
-                            setOptionsStreets(area?.streets.map(e => { return { value: e.id, label: e.name } }) || [])
+                            setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
 
                         }}
                         // when user selects from dropdown
@@ -790,7 +800,7 @@ export default function SpecializationsPage() {
                             setSearchTextArea(option?.label as string);  // show name
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
-                            setOptionsStreets(area?.streets.map(e => { return { value: e.id, label: e.name } }) || [])
+                            setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
 
                         }}
                         filterOption={(inputValue, option) =>
@@ -922,6 +932,21 @@ export default function SpecializationsPage() {
         >
         </Modal>
 
+
+        {/*Location Modal*/}
+        <Modal
+            title="الموقع"
+            open={openLocationModal}
+            onOk={() => setOpenLocationModal(false)}
+            onCancel={() => setOpenLocationModal(false)}
+            // confirmLoading={loading4}
+            mask={false}
+            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+        >
+            <Map lan={lan} lat={lat}></Map>
+        </Modal>
+
+
         {/*Filter Modal*/}
         <Modal
             title="فلترة النتائج"
@@ -1004,10 +1029,38 @@ export default function SpecializationsPage() {
         <Button variant="solid" color="purple" onClick={() => changeOpenModalAdd()}>
             إضافة
         </Button>
-
-        <Table
+        {filtered ? <Table
             scroll={{ x: "max-content" }}
             columns={columns}
-            dataSource={filtered ? filteredDataDoctors : dataDoctors} />
+            pagination={{
+                current: filter_page,
+                pageSize: limit,
+                total: filter_total,
+                onChange: (page, pageSize) => {
+                    setFilterPage(filter_page)
+                    getFilteredData(page, pageSize)
+                    // setPage(lastPage)
+                },
+            }}
+            dataSource={filteredDataDoctors || []} />
+            :
+            <Table
+                scroll={{ x: "max-content" }}
+                columns={columns}
+                pagination={{
+                    current: page,
+                    pageSize: limit,
+                    total: total,
+                    onChange: (page, pageSize) => {
+                        getDoctorsData(page, pageSize);
+                        setPage(page)
+                        // setPage(lastPage)
+                    },
+                }}
+                dataSource={dataDoctors || []} />
+        }
+
+
+
     </div>
 }

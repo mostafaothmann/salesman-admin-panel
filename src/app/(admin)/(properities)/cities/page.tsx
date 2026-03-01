@@ -1,10 +1,9 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, Menu, Modal, Space, Table, Tag, Upload } from "antd";
+import { AutoComplete, Button, Dropdown, Input,  Modal, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { Company, useCompanyDataStore } from "../../../../stores/companiesStore/data.store";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 
 
@@ -38,7 +37,7 @@ export default function CititesPage() {
     const [items, setItems] = useState([])
 
     //options for Governorate auto complete
-    const options = dataGovernorates.map(e => { return { value: e.id, label: e.name } })
+    const options = dataGovernorates?.map(e => { return { value: e.id, label: e.name } })
 
     //handleEdit
     async function handleEdit() {
@@ -75,9 +74,8 @@ export default function CititesPage() {
         );
         setName(city?.name || "");
         setDescription(city?.description || "");
-        console.log(city?.id)
-        dataCities.find(e => e.id == Number(city?.id))?.governorate_id
-        setSearchText(dataGovernorates.find(e => e.id == dataCities.find(e => e.id == Number(city?.id))?.governorate_id).name)
+        dataCities?.find(e => e.id == Number(city?.id))?.governorate_id
+        setSearchText(dataGovernorates?.find(e => e.id == dataCities?.find(e => e.id == Number(city?.id))?.governorate_id).name)
         setOpenEditModal(true);
     }
     //deleteModal
@@ -90,10 +88,8 @@ export default function CititesPage() {
         const city = dataCities?.find(
             item => item.id === id
         );
-        console.log()
         setName(city?.name || "");
         setDescription(city?.description || "");
-        console.log(city)
         setItems(city?.areas?.map(e => { return { key: e.id, label: e.name } }) || [])
         setOpen3(true);
     }
@@ -132,7 +128,7 @@ export default function CititesPage() {
             dataIndex: "governorate_id",
             sorter: (a: any, b: any) => Number(a.governorate_id) - Number(b.governorate_id),
             render: (value: number) => {
-                return dataGovernorates.find(e => e.id == Number(value)).name;
+                return dataGovernorates?.find(e => e.id == Number(value)).name;
             }
         },
         ,

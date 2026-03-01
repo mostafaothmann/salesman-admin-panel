@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import axios from 'axios';
 import { useAuthStore } from '../customersStore/auth.store';
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { apiCity, apiDoctor, apiSpecialization, apiSpecializationType } from '../apis';
-import { AddingDoctor, AddingSpecialization, AddingSpecializationType, Doctor, FilterDoctorProps, Specialization, SpecializationType } from '../medical-store-interfaces';
+import { apiCity, apiDoctor, apiPharmacist, apiSpecialization, apiSpecializationType } from '../apis';
+import { AddingDoctor, AddingPharmacist, AddingSpecialization, AddingSpecializationType, Doctor, FilterDoctorProps, FilterPharmacistProps, Pharmacist, Specialization, SpecializationType } from '../medical-store-interfaces';
 import { Type } from '../types-store-interfaces';
 
 
@@ -17,13 +17,19 @@ interface DataStore {
 
     dataDoctors: Doctor[];
     doctorD: Doctor;
-
     filteredDataDoctors: Doctor[];
-
     typesForSpecialization: Type[] | undefined;
+
+
+    dataPharmacists: Pharmacist[];
+    pharmacistD: Pharmacist;
+    filteredDataPharmacisits: Pharmacist[];
 
     loading: boolean;
     error: string | null;
+    total: number,
+    filter_total: number,
+    lastPage: number,
 
     //for Specializations
     getSpecializationsData: () => Promise<void>;
@@ -41,13 +47,22 @@ interface DataStore {
     editSpecializationType: (id: number, specializationType: AddingSpecializationType) => Promise<void>;
 
     //for Doctors
-    getDoctorsData: () => Promise<void>;
+    getDoctorsData: (page: number, limit: number) => Promise<void>;
     getDoctorData: (id: number) => Promise<void>;
     // getVisitsForDoctor: (id: number) => Promise<void>;
     addDoctor: (doctor: AddingDoctor) => Promise<void>;
     deleteDoctor: (id: number) => Promise<void>;
     editDoctor: (id: number, doctor: AddingDoctor) => Promise<void>;
     getFilteredDataDoctors: (filters: FilterDoctorProps) => Promise<void>;
+
+    //for Pharmacists
+    getPharmacistsData: (page: number, limit: number) => Promise<void>;
+    getPharmacistData: (id: number) => Promise<void>;
+    // getVisitsForDoctor: (id: number) => Promise<void>;
+    addPharmacist: (doctor: AddingPharmacist) => Promise<void>;
+    deletePharmacist: (id: number) => Promise<void>;
+    editPharmacist: (id: number, doctor: AddingPharmacist) => Promise<void>;
+    getFilteredDataPharmacists: (filters: FilterPharmacistProps) => Promise<void>;
 
 }
 //gettig the token from Auth Store 
@@ -61,6 +76,9 @@ export const useMedicalStore = create<DataStore>()(
             typesForSpecialization: null,
             loading: false,
             error: null,
+            total: 0,
+            filter_total: 0,
+            lastPage: 1,
             // Get Specializations Data
             getSpecializationsData: async () => {
                 set({ loading: true, error: null });
@@ -296,13 +314,20 @@ export const useMedicalStore = create<DataStore>()(
             doctorD: null,
             filteredDataDoctors: undefined,
             // Get ALL Specialization Types
-            getDoctorsData: async () => {
+            getDoctorsData: async (page: number, limit: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiDoctor.get(``);
-                    const dataDoctors = res.data;
-
-                    set({ dataDoctors, loading: false });
+                    const res = await apiDoctor.get(``, {
+                        params: {
+                            page,
+                            limit,
+                        }
+                    });
+                    const dataDoctors = res.data.data;
+                    const total = res.data.total
+                    const lastPage = res.data.lastPage
+                    console.log(res.data)
+                    set({ dataDoctors, loading: false, total: total, lastPage });
                     return dataDoctors;
                 } catch (err: any) {
                     set({
@@ -415,8 +440,12 @@ export const useMedicalStore = create<DataStore>()(
                         filters
                     );
                     if (res.status === 201) {
-                        const filteredDataDoctors = res.data;
-                        set({ filteredDataDoctors, loading: false });
+                        console.log(res.data)
+
+                        const filteredDataDoctors = res.data.data;
+                        const filter_total = res.data.total;
+
+                        set({ filteredDataDoctors, loading: false, filter_total });
                         return filteredDataDoctors;
                     }
                 } catch (err: any) {
@@ -429,6 +458,158 @@ export const useMedicalStore = create<DataStore>()(
                 }
             },
 
+
+
+
+
+
+
+            //Pharmacists
+            dataPharmacists: undefined,
+            pharmacistD: null,
+            filteredDataPharmacisits: undefined,
+            // Get ALL Pharmacists
+            getPharmacistsData: async (page: number, limit: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiPharmacist.get(``, {
+                        params: {
+                            page,
+                            limit,
+                        }
+                    });
+                    const dataPharmacists = res.data.data;
+                    const total = res.data.total
+                    const lastPage = res.data.lastPage
+                    console.log(res.data)
+                    set({ dataPharmacists, loading: false, total: total, lastPage });
+                    return dataPharmacists;
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Loading Pharmacist ",
+                        loading: false,
+                    });
+                }
+            },
+
+            // Get ONE Pharmacist Type
+            getPharmacistData: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiPharmacist.get(`/${id}`);
+                    const pharmacistD = res.data;
+
+                    set({ pharmacistD, loading: false });
+                    return pharmacistD;
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Loading Pharmacist",
+                        loading: false,
+                    });
+                }
+            },
+
+
+            // Delete Pharmacist
+            deletePharmacist: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    await apiPharmacist.delete(`/${id}`);
+
+                    set((state) => ({
+                        dataPharmacists: state.dataPharmacists?.filter((a) => a.id !== id
+                        ),
+                        loading: false,
+                    }));
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Deleting Pharmacist",
+                        loading: false,
+                    });
+                }
+            },
+
+            // Edit Pharmacist Type
+            editPharmacist: async (
+                id: number,
+                doctor: AddingPharmacist
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiDoctor.patch(
+                        `/${id}`,
+                        doctor
+                    );
+
+                    if (res.status === 200 || res.status === 201) {
+                        set({ loading: false });
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Editing Pharmacist ",
+                        loading: false,
+                    });
+                }
+            },
+
+            // Add New Pharmacist Type
+            addPharmacist: async (
+                pharmacist: AddingPharmacist
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiPharmacist.post(
+                        ``,
+                        pharmacist
+                    );
+
+                    if (res.status === 201) {
+                        set({ loading: false });
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Adding Pharmacist",
+                        loading: false,
+                    });
+                }
+            },
+
+            //Get Filtered Data
+            getFilteredDataPharmacists: async (
+                filters: FilterPharmacistProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiDoctor.post(
+                        `/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+                        console.log(res.data)
+                        const filteredDataPharmacisits = res.data.data;
+                        const filter_total = res.data.total;
+                        set({ filteredDataPharmacisits, loading: false, filter_total });
+                        return filteredDataPharmacisits;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Adding Pharmacist",
+                        loading: false,
+                    });
+                }
+            },
 
         }),
 

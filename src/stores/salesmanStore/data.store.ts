@@ -10,7 +10,7 @@ interface DataStore {
     loading: boolean;
     salesmanD: Salesman,
     error: string | null;
-    getSalesmanData: () => Promise<void>;
+    getSalesmansData: () => Promise<void>;
 }
 //gettig the token from Auth Store 
 export const useSalesmanDataStore = create<DataStore>()(
@@ -21,7 +21,7 @@ export const useSalesmanDataStore = create<DataStore>()(
             loading: false,
             error: null,
             // Get Properties Data
-            getSalesmanData: async () => {
+            getSalesmansData: async () => {
                 set({ loading: true, error: null });
                 try {
                     const res = await apiSalesman.get(``);
@@ -30,7 +30,7 @@ export const useSalesmanDataStore = create<DataStore>()(
                     return dataSalesmans
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || 'Error Loading Properties',
+                        error: err.response?.data?.message || 'Error Loading Salesmans',
                         loading: false,
                     });
                 }
@@ -51,7 +51,7 @@ export const useSalesmanDataStore = create<DataStore>()(
                     }
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || 'Error Loading Properties',
+                        error: err.response?.data?.message || 'Error Posting Salesman',
                         loading: false,
                     });
                 }

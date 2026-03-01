@@ -1,6 +1,6 @@
 "use client";
 
-export default function SalesmansPage() {
+export default function ProductsPage() {
     return <div>
 
     </div>

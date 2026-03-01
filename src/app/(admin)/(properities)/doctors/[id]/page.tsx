@@ -4,15 +4,15 @@ import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 
 import { useMedicalStore } from "../../../../../stores/medicalStore/data.store";
-import { TypeSpecializationsChart } from "../../../../../sharedComponents/pagesComponents/typeSpecializationsChart/TypeSpecializationsChart";
 import { Button, Tabs } from "antd";
+import { TypeSpecializations } from "../../../../../sharedComponents/pagesComponents/typePage/typeSpecializations/TypeSpecializations";
 export default function DoctorPage() {
     const params = useParams()
     const router = useRouter()
 
     const tabsItems = [{
         label: <div>الاختصاصات </div>, key: "0",
-        children: <TypeSpecializationsChart id={Number(params.id)}></TypeSpecializationsChart>
+        children: <TypeSpecializations id={Number(params.id)}></TypeSpecializations>
     },/*
     {
         label: <div>زيارات الأطباء بالصنف</div>, key: "1",

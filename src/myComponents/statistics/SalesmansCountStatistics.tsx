@@ -3,11 +3,12 @@ import React, { useEffect } from "react";
 import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from "../../icons";
 import { useCustomerDataStore } from "../../stores/customersStore/data.store";
 import { Badge } from "antd";
+import { useSalesmanDataStore } from "../../stores/salesmanStore/data.store";
 
 
-export default  function  CustomerCountStatistics (){
-  const {dataCustomers,getCustomersData} =useCustomerDataStore();
-  useEffect(() => {getCustomersData();}, []);
+export default  function  SalesmansCountStatistics (){
+  const {getSalesmansData,dataSalesmans} =useSalesmanDataStore();
+  useEffect(() => {getSalesmansData();}, []);
   return (
 <div className="w-full grid grid-cols-4 gap-4 sm:grid-cols-2 md:gap-6">
       {/* <!-- Metric Item Start --> */}
@@ -19,10 +20,10 @@ export default  function  CustomerCountStatistics (){
         <div className="flex items-end justify-between mt-5">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              Customers
+              المندوبين
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              {dataCustomers?.length }
+              {dataSalesmans?.length }
             </h4>
           </div>
           <Badge color="success">

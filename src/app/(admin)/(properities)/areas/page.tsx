@@ -4,7 +4,6 @@
 import { AutoComplete, Button, Dropdown, Input, Menu, Modal, Space, Table, Tag, Upload } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { Company, useCompanyDataStore } from "../../../../stores/companiesStore/data.store";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 
 
@@ -37,7 +36,7 @@ export default function AreasPage() {
     const [loading3, setLoading3] = useState(false);
     const [items, setItems] = useState([])
     //options for Cities auto complete
-    const options = dataCities.map(e => { return { value: e.id, label: e.name } })
+    const options = dataCities?.map(e => { return { value: e.id, label: e.name } })
 
     //handleEdit
     async function handleEdit() {
@@ -76,8 +75,8 @@ export default function AreasPage() {
         setName(area?.name || "");
         setDescription(area?.description || "");
         console.log(area?.id)
-        dataAreas.find(e => e.id == Number(area?.id))?.city_id
-        setSearchText(dataCities.find(e => e.id == dataAreas.find(e => e.id == Number(area?.id))?.city_id).name)
+        dataAreas?.find(e => e.id == Number(area?.id))?.city_id
+        setSearchText(dataCities?.find(e => e.id == dataAreas?.find(e => e.id == Number(area?.id))?.city_id).name)
         setOpenEditModal(true);
     }
     //deleteModal
@@ -131,7 +130,7 @@ export default function AreasPage() {
             dataIndex: "city_id",
             sorter: (a: any, b: any) => Number(a.city_id) - Number(b.city_id),
             render: (value: number) => {
-                return dataCities.find(e => e.id == Number(value))?.name;
+                return dataCities?.find(e => e.id == Number(value))?.name;
             }
         },
         ,
@@ -148,7 +147,6 @@ export default function AreasPage() {
         },
         {
             title: "",
-            fixed: "right",
             key: "id",
             render: (_: any, record: any) => (
                 <Space size="middle">

@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import axios from 'axios';
 import { useAuthStore } from '../customersStore/auth.store';
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { apiGroupType, apiType } from '../apis';
-import { AddingGroupType, AddingType, BaseOffer, GroupType, Ingredient, OnlineProduct, Product, RecoveryCase, Type } from '../types-store-interfaces';
+import { apiGroupType, apiIngredient, apiType } from '../apis';
+import { AddingGroupType, AddingIngredient, AddingType, BaseOffer, GroupType, Ingredient, OnlineProduct, Product, RecoveryCase, Type } from '../types-store-interfaces';
 import { Doctor, DoctorSample, Pharmacist, PharmacistSample, Specialization } from '../medical-store-interfaces';
 
 
@@ -24,6 +24,11 @@ interface DataStore {
     dataOnlinProductsForType: OnlineProduct[],
     dataBaseOffersForType: BaseOffer[],
     dataRecoveryCasesForType: RecoveryCase[],
+
+    dataTypesForIngredient: any[],
+    dataIngredients: Ingredient[],
+    ingredientD: Ingredient,
+
     loading: boolean;
     error: string | null;
 
@@ -37,9 +42,18 @@ interface DataStore {
     // for Types
     getTypesData: () => Promise<void>;
     getTypeData: (id: number) => Promise<void>;
-    addType: (groupType: AddingGroupType) => Promise<void>;
+    addType: (type: AddingType) => Promise<void>;
     deleteType: (id: number) => Promise<void>;
-    editType: (id: number, groupType: AddingGroupType) => Promise<void>;
+    editType: (id: number, type: AddingType) => Promise<void>;
+
+    // for Ingredients
+    getIngredientsData: () => Promise<void>;
+    getIngredientData: (id: number) => Promise<void>;
+    addIngredient: (type: AddingIngredient) => Promise<void>;
+    deleteIngredient: (id: number) => Promise<void>;
+    editIngredient: (id: number, groupType: AddingIngredient) => Promise<void>;
+    getTypesForIngredient: (id: number) => Promise<void>;
+
     //for other relations 
     getSpecializationForType: (id: number) => Promise<void>;
     getDoctorsVisitsForType: (id: number) => Promise<void>;
@@ -389,9 +403,113 @@ export const useTypeStore = create<DataStore>()(
                 }
             },
 
+
+
+
+
+
+            // Ingredients
+            dataIngredients: undefined,
+            dataTypesForIngredient: undefined,
+            ingredientD: null,
+
+
+            getIngredientsData: async () => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiIngredient.get(``);
+                    const dataIngredients = res.data;
+                    set({ dataIngredients, loading: false });
+                    return dataIngredients;
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Loading dataIngredients',
+                        loading: false,
+                    });
+                }
+            },
+
+            getIngredientData: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiIngredient.get(`/${id}`);
+                    const ingredientD = res.data;
+                    set({ ingredientD, loading: false });
+                    return ingredientD;
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Loading ingredientD',
+                        loading: false,
+                    });
+                }
+            },
+
+
+            deleteIngredient: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    await apiIngredient.delete(`/${id}`);
+                    set((state) => ({
+                        dataIngredients: state.dataIngredients?.filter((a) => a.id !== id),
+                        loading: false,
+                    }));
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Deleting GroupType',
+                        loading: false,
+                    });
+                }
+            },
+
+            editIngredient: async (id: number, ingredient: AddingIngredient) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiIngredient.patch(`/${id}`, ingredient);
+                    if (res.status != 201) { }
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Loading GroupType',
+                        loading: false,
+                    });
+                }
+            },
+
+            addIngredient: async (ingredient: AddingIngredient) => {
+                set({ loading: true, error: null });
+                try {
+                    if (ingredient !== null) {
+                        const res = await apiIngredient.post(``, ingredient);
+                        set({ loading: false });
+                        if (res.status == 201) { }
+                    }
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Adding Ingredient',
+                        loading: false,
+                    });
+                }
+            },
+
+            getTypesForIngredient: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiIngredient.get(`/types/${id}`);
+                    const dataTypesForIngredient = res.data;
+                    console.log(res)
+                    set({ dataTypesForIngredient, loading: false });
+                    return dataTypesForIngredient;
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Loading Types For Ingredients',
+                        loading: false,
+                    });
+                }
+            },
+
+
         }),
         {
-            name: 'places-data-storage',
+            name: 'types-data-storage',
             storage: createJSONStorage(() => localStorage),
             //partialize: (state) => ({ data: state.dataGovernorates })
         } // AsyncStorage (React Native)

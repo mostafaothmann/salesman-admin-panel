@@ -11,7 +11,8 @@ export interface GroupType {
 export interface Ingredient {
     id: number,
     name: string,
-    description: string,
+    salesman_description: string,
+    admin_description: string,
     quantity: number,
 }
 
@@ -26,8 +27,8 @@ export interface RecoveryCase {
     id: number,
     description: string,
     type_id: number,
-    end_treatment: Date,
-    start_treatment: Date,
+    end_treatment: string,
+    start_treatment: string,
 }
 
 export interface RecoveryCaseImage {
@@ -39,11 +40,13 @@ export interface RecoveryCaseImage {
 export interface Type {
     id: number,
     grouptype_id: number;
+    salesman_description: string;
+    admin_description: string,
     name: string,
     quantity: number,
     brand: string,
-    description: string,
     price_for_piece: number;
+    manufacturing_date: string;
     price_for_sale: number;
     percentage: number;
     type: number,
@@ -88,7 +91,8 @@ export interface AddingGroupType {
 
 export interface AddingIngredient {
     name: string,
-    description: string,
+    admin_description: string,
+    salesman_description: string,
     quantity: number,
 }
 
@@ -101,8 +105,8 @@ export interface AddingTypeIngredient {
 export interface AddingRecoveryCase {
     description: string,
     type_id: number,
-    end_treatment: Date,
-    start_treatment: Date,
+    end_treatment: string,
+    start_treatment: string,
 }
 
 export interface AddingRecoveryCaseImage {
@@ -111,15 +115,16 @@ export interface AddingRecoveryCaseImage {
 }
 
 export interface AddingType {
-    group_type_id: number;
+    grouptype_id: number;
     name: string,
     quantity: number,
     brand: string,
-    description: string,
+    salesman_description: string;
+    admin_description: string,
     price_for_piece: number;
     price_for_sale: number;
     percentage: number;
-    manufacturing_date: Date;
+    manufacturing_date: string;
     type: number,
     online_percentage: number;
 }

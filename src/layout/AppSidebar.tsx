@@ -41,6 +41,7 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "مجموعات الأصناف", path: "/group-types", pro: false },
       { name: "الأصناف", path: "/types", pro: false },
+      { name: "المكونات", path: "/ingredients", pro: false },
       { name: "حالات الشفاء", path: "/recovery-cases", pro: false },
     ],
   },
@@ -355,7 +356,7 @@ const AppSidebar: React.FC = () => {
                   }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                 "nothing"
+                  "nothing"
                 ) : (
                   <HorizontaLDots />
                 )}

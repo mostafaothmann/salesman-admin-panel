@@ -126,7 +126,7 @@ export default function GroupTypesPage() {
             title: "عدد الأصناف",
             dataIndex: "types",
             sorter: (a: any, b: any) => Number(a.types.length) - Number(a.types.length),
-            render: (value: Type[]) => { return value.map(e=><div>{e.name}</div> ) }
+            render: (value: Type[]) => { return value?.map(e=><div>{e.name}</div> ) }
         },
         {
             title: "تاريخ الإضافة",
