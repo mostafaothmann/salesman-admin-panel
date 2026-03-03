@@ -78,6 +78,7 @@ export interface OnlineProduct {
 }
 
 export interface BaseOffer {
+    id:number,
     type_id: number,
     number_of_gifts: number;
     number_of_pieces: number;

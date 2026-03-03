@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
-import { useAuthStore } from '../customersStore/auth.store';
+import { useAuthStore } from '../usersStore/auth.store';
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { apiGroupType, apiIngredient, apiType } from '../apis';
 import { AddingGroupType, AddingIngredient, AddingType, BaseOffer, GroupType, Ingredient, OnlineProduct, Product, RecoveryCase, Type } from '../types-store-interfaces';

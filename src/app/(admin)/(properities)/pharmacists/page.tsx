@@ -7,12 +7,18 @@ import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
 import dayjs from 'dayjs';
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 import { useRouter } from "next/navigation";
-import Map from "../../../../sharedComponents/maps/map/Map";
+
+import dynamic from "next/dynamic";
+
 
 export default function PharmacistsPage() {
     const { getPharmacistData, getPharmacistsData, total, filter_total, filteredDataPharmacisits, getFilteredDataPharmacists, dataPharmacists, pharmacistD, deletePharmacist, addPharmacist, editPharmacist } = useMedicalStore();
     const { dataGovernorates, getGovernoratesData, getCitiesData, getAreasData, getStreetsData, dataCities, dataAreas, dataStreets } = usePlacesStore()
     const router = useRouter();
+    const Map = dynamic(
+        () => import("../../../../sharedComponents/maps/map/Map"),
+        { ssr: false }
+    );
     //table constants
     const [page, setPage] = useState(1)
     const [filter_page, setFilterPage] = useState(1)
@@ -986,8 +992,6 @@ export default function PharmacistsPage() {
                 }}
                 dataSource={dataPharmacists || []} />
         }
-
-
 
     </div>
 }

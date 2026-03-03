@@ -6,7 +6,7 @@ import { useMedicalStore } from "../../stores/medicalStore/data.store";
 
 export default function DoctorsCountStatistics() {
   const { dataDoctors, getDoctorsData } = useMedicalStore();
-  useEffect(() => { getDoctorsData() }, [])
+  //useEffect(() => { getDoctorsData(p) }, [])
   return (
     <div className="w-full grid grid-cols-4 gap-4 sm:grid-cols-2 md:gap-6">
       {/* <!-- Metric Item Start --> */}

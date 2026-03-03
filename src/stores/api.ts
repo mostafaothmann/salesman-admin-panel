@@ -1,6 +1,6 @@
 // api.ts
 import axios from 'axios';
-import { useAuthStore } from './customersStore/auth.store';
+import { useAuthStore } from './usersStore/auth.store';
 const url = `http://192.168.1.103:3000`
 
 

@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
 import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from "../../icons";
-import { useCustomerDataStore } from "../../stores/customersStore/data.store";
 import { Badge } from "antd";
 import { useSalesmanDataStore } from "../../stores/salesmanStore/data.store";
 

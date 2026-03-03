@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 import { apiCPO, apiProperty, apiTypeOfOwnering, apiTypeOfProperty, apiTypeOfWork } from '../api';
-import { useAuthStore } from '../customersStore/auth.store';
+import { useAuthStore } from '../usersStore/auth.store';
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { apiArea, apiBuilding, apiCity, apiGovernorate, apiStreet } from '../apis';
 import { Area, City, Governorate, Street, AddingArea, AddingBuilding, AddingCity, AddingGovernorate, AddingStreet } from '../places-store-Interfaces';

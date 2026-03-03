@@ -329,52 +329,6 @@ apiSalesman.interceptors.request.use(
  */
 
 
-//for DoctorSamples
-export const apiDoctorSample = axios.create({
-  baseURL: `${url}/doctor-sample`,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-/*
- // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
-  (config) => {
-    const token = useAuthStore.getState().authData?.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      delete config.headers.Authorization;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
- */
-
-
-//for PharmacistSamples
-export const apiPharmacistSample = axios.create({
-  baseURL: `${url}/pharmacist-sample`,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-/*
- // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
-  (config) => {
-    const token = useAuthStore.getState().authData?.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      delete config.headers.Authorization;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
- */
-
-
 
 //APIs for types store
 
@@ -518,5 +472,392 @@ apiSalesman.interceptors.request.use(
   (error) => Promise.reject(error)
 );
  */
+
+
+
+//for Assistant
+export const apiAssistant = axios.create({
+  baseURL: `${url}/assistant`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+//for Order
+export const apiOrder = axios.create({
+  baseURL: `${url}/order`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+//for Online Order
+export const apiOnlineOrder = axios.create({
+  baseURL: `${url}/online-order`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+//for Product
+export const apiProduct = axios.create({
+  baseURL: `${url}/product`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+//for Online Product
+export const apiOnlineProduct = axios.create({
+  baseURL: `${url}/online-product`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+//for Product
+export const apiOffer = axios.create({
+  baseURL: `${url}/offer`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+//for Online Product
+export const apiOnlineOffer = axios.create({
+  baseURL: `${url}/online-offer`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+//for Online Product
+export const apiBaseOffer = axios.create({
+  baseURL: `${url}/base-offer`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+
+
+//for Online Product
+export const apiOnlineCustomer = axios.create({
+  baseURL: `${url}/online-customer`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+//for Hospital Doctor
+export const apiHospitalDoctor = axios.create({
+  baseURL: `${url}/hospital-doctor`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+
+//for Hospital Pharmacist
+export const apiHospitalPharmacist = axios.create({
+  baseURL: `${url}/hospital-pharmacist`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+
+
+//for Sample Pharmacist
+export const apiSamplePharmacist = axios.create({
+  baseURL: `${url}/hospital-pharmacist`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+
+//for Sample Doctor
+export const apiSampleDoctor = axios.create({
+  baseURL: `${url}/hospital-pharmacist`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+
+
+//for Association Pharmacist
+export const apiِAssociationPharmacist = axios.create({
+  baseURL: `${url}/hospital-pharmacist`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+
+//for Association Doctor
+export const apiِAssociationDoctor = axios.create({
+  baseURL: `${url}/hospital-pharmacist`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesman.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+
+
+
+
+
+
 
 

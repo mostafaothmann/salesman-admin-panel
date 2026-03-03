@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 export default function FieldSalesmanPage() {
   //store
-  const { getSalesmanData, dataSalesmans } = useSalesmanDataStore()
+  const { getSalesmansData, dataSalesmans } = useSalesmanDataStore()
 
   //columns for field salesmans
   const columns = [
@@ -31,7 +31,7 @@ export default function FieldSalesmanPage() {
   const [open, setOpen] = useState(false);
 
 
-  useEffect(() => { getSalesmanData(); }, []);
+  useEffect(() => { getSalesmansData(); }, []);
   const onClose = () => {
     setOpen(false);
   };
@@ -41,8 +41,8 @@ export default function FieldSalesmanPage() {
   };
 
   //add Salesamn Function
-  const addSalesman =()=>{
-       
+  const addSalesman = () => {
+
   }
 
   return <div>

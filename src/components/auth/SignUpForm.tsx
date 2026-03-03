@@ -1,7 +1,7 @@
 "use client";
 
 import { Checkbox, Input } from "antd";
-import { ChevronLeftIcon,EyeIcon } from "lucide-react";
+import { ChevronLeftIcon, EyeIcon } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { EyeCloseIcon } from "../../icons";
@@ -150,8 +150,7 @@ export default function SignUpForm() {
                   <Checkbox
                     className="w-5 h-5"
                     checked={isChecked}
-                    onChange={setIsChecked}
-                  />
+                    onChange={(e) => setIsChecked(e.target.checked)} />
                   <p className="inline-block font-normal text-gray-500 dark:text-gray-400">
                     By creating an account means you agree to the{" "}
                     <span className="text-gray-800 dark:text-white/90">

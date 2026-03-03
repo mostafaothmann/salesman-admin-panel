@@ -3,13 +3,15 @@
 
 import { Type } from "./types-store-interfaces";
 
-export interface DoctorSample {
+export interface SampleDoctor {
     id: number,
     doctor_visit_id: number,
     quantity: number,
 }
 
-export interface PharmacistSample {
+
+
+export interface SamplePharmacist {
     id: number,
     pharmacist_visit_id: number,
     quantity: number,
@@ -27,7 +29,7 @@ export interface DoctorVisit {
     photo: string,
     closest_pharmacy: string,
     number_of_patients: number,
-    samples: DoctorSample[]
+    samples: SampleDoctor[]
 }
 
 
@@ -42,7 +44,7 @@ export interface PharmacistVisit {
     is_other_spoken_note: boolean,
     photo: string,
     number_of_patients: number,
-    samples: PharmacistSample[]
+    samples: SamplePharmacist[]
 }
 
 export interface Doctor {
@@ -177,6 +179,94 @@ export interface DoctorPharmacist {
     pharmacist_id: number,
 }
 
+export interface Hospital {
+    id: number;
+
+    lan?: string;
+    lat?: string;
+
+    phone_number?: string;
+    telephone_number?: string;
+
+    governorate_id: number;
+    city_id?: number;
+    area_id?: number;
+    street_id?: number;
+
+    salesman_description?: string;
+    admin_description?: string;
+}
+
+export interface Mall {
+    id: number;
+    lan?: string;
+    lat?: string;
+    phone_number?: string;
+    telephone_number?: string;
+    governorate_id: number;
+    city_id?: number;
+    area_id?: number;
+    street_id?: number;
+    salesman_description?: string;
+    admin_description?: string;
+}
+
+export interface AddingMall {
+    lan?: string;
+    lat?: string;
+    phone_number?: string;
+    telephone_number?: string;
+    governorate_id: number;
+    city_id?: number;
+    area_id?: number;
+    street_id?: number;
+    salesman_description?: string;
+    admin_description?: string;
+}
+
+export interface HospitalPharmacist {
+    id: number;
+    status: string;
+    pharmacist_id: number;
+    hospital_id: number;
+}
+
+export interface AddingHospitalPharmacist {
+    status: string;
+    pharmacist_id: number;
+    hospital_id: number;
+}
+
+export interface HospitalDoctor {
+    id: number;
+    status: string;
+    doctor_id: number;
+    hospital_id: number;
+}
+
+export interface AddingHospitalDoctor {
+    status: string;
+    doctor_id: number;
+    hospital_id: number;
+}
+
+export interface AddingHospital {
+
+    lan?: string;
+    lat?: string;
+
+    phone_number?: string;
+    telephone_number?: string;
+
+    governorate_id: number;
+    city_id?: number;
+    area_id?: number;
+    street_id?: number;
+
+    salesman_description?: string;
+    admin_description?: string;
+}
+
 export interface AssociationDoctor {
     id: number,
     doctor_id: number,
@@ -205,12 +295,12 @@ export interface Association {
 
 //for Adding/Edititng
 
-export interface AddingDoctorSample {
+export interface AddingSampleDoctor {
     doctor_visit_id: number,
     quantity: number,
 }
 
-export interface AddingPharmacistSample {
+export interface AddingSamplePharmacist {
     pharmacist_visit_id: number,
     quantity: number,
 }
@@ -226,7 +316,7 @@ export interface AddingDoctorVisit {
     photo: string,
     closest_pharmacy: string,
     number_of_patients: number,
-    samples: DoctorSample[]
+    samples: SampleDoctor[]
 }
 
 export interface AddingPharmacistVisit {
@@ -279,6 +369,8 @@ export interface AddingDoctor {
 export interface AddingPharmacist {
     governorate_id: number,
     city_id: number,
+    phone_number: string,
+    telephone_number: string,
     area_id: number,
     street_id: number,
     //   building_id:number,
@@ -286,10 +378,7 @@ export interface AddingPharmacist {
     last_name: string,
     classification: number,
     loyalty: number,
-    last_visit_note: string,
-    last_visit_date: Date,
     birth_date: string,
-    average_patients_per_day: number,
     admin_description: string,
     salesman_description: string,
     favourite_time_opening: string,
@@ -298,10 +387,8 @@ export interface AddingPharmacist {
     first_work_time_closing: string,
     second_work_time_opening: string,
     second_work_time_closing: string,
-    photo: string,
     graduation_country: string,
     graduation_university: string,
-    is_added_by_admin: boolean,
     sex: number,
     wife_husband_first_name: string;
     wife_husband_last_name: string;

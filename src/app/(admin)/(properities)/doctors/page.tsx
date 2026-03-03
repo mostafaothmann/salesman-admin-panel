@@ -7,12 +7,17 @@ import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
 import dayjs from 'dayjs';
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 import { useRouter } from "next/navigation";
-import Map from "../../../../sharedComponents/maps/map/Map";
+import dynamic from "next/dynamic";
+
 
 export default function DoctorsPage() {
     const { getDoctorsData, filteredDataDoctors, filter_total, total, lastPage, getFilteredDataDoctors, addDoctor, deleteDoctor, getSpecializationsData, dataSpecializations, dataDoctors, doctorD } = useMedicalStore();
     const { dataGovernorates, getGovernoratesData, getCitiesData, getAreasData, getStreetsData, dataCities, dataAreas, dataStreets } = usePlacesStore()
     const router = useRouter();
+    const Map = dynamic(
+        () => import("../../../../sharedComponents/maps/map/Map"),
+        { ssr: false }
+    );
     //table constants
     const [page, setPage] = useState(1)
     const [filter_page, setFilterPage] = useState(1)
