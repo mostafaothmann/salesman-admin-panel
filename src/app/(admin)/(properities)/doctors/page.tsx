@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import { ColumnsType } from "antd/es/table";
 
 
 export default function DoctorsPage() {
@@ -40,7 +41,7 @@ export default function DoctorsPage() {
     const [classificationId, setClassificationId] = useState(1);
     const [loyaltyId, setLoyaltyId] = useState(0);
     const [birth_date, setBirthDate] = useState("");
-    const [sexId, setSexId] = useState(0);
+    const [sex_id, setSexId] = useState(0);
     const [phone_number, setPhoneNumber] = useState("");
     const [telephone_number, setTelephoneNumber] = useState("");
     const [wife_husband_first_name, setWifeHusbandFirstName] = useState("");
@@ -174,7 +175,7 @@ export default function DoctorsPage() {
             loyalty: loyaltyId,
             admin_description: admin_description,
             salesman_description: salesman_description,
-            sex: sexId,
+            sex: sex_id,
             wife_husband_first_name: wife_husband_first_name,
             wife_husband_last_name: wife_husband_first_name,
             phone_number: phone_number,
@@ -268,7 +269,7 @@ export default function DoctorsPage() {
         getFilteredDataDoctors({
             filter_first_name,
             filter_last_name,
-            page,
+            page: 1,
             limit,
             filter_max_age,
             filter_min_age,
@@ -285,7 +286,7 @@ export default function DoctorsPage() {
         setFiltered(true);
     }
     const handleFilter = () => {
-        getFilteredData(page, limit);
+        getFilteredData(filter_page, limit);
         setOpenFilterModal(false)
     }
     //deleteModal
@@ -325,10 +326,11 @@ export default function DoctorsPage() {
     };
     useEffect(() => { getDoctorsData(page, limit); }, []);
 
-    const columns = [
+    const columns: ColumnsType<any> = [
         {
             title: "الرقم",
             dataIndex: "id",
+            fixed: "left",
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
         {
@@ -393,12 +395,6 @@ export default function DoctorsPage() {
             title: "رقم الهاتف",
             dataIndex: "phone_number"
         },
-        /*  {
-             title: "تاريخ الإضافة",
-             dataIndex: "created_at",
-             sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
-             render: (value: string) => { return value?.slice(0, 10) }
-         }, */
         {
             title: "",
             key: "id",
@@ -419,6 +415,14 @@ export default function DoctorsPage() {
                     >
                         Location
                     </Button>
+                </Space>
+            ),
+        },
+        {
+            title: "",
+            fixed: "right",
+            render: (_: any, record: any) => (
+                <Space size="middle">
                     <Button
                         variant="solid"
                         color="cyan"
@@ -1037,13 +1041,15 @@ export default function DoctorsPage() {
         {filtered ? <Table
             scroll={{ x: "max-content" }}
             columns={columns}
+            style={{ maxWidth: 1100 }}
             pagination={{
+                position: ["topRight"],
                 current: filter_page,
                 pageSize: limit,
                 total: filter_total,
-                onChange: (page, pageSize) => {
+                onChange: (filter_page, pageSize) => {
                     setFilterPage(filter_page)
-                    getFilteredData(page, pageSize)
+                    getFilteredData(filter_page, pageSize)
                     // setPage(lastPage)
                 },
             }}
@@ -1052,7 +1058,9 @@ export default function DoctorsPage() {
             <Table
                 scroll={{ x: "max-content" }}
                 columns={columns}
+                style={{ maxWidth: 1100 }}
                 pagination={{
+                    position: ["topRight"],
                     current: page,
                     pageSize: limit,
                     total: total,

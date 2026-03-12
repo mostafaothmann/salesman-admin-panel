@@ -1,4 +1,3 @@
-import { DoctorSample, DoctorVisit, PharmacistSample } from "./medical-store-interfaces";
 
 // 🧩 Interfaces
 export interface GroupType {

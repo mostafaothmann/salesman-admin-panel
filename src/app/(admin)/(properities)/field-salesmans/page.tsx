@@ -1,13 +1,19 @@
 "use client";
 
+export default function FieldSalesmansPage() {
+    return <div>
+    </div >
+}
+/* "use client";
+
 import { Button, Col, DatePicker, Drawer, Form, Input, Row, Select, Space, Table } from "antd"
-import { useSalesmanDataStore } from "../../../../stores/salesmanStore/data.store"
 import { useEffect, useState } from "react";
+import { useUsersStore } from "../../../../stores/usersStore/data.store";
 
 
 export default function FieldSalesmanPage() {
   //store
-  const { getSalesmansData, dataSalesmans } = useSalesmanDataStore()
+  const { getSalesmansData, dataSalesmans } = useUsersStore()
 
   //columns for field salesmans
   const columns = [
@@ -169,4 +175,4 @@ export default function FieldSalesmanPage() {
     <Table columns={columns} dataSource={dataSalesmans} />
 
   </div>
-}
+} */

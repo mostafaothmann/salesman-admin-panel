@@ -1,6 +1,6 @@
 "use client";
 
-export default function DoctorVisitsPage() {
+export default function BaseOffersPage() {
     return <div>
     </div >
 }

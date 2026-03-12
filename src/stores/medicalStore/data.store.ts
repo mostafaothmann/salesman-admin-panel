@@ -1,15 +1,32 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { apiDoctor, apiDoctorPharmacist, apiDoctorVisit, apiHospitalDoctor, apiHospitalPharmacist, apiPharmacist, apiPharmacistVisit, apiSampleDoctor, apiSamplePharmacist, apiSpecialization, apiSpecializationType, apiِAssociationDoctor, apiِAssociationPharmacist } from '../apis';
+import {
+    apiDoctor, apiDoctorPharmacist, apiVisit, apiHospitalDoctor,
+    apiHospitalPharmacist, apiPharmacist,
+    apiSample, apiSpecialization, apiSpecializationType, apiِAssociationDoctor,
+    apiAssociation,
+    apiHospital,
+    apiِAssociationPharmacist
+} from '../apis';
 import {
     AddingAssociationDoctor, AddingAssociationPharmacist, AddingDoctor,
-    AddingDoctorPharmacist, AddingDoctorVisit, AddingHospitalDoctor,
-    AddingHospitalPharmacist, AddingPharmacist, AddingPharmacistVisit,
-    AddingSampleDoctor, AddingSamplePharmacist, AddingSpecialization,
+    AddingDoctorPharmacist, AddingDoctorSample, AddingDoctorVisit, AddingHospitalDoctor,
+    AddingHospitalPharmacist, AddingPharmacist, AddingPharmacistSample, AddingPharmacistVisit,
+    AddingSpecialization,
     AddingSpecializationType, AssociationDoctor, AssociationPharmacist,
-    Doctor, DoctorPharmacist, DoctorVisit, FilterDoctorProps,
+    Doctor, DoctorPharmacist, DoctorSample, DoctorVisit, FilterDoctorProps,
+    FilterSamplesProps,
+    FilterDoctorVisitProps,
     FilterPharmacistProps, HospitalDoctor, HospitalPharmacist, Pharmacist,
-    PharmacistVisit, SampleDoctor, SamplePharmacist, Specialization, SpecializationType
+    PharmacistSample,
+    PharmacistVisit, Specialization, SpecializationType,
+    AddingAssociation,
+    Association,
+    AddingHospital,
+    Hospital,
+    FilterPharmacistVisitProps,
+    Sample,
+    AddingSample,
 } from '../medical-store-interfaces';
 import { Type } from '../types-store-interfaces';
 
@@ -34,18 +51,21 @@ interface DataStore {
 
     dataDoctorsVisits: DoctorVisit[] | undefined;
     doctorVisitD: DoctorVisit,
+    filteredDataDoctorsVisits: DoctorVisit[],
 
     dataPharmacistsVisits: PharmacistVisit[] | undefined;
     pharmacistVisitD: PharmacistVisit,
+    filteredDataPharmacistsVisits: PharmacistVisit[],
 
 
     dataAssociationDoctors: AssociationDoctor[] | undefined;
     associationDoctorD: AssociationDoctor,
 
-
-
     dataAssociationPharmacists: AssociationPharmacist[] | undefined;
     associationPharmacistD: AssociationPharmacist,
+
+    dataHospitals: Hospital[] | undefined;
+    hospitalD: Hospital,
 
     dataHospitalDoctors: HospitalDoctor[] | undefined;
     hospitalDoctorD: HospitalDoctor,
@@ -53,18 +73,23 @@ interface DataStore {
     dataHospitalPharmacists: HospitalPharmacist[] | undefined;
     hospitalPharmacistD: HospitalPharmacist,
 
+    dataSamples: Sample[] | undefined;
+    sampleD: Sample,
+    filteredDataSamples: Sample[],
 
-    dataSamplePharmacists: SamplePharmacist[] | undefined;
-    samplePharmacistD: SamplePharmacist,
+    dataPharmacistSamples: PharmacistSample[] | undefined;
+    pharmacistSampleD: PharmacistSample,
+    filteredDataPharmacistsSamples: PharmacistSample[],
 
-
-    dataSampleDoctors: SampleDoctor[] | undefined;
-    sampleDoctorD: SampleDoctor,
-
+    dataDoctorSamples: DoctorSample[] | undefined;
+    doctorSampleD: DoctorSample,
+    filteredDataDoctorsSamples: DoctorSample[],
 
     dataDoctorPharmacists: DoctorPharmacist[] | undefined;
     doctorPharmacistD: DoctorPharmacist,
 
+    dataAssociations: Association[],
+    associationD: Association,
 
     loading: boolean;
     error: string | null;
@@ -90,6 +115,7 @@ interface DataStore {
     //for Doctors
     getDoctorsData: (page: number, limit: number) => Promise<void>;
     getDoctorData: (id: number) => Promise<void>;
+
     // getVisitsForDoctor: (id: number) => Promise<void>;
     addDoctor: (doctor: AddingDoctor) => Promise<void>;
     deleteDoctor: (id: number) => Promise<void>;
@@ -99,6 +125,7 @@ interface DataStore {
     //for Pharmacists
     getPharmacistsData: (page: number, limit: number) => Promise<void>;
     getPharmacistData: (id: number) => Promise<void>;
+
     // getVisitsForDoctor: (id: number) => Promise<void>;
     addPharmacist: (doctor: AddingPharmacist) => Promise<void>;
     deletePharmacist: (id: number) => Promise<void>;
@@ -112,13 +139,15 @@ interface DataStore {
     addDoctorVisit: (doctorVisit: AddingDoctorVisit) => Promise<void>;
     deleteDoctorVisit: (id: number) => Promise<void>;
     editDoctorVisit: (id: number, doctorVisit: AddingDoctorVisit) => Promise<void>;
+    getFilteredDataDoctorsVisits: (filters: FilterDoctorVisitProps) => Promise<void>;
 
     // For PharmacistVisits
     getPharmacistsVisitsData: (page: number, limit: number) => Promise<void>;
     getPharmacistVisitData: (id: number) => Promise<void>;
-    addPharmacistVisit: (pharmacistVisit: AddingPharmacistVisit) => Promise<void>;
+    addPharmacistVisit: (pharmacistVisit: PharmacistVisit) => Promise<void>;
     deletePharmacistVisit: (id: number) => Promise<void>;
     editPharmacistVisit: (id: number, pharmacistVisit: AddingPharmacistVisit) => Promise<void>;
+    getFilteredDataPharmacistsVisits: (filters: FilterPharmacistVisitProps) => Promise<void>;
 
     // AssociationDoctor
     getAssociationDoctorsData: (page: number, limit: number) => Promise<void>;
@@ -134,19 +163,45 @@ interface DataStore {
     deleteAssociationPharmacist: (id: number) => Promise<void>;
     editAssociationPharmacist: (id: number, associationPharmacist: AddingAssociationPharmacist) => Promise<void>;
 
-    // SampleDoctor
-    getSampleDoctorsData: (page: number, limit: number) => Promise<void>;
-    getSampleDoctorData: (id: number) => Promise<void>;
-    addSampleDoctor: (sampleDoctor: AddingSampleDoctor) => Promise<void>;
-    deleteSampleDoctor: (id: number) => Promise<void>;
-    editSampleDoctor: (id: number, sampleDoctor: AddingSampleDoctor) => Promise<void>;
+    // Association
+    getAssociationsData: () => Promise<void>;
+    getAssociationData: (id: number) => Promise<void>;
+    addAssociation: (association: AddingAssociation) => Promise<void>;
+    deleteAssociation: (id: number) => Promise<void>;
+    editAssociation: (id: number, association: AddingAssociation) => Promise<void>;
 
-    // SamplePharmacist
-    getSamplePharmacistsData: (page: number, limit: number) => Promise<void>;
-    getSamplePharmacistData: (id: number) => Promise<void>;
-    addSamplePharmacist: (samplePharmacist: AddingSamplePharmacist) => Promise<void>;
-    deleteSamplePharmacist: (id: number) => Promise<void>;
-    editSamplePharmacist: (id: number, samplePharmacist: AddingSamplePharmacist) => Promise<void>;
+    // Sample
+    getSamplesData: (page: number, limit: number) => Promise<void>;
+    getSampleData: (id: number) => Promise<void>;
+    addSample: (DoctorSample: AddingSample) => Promise<void>;
+    deleteSample: (id: number) => Promise<void>;
+    editSample: (id: number, DoctorSample: AddingSample) => Promise<void>;
+    getFilteredDataSamples: (filters: FilterSamplesProps) => Promise<void>;
+
+    // DoctorSample
+    getDoctorSamplesData: (page: number, limit: number) => Promise<void>;
+    getDoctorSampleData: (id: number) => Promise<void>;
+    addDoctorSample: (DoctorSample: AddingDoctorSample) => Promise<void>;
+    deleteDoctorSample: (id: number) => Promise<void>;
+    editDoctorSample: (id: number, DoctorSample: AddingDoctorSample) => Promise<void>;
+    getFilteredDataDoctorsSamples: (filters: FilterSamplesProps) => Promise<void>;
+
+    // PharmacistSample
+    getPharmacistSamplesData: (page: number, limit: number) => Promise<void>;
+    getpharmacistSampleData: (id: number) => Promise<void>;
+    addPharmacistSample: (PharmacistSample: AddingPharmacistSample) => Promise<void>;
+    deletePharmacistSample: (id: number) => Promise<void>;
+    editPharmacistSample: (id: number, PharmacistSample: AddingPharmacistSample) => Promise<void>;
+    getFilteredDataPharmacistsSamples: (filters: FilterSamplesProps) => Promise<void>;
+
+
+    // Hospital
+    getHospitalsData: () => Promise<void>;
+    getHospitalData: (id: number) => Promise<void>;
+    addHospital: (hospitalDoctor: AddingHospital) => Promise<void>;
+    deleteHospital: (id: number) => Promise<void>;
+    editHospital: (id: number, hospitalDoctor: AddingHospital) => Promise<void>;
+
 
     // HospitalDoctor
     getHospitalDoctorsData: (page: number, limit: number) => Promise<void>;
@@ -556,7 +611,7 @@ export const useMedicalStore = create<DataStore>()(
                     set({
                         error:
                             err.response?.data?.message ||
-                            "Error Adding Doctor",
+                            "Error Filtering Doctors",
                         loading: false,
                     });
                 }
@@ -709,7 +764,7 @@ export const useMedicalStore = create<DataStore>()(
                     set({
                         error:
                             err.response?.data?.message ||
-                            "Error Adding Pharmacist",
+                            "Error Filtering Pharmacists",
                         loading: false,
                     });
                 }
@@ -721,11 +776,12 @@ export const useMedicalStore = create<DataStore>()(
             // DoctorVisits
             dataDoctorsVisits: undefined,
             doctorVisitD: null,
+            filteredDataDoctorsVisits: undefined,
 
             getDoctorsVisitsData: async (page: number, limit: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiDoctorVisit.get(``, { params: { page, limit } });
+                    const res = await apiVisit.get(`/doctors`, { params: { page, limit } });
                     const dataDoctorsVisits = res.data.data;
                     const total = res.data.total;
                     const lastPage = res.data.lastPage;
@@ -742,8 +798,8 @@ export const useMedicalStore = create<DataStore>()(
             getDoctorVisitData: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiDoctorVisit.get(`/${id}`);
-                    const doctorVisitD = res.data;
+                    const res = await apiVisit.get(`/${id}`);
+                    const doctorVisitD = res?.data[0];
                     set({ doctorVisitD, loading: false });
                     return doctorVisitD;
                 } catch (err: any) {
@@ -757,7 +813,7 @@ export const useMedicalStore = create<DataStore>()(
             deleteDoctorVisit: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiDoctorVisit.delete(`/${id}`);
+                    await apiVisit.delete(`/${id}`);
                     set((state) => ({
                         dataDoctorVisits: state.dataDoctorsVisits?.filter((a) => a.id !== id),
                         loading: false,
@@ -770,10 +826,11 @@ export const useMedicalStore = create<DataStore>()(
                 }
             },
 
-            editDoctorVisit: async (id: number, doctorVisit: AddingDoctorVisit) => {
+            editDoctorVisit: async (id: number, doctorVisit: DoctorVisit) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiDoctorVisit.patch(`/${id}`, doctorVisit);
+                    console.log(doctorVisit)
+                    await apiVisit.patch(`/${id}`, { visit_status_id: doctorVisit?.visit_status_id });
                     set({ loading: false });
                 } catch (err: any) {
                     set({
@@ -786,7 +843,7 @@ export const useMedicalStore = create<DataStore>()(
             addDoctorVisit: async (doctorVisit: AddingDoctorVisit) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiDoctorVisit.post(``, doctorVisit);
+                    const res = await apiVisit.post(``, { ...doctorVisit, typeC: 'doctor' });
                     if (res.status === 201) set({ loading: false });
                 } catch (err: any) {
                     set({
@@ -795,15 +852,51 @@ export const useMedicalStore = create<DataStore>()(
                     });
                 }
             },
+            //Get Filtered Data
+            getFilteredDataDoctorsVisits: async (
+                filters: FilterDoctorVisitProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiVisit.post(
+                        `/doctors/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+                        console.log(res.data)
+
+                        const filteredDataDoctorsVisits = res.data.data;
+                        const filter_total = res.data.total;
+
+                        set({ filteredDataDoctorsVisits, loading: false, filter_total });
+                        return filteredDataDoctorsVisits;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Filtering Doctors Visits",
+                        loading: false,
+                    });
+                }
+            },
+
+
+
+
+
+
+
 
             // PharmacistVisits
             dataPharmacistsVisits: undefined,
             pharmacistVisitD: null,
+            filteredDataPharmacistsVisits: undefined,
 
             getPharmacistsVisitsData: async (page: number, limit: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiPharmacistVisit.get(``, { params: { page, limit } });
+                    const res = await apiVisit.get(`/pharmacists`, { params: { page, limit } });
                     const dataPharmacistsVisits = res.data.data;
                     const total = res.data.total;
                     const lastPage = res.data.lastPage;
@@ -820,8 +913,8 @@ export const useMedicalStore = create<DataStore>()(
             getPharmacistVisitData: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiPharmacistVisit.get(`/${id}`);
-                    const pharmacistVisitD = res.data;
+                    const res = await apiVisit.get(`/${id}`);
+                    const pharmacistVisitD = res.data[0];
                     set({ pharmacistVisitD, loading: false });
                     return pharmacistVisitD;
                 } catch (err: any) {
@@ -835,7 +928,7 @@ export const useMedicalStore = create<DataStore>()(
             deletePharmacistVisit: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiPharmacistVisit.delete(`/${id}`);
+                    await apiVisit.delete(`/${id}`);
                     set((state) => ({
                         dataPharmacistsVisits: state.dataPharmacistsVisits?.filter((a) => a.id !== id),
                         loading: false,
@@ -848,10 +941,10 @@ export const useMedicalStore = create<DataStore>()(
                 }
             },
 
-            editPharmacistVisit: async (id: number, pharmacistVisit: AddingPharmacistVisit) => {
+            editPharmacistVisit: async (id: number, pharmacistVisit: PharmacistVisit) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiPharmacistVisit.patch(`/${id}`, pharmacistVisit);
+                    await apiVisit.patch(`/${id}`, { visit_status_id: pharmacistVisit?.visit_status_id });
                     set({ loading: false });
                 } catch (err: any) {
                     set({
@@ -864,7 +957,7 @@ export const useMedicalStore = create<DataStore>()(
             addPharmacistVisit: async (pharmacistVisit: AddingPharmacistVisit) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiPharmacistVisit.post(``, pharmacistVisit);
+                    const res = await apiVisit.post(``, { ...pharmacistVisit, typeC: 'pharmacist' });
                     if (res.status === 201) set({ loading: false });
                 } catch (err: any) {
                     set({
@@ -873,6 +966,126 @@ export const useMedicalStore = create<DataStore>()(
                     });
                 }
             },
+            //Get Filtered Data
+            getFilteredDataPharmacistsVisits: async (
+                filters: FilterPharmacistVisitProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiVisit.post(
+                        `/pharmacists/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+                        console.log(res.data)
+
+                        const filteredDataPharmacistsVisits = res.data.data;
+                        const filter_total = res.data.total;
+
+                        set({ filteredDataPharmacistsVisits, loading: false, filter_total });
+                        return filteredDataPharmacistsVisits;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Filtering Pharmacists Visits",
+                        loading: false,
+                    });
+                }
+            },
+
+
+
+
+
+
+            // AssociationDoctors
+            dataAssociations: undefined,
+            associationD: null,
+            // Get Associations Data
+            getAssociationsData: async () => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiAssociation.get(``);
+                    const dataAssociations = res.data
+                    set({ dataAssociations, loading: false });
+                    return dataAssociations
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Loading Associations',
+                        loading: false,
+                    });
+                }
+            },
+
+            // Get One Association Data
+            getAssociationData: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiAssociation.get(`/${id}`);
+                    const associationD = res.data
+                    set({ associationD, loading: false });
+                    return associationD
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Loading Association',
+                        loading: false,
+                    });
+                }
+            },
+
+            // Delete Association
+            deleteAssociation: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    await apiAssociation.delete(`/${id}`);
+                    set((state) => ({
+                        dataAssociations: state.dataAssociations?.filter((a) => a.id !== id),
+                        loading: false,
+                    }));
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Deleting Association',
+                        loading: false,
+                    });
+                }
+            },
+
+            // Edit Association
+            editAssociation: async (id: number, association: AddingAssociation) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiAssociation.patch(`/${id}`, association);
+                    if (res.status != 201) { }
+
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Editing Association',
+                        loading: false,
+                    });
+                }
+            },
+
+            // Add New Association
+            addAssociation: async (association: AddingAssociation) => {
+                set({ loading: true, error: null });
+                try {
+                    if (association !== null) {
+                        const res = await apiAssociation.post(``, association);
+                        set({ loading: false });
+                        if (res.status == 201) {
+
+                        }
+                    }
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Adding Association',
+                        loading: false,
+                    });
+                }
+            },
+
 
 
 
@@ -1045,167 +1258,345 @@ export const useMedicalStore = create<DataStore>()(
 
 
 
-            // SampleDoctors
 
-            dataSampleDoctors: undefined,
-            sampleDoctorD: null,
+            // DoctorSamples
 
-            getSampleDoctorsData: async (page: number, limit: number) => {
+            dataSamples: undefined,
+            sampleD: null,
+            filteredDataSamples: undefined,
+
+            getSamplesData: async (page: number, limit: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiSampleDoctor.get(``, { params: { page, limit } });
-                    const dataSampleDoctors = res.data.data;
+                    const res = await apiSample.get(``, { params: { page, limit } });
+                    const dataSamples = res.data.data;
                     const total = res.data.total;
                     const lastPage = res.data.lastPage;
 
-                    set({ dataSampleDoctors, loading: false, total, lastPage });
-                    return dataSampleDoctors;
+                    set({ dataSamples, loading: false, total, lastPage });
+                    return dataSamples;
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || "Error Loading SampleDoctors",
+                        error: err.response?.data?.message || "Error Loading Samples",
                         loading: false,
                     });
                 }
             },
 
-            getSampleDoctorData: async (id: number) => {
+            getSampleData: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiSampleDoctor.get(`/${id}`);
-                    const sampleDoctorD = res.data;
+                    const res = await apiSample.get(`/${id}`);
+                    const sampleD = res.data;
 
-                    set({ sampleDoctorD, loading: false });
-                    return sampleDoctorD;
+                    set({ sampleD, loading: false });
+                    return sampleD;
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || "Error Loading SampleDoctor",
+                        error: err.response?.data?.message || "Error Loading Sample",
                         loading: false,
                     });
                 }
             },
 
-            deleteSampleDoctor: async (id: number) => {
+            deleteSample: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiSampleDoctor.delete(`/${id}`);
+                    await apiSample.delete(`/${id}`);
                     set((state) => ({
-                        dataSampleDoctors: state.dataSampleDoctors?.filter((a) => a.id !== id),
+                        dataSamples: state.dataSamples?.filter((a) => a.id !== id),
                         loading: false,
                     }));
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || "Error Deleting SampleDoctor",
+                        error: err.response?.data?.message || "Error Deleting Sample",
                         loading: false,
                     });
                 }
             },
 
-            editSampleDoctor: async (id: number, sampleDoctor: AddingSampleDoctor) => {
+            editSample: async (id: number, sample: AddingSample) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiSampleDoctor.patch(`/${id}`, sampleDoctor);
+                    await apiSample.patch(`/${id}`, sample);
                     set({ loading: false });
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || "Error Editing SampleDoctor",
+                        error: err.response?.data?.message || "Error Editing Sample",
                         loading: false,
                     });
                 }
             },
 
-            addSampleDoctor: async (sampleDoctor: AddingSampleDoctor) => {
+            addSample: async (Sample: AddingSample) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiSampleDoctor.post(``, sampleDoctor);
+                    const res = await apiSample.post(``, Sample);
                     if (res.status === 201) set({ loading: false });
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || "Error Adding SampleDoctor",
+                        error: err.response?.data?.message || "Error Adding Sample",
+                        loading: false,
+                    });
+                }
+            },
+
+            //Get Filtered Data
+            getFilteredDataSamples: async (
+                filters: FilterSamplesProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiSample.post(
+                        `/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+
+                        const filteredDataSamples = res.data.data;
+                        const filter_total = res.data.total;
+
+                        set({ filteredDataSamples, loading: false, filter_total });
+                        return filteredDataSamples;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Adding Samples",
                         loading: false,
                     });
                 }
             },
 
 
-            // SamplePharmacists
-            dataSamplePharmacists: undefined,
-            samplePharmacistD: null,
 
-            getSamplePharmacistsData: async (page: number, limit: number) => {
+
+
+
+            // DoctorSamples
+            dataDoctorSamples: undefined,
+            doctorSampleD: null,
+            filteredDataDoctorsSamples: undefined,
+            getDoctorSamplesData: async (page: number, limit: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiSamplePharmacist.get(``, { params: { page, limit } });
-                    const dataSamplePharmacists = res.data.data;
+                    const res = await apiSample.get(`/doctors`, { params: { page, limit } });
+                    const dataDoctorSamples = res.data.data;
                     const total = res.data.total;
                     const lastPage = res.data.lastPage;
 
-                    set({ dataSamplePharmacists, loading: false, total, lastPage });
-                    return dataSamplePharmacists;
+                    set({ dataDoctorSamples, loading: false, total, lastPage });
+                    return dataDoctorSamples;
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || "Error Loading SamplePharmacists",
+                        error: err.response?.data?.message || "Error Loading DoctorSamples",
                         loading: false,
                     });
                 }
             },
 
-            getSamplePharmacistData: async (id: number) => {
+            getDoctorSampleData: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiSamplePharmacist.get(`/${id}`);
-                    const samplePharmacistD = res.data;
+                    const res = await apiSample.get(`/${id}`);
+                    const doctorSampleD = res.data;
 
-                    set({ samplePharmacistD, loading: false });
-                    return samplePharmacistD;
+                    set({ doctorSampleD, loading: false });
+                    return doctorSampleD;
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || "Error Loading SamplePharmacist",
+                        error: err.response?.data?.message || "Error Loading DoctorSample",
                         loading: false,
                     });
                 }
             },
 
-            deleteSamplePharmacist: async (id: number) => {
+            deleteDoctorSample: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiSamplePharmacist.delete(`/${id}`);
+                    await apiSample.delete(`/${id}`);
                     set((state) => ({
-                        dataSamplePharmacists: state.dataSamplePharmacists?.filter((a) => a.id !== id),
+                        dataDoctorSamples: state.dataDoctorSamples?.filter((a) => a.id !== id),
                         loading: false,
                     }));
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || "Error Deleting SamplePharmacist",
+                        error: err.response?.data?.message || "Error Deleting DoctorSample",
                         loading: false,
                     });
                 }
             },
 
-            editSamplePharmacist: async (id: number, samplePharmacist: AddingSamplePharmacist) => {
+            editDoctorSample: async (id: number, DoctorSample: AddingDoctorSample) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiSamplePharmacist.patch(`/${id}`, samplePharmacist);
+                    await apiSample.patch(`/${id}`, DoctorSample);
                     set({ loading: false });
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || "Error Editing SamplePharmacist",
+                        error: err.response?.data?.message || "Error Editing DoctorSample",
                         loading: false,
                     });
                 }
             },
 
-            addSamplePharmacist: async (samplePharmacist: AddingSamplePharmacist) => {
+            addDoctorSample: async (DoctorSample: AddingDoctorSample) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiSamplePharmacist.post(``, samplePharmacist);
+                    const res = await apiSample.post(``, DoctorSample);
                     if (res.status === 201) set({ loading: false });
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || "Error Adding SamplePharmacist",
+                        error: err.response?.data?.message || "Error Adding DoctorSample",
                         loading: false,
                     });
                 }
             },
+
+            //Get Filtered Data
+            getFilteredDataDoctorsSamples: async (
+                filters: FilterSamplesProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiSample.post(
+                        `/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+
+                        const filteredDataDoctorsSamples = res.data.data;
+                        const filter_total = res.data.total;
+
+                        set({ filteredDataDoctorsSamples, loading: false, filter_total });
+                        return filteredDataDoctorsSamples;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Adding Samples",
+                        loading: false,
+                    });
+                }
+            },
+
+
+
+
+
+
+            // PharmacistSamples
+            dataPharmacistSamples: undefined,
+            pharmacistSampleD: null,
+            filteredDataPharmacistsSamples: undefined,
+            getPharmacistSamplesData: async (page: number, limit: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiSample.get(`/pharmacists`, { params: { page, limit } });
+                    const dataPharmacistSamples = res.data.data;
+                    const total = res.data.total;
+                    const lastPage = res.data.lastPage;
+
+                    set({ dataPharmacistSamples, loading: false, total, lastPage });
+                    return dataPharmacistSamples;
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || "Error Loading PharmacistSamples",
+                        loading: false,
+                    });
+                }
+            },
+
+            getpharmacistSampleData: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiSample.get(`/${id}`);
+                    const pharmacistSampleD = res.data;
+
+                    set({ pharmacistSampleD, loading: false });
+                    return pharmacistSampleD;
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || "Error Loading PharmacistSample",
+                        loading: false,
+                    });
+                }
+            },
+
+            deletePharmacistSample: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    await apiSample.delete(`/${id}`);
+                    set((state) => ({
+                        dataPharmacistSamples: state.dataPharmacistSamples?.filter((a) => a.id !== id),
+                        loading: false,
+                    }));
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || "Error Deleting PharmacistSample",
+                        loading: false,
+                    });
+                }
+            },
+
+            editPharmacistSample: async (id: number, PharmacistSample: AddingPharmacistSample) => {
+                set({ loading: true, error: null });
+                try {
+                    await apiSample.patch(`/${id}`, PharmacistSample);
+                    set({ loading: false });
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || "Error Editing PharmacistSample",
+                        loading: false,
+                    });
+                }
+            },
+
+            addPharmacistSample: async (PharmacistSample: AddingPharmacistSample) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiSample.post(``, PharmacistSample);
+                    if (res.status === 201) set({ loading: false });
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || "Error Adding PharmacistSample",
+                        loading: false,
+                    });
+                }
+            },
+
+
+            //Get Filtered Data
+            getFilteredDataPharmacistsSamples: async (
+                filters: FilterSamplesProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiSample.post(
+                        `/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+
+                        const filteredDataPharmacistsSamples = res.data.data;
+                        const filter_total = res.data.total;
+
+                        set({ filteredDataPharmacistsSamples, loading: false, filter_total });
+                        return filteredDataPharmacistsSamples;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Adding Samples",
+                        loading: false,
+                    });
+                }
+            },
+
+
 
 
 
@@ -1376,6 +1767,87 @@ export const useMedicalStore = create<DataStore>()(
 
 
 
+            // Hospital
+            dataHospitals: undefined,
+            hospitalD: null,
+
+            getHospitalsData: async () => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiHospital.get(``);
+                    const dataHospitals = res.data;
+                    set({ dataHospitals, loading: false });
+                    return dataHospitals;
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || "Error Loading Hospital",
+                        loading: false,
+                    });
+                }
+            },
+
+            getHospitalData: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiHospital.get(`/${id}`);
+                    const hospitalD = res.data;
+
+                    set({ hospitalD, loading: false });
+                    return hospitalD;
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || "Error Loading Hospital",
+                        loading: false,
+                    });
+                }
+            },
+
+            deleteHospital: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    await apiHospital.delete(`/${id}`);
+                    set((state) => ({
+                        dataHospitals: state.dataHospitals?.filter((a) => a.id !== id),
+                        loading: false,
+                    }));
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || "Error Deleting Hospital",
+                        loading: false,
+                    });
+                }
+            },
+
+            editHospital: async (id: number, hospitalPharmacist: AddingHospital) => {
+                set({ loading: true, error: null });
+                try {
+                    await apiHospital.patch(`/${id}`, hospitalPharmacist);
+                    set({ loading: false });
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || "Error Editing Hospital",
+                        loading: false,
+                    });
+                }
+            },
+
+            addHospital: async (hospitalPharmacist: AddingHospital) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiHospital.post(``, hospitalPharmacist);
+                    if (res.status === 201) set({ loading: false });
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || "Error Adding HospitalPharmacist",
+                        loading: false,
+                    });
+                }
+            },
+
+
+
+
+
             // HospitalPharmacists
             dataHospitalPharmacists: undefined,
             hospitalPharmacistD: null,
@@ -1462,6 +1934,6 @@ export const useMedicalStore = create<DataStore>()(
             name: 'medical-data-storage',
             storage: createJSONStorage(() => localStorage),
             //partialize: (state) => ({ data: state.dataSpecializations })
-        } // AsyncStorage (React Native)
+        } 
     )
 );

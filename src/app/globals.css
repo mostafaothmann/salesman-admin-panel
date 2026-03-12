@@ -3,6 +3,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@media print {
+  * {
+    -webkit-print-color-adjust: exact ;
+    print-color-adjust: exact;
+  }
+}
+
+
 @theme {
   --font-*: initial;
   --font-outfit: Outfit, sans-serif;

@@ -86,6 +86,44 @@ export interface AddingOnlineOffer {
     total_quantity: number;
 }
 
+
+export interface Mall {
+    id: number;
+    type: number;
+    name: string;
+    lan?: string;
+    lat?: string;
+
+    phone_number?: string;
+    telephone_number?: string;
+
+    governorate_id: number;
+    city_id?: number;
+    area_id?: number;
+    street_id?: number;
+
+    salesman_description?: string;
+    admin_description?: string;
+}
+
+
+export interface AddingMall {
+    name: string;
+    lan?: string;
+    lat?: string;
+
+    phone_number?: string;
+    telephone_number?: string;
+
+    governorate_id: number;
+    city_id: number;
+    area_id: number;
+    street_id: number;
+
+    salesman_description?: string;
+    admin_description?: string;
+}
+
 export interface BaseOffer {
     id: number;
     number_of_gifts: number;

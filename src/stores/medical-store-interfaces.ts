@@ -3,15 +3,25 @@
 
 import { Type } from "./types-store-interfaces";
 
-export interface SampleDoctor {
+export interface DoctorSample {
     id: number,
     doctor_visit_id: number,
     quantity: number,
 }
 
+export interface Sample {
+    id: number,
+    visit: number,
+    quantity: number,
+}
 
+export interface AddingSample {
+    id: number,
+    doctor_visit_id: number,
+    quantity: number,
+}
 
-export interface SamplePharmacist {
+export interface PharmacistSample {
     id: number,
     pharmacist_visit_id: number,
     quantity: number,
@@ -19,32 +29,47 @@ export interface SamplePharmacist {
 
 export interface DoctorVisit {
     id: number,
+    assistant_id: number,
     rejection_cause: string,
     doctor_id: number,
     salesman_id: number,
+    visit_status_id: number,
     type_id: number,
+    lan?: string,
+    lat?: string,
+    doctorLan?: string,
+    doctorLat?: string,
     status: number,
     note: string,
+    created_at: string;
+    validated_at: string;
     is_other_spoken_note: boolean,
     photo: string,
     closest_pharmacy: string,
     number_of_patients: number,
-    samples: SampleDoctor[]
 }
 
 
 export interface PharmacistVisit {
     id: number,
+    assistant_id: number,
     rejection_cause: string,
     pharmacist_id: number,
     salesman_id: number,
+    visit_status_id: number,
     type_id: number,
+    lan?: string,
+    lat?: string,
+    pharmacistLan?: string,
+    pharmacistLat?: string,
     status: number,
     note: string,
+    created_at: string;
+    validated_at: string;
     is_other_spoken_note: boolean,
     photo: string,
+    closest_pharmacy: string,
     number_of_patients: number,
-    samples: SamplePharmacist[]
 }
 
 export interface Doctor {
@@ -102,6 +127,14 @@ export interface FilterDoctorProps {
     filter_street_id: number;
 }
 
+export interface FilterSamplesProps {
+    page: number;
+    limit: number;
+    filter_min_quantity: number;
+    filter_max_quantity: number;
+    filter_type_id: number;
+}
+
 
 export interface FilterPharmacistProps {
     page: number;
@@ -115,6 +148,45 @@ export interface FilterPharmacistProps {
     filter_specialization_id: number;
     filter_min_loyalty: number;
     filter_max_loyalty: number;
+    filter_governorate_id: number;
+    filter_city_id: number;
+    filter_area_id: number;
+    filter_street_id: number;
+}
+
+export interface FilterDoctorVisitProps {
+    page: number;
+    limit: number;
+    filter_min_date: string;
+    filter_max_date: string;
+    filter_type_id: number;
+    filter_assistant_id: number;
+    filter_doctor_id: number;
+    filter_salesman_id: number;
+    filter_visit_status_id: number;
+    filter_min_classification: number;
+    filter_max_classification: number;
+    filter_specialization_id: number;
+    filter_governorate_id: number;
+    filter_city_id: number;
+    filter_area_id: number;
+    filter_street_id: number;
+}
+
+
+export interface FilterPharmacistVisitProps {
+    page: number;
+    limit: number;
+    filter_min_date: string;
+    filter_max_date: string;
+    filter_type_id: number;
+    filter_assistant_id: number;
+    filter_pharmacist_id: number;
+    filter_salesman_id: number;
+    filter_visit_status_id: number;
+    filter_min_classification: number;
+    filter_max_classification: number;
+    filter_specialization_id: number;
     filter_governorate_id: number;
     filter_city_id: number;
     filter_area_id: number;
@@ -181,12 +253,15 @@ export interface DoctorPharmacist {
 
 export interface Hospital {
     id: number;
+    type: number;
+    name: string;
 
     lan?: string;
     lat?: string;
 
     phone_number?: string;
     telephone_number?: string;
+    email?: string;
 
     governorate_id: number;
     city_id?: number;
@@ -197,32 +272,6 @@ export interface Hospital {
     admin_description?: string;
 }
 
-export interface Mall {
-    id: number;
-    lan?: string;
-    lat?: string;
-    phone_number?: string;
-    telephone_number?: string;
-    governorate_id: number;
-    city_id?: number;
-    area_id?: number;
-    street_id?: number;
-    salesman_description?: string;
-    admin_description?: string;
-}
-
-export interface AddingMall {
-    lan?: string;
-    lat?: string;
-    phone_number?: string;
-    telephone_number?: string;
-    governorate_id: number;
-    city_id?: number;
-    area_id?: number;
-    street_id?: number;
-    salesman_description?: string;
-    admin_description?: string;
-}
 
 export interface HospitalPharmacist {
     id: number;
@@ -251,12 +300,15 @@ export interface AddingHospitalDoctor {
 }
 
 export interface AddingHospital {
+    type: number;
+    name: string;
 
     lan?: string;
     lat?: string;
 
     phone_number?: string;
     telephone_number?: string;
+    email?: string;
 
     governorate_id: number;
     city_id?: number;
@@ -284,23 +336,28 @@ export interface AssociationPharmacist {
 export interface Association {
     id: number,
     name: string,
-    description: string,
+    admin_description: string,
+    salesman_description: string,
+    lat?: string;
+    lan?: string;
     email: string,
     phone_number: string,
     country: string,
     telephone_number: string,
-    associationDoctors: AssociationDoctor[],
-    associationPharmacists: AssociationPharmacist[],
+    governorate_id: number,
+    city_id: number,
+    area_id: number,
+    street_id: number,
 }
 
 //for Adding/Edititng
 
-export interface AddingSampleDoctor {
+export interface AddingDoctorSample {
     doctor_visit_id: number,
     quantity: number,
 }
 
-export interface AddingSamplePharmacist {
+export interface AddingPharmacistSample {
     pharmacist_visit_id: number,
     quantity: number,
 }
@@ -310,17 +367,17 @@ export interface AddingDoctorVisit {
     doctor_id: number,
     salesman_id: number,
     type_id: number,
-    status: number,
+    visit_status_id: number,
     note: string,
     is_other_spoken_note: boolean,
     photo: string,
     closest_pharmacy: string,
     number_of_patients: number,
-    samples: SampleDoctor[]
 }
 
 export interface AddingPharmacistVisit {
     rejection_cause: string,
+    visit_status_id: number,
     pharmacist_id: number,
     salesman_id: number,
     type_id: number,
@@ -423,12 +480,18 @@ export interface AddingAssociationPharmacist {
 
 export interface AddingAssociation {
     name: string,
-    description: string,
+    admin_description: string,
+    salesman_description: string,
+    lat?: string;
+    lan?: string;
     email: string,
     phone_number: string,
     country: string,
     telephone_number: string,
-    associationDoctors: AssociationDoctor[],
-    associationPharmacists: AssociationPharmacist[],
+    governorate_id: number,
+    city_id: number,
+    area_id: number,
+    street_id: number,
+
 }
 

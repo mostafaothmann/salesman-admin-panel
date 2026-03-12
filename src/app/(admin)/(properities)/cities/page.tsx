@@ -1,10 +1,11 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input,  Modal, Space, Table } from "antd";
+import { AutoComplete, Button, Dropdown, Input, Modal, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
+import { ColumnsType } from "antd/es/table";
 
 
 export default function CititesPage() {
@@ -111,10 +112,11 @@ export default function CititesPage() {
         XLSX.writeFile(workbook, "Cities.xlsx");
     };
     useEffect(() => { getCitiesData(); }, []);
-    const columns = [
+    const columns: ColumnsType<any> = [
         {
             title: "الرقم",
             dataIndex: "id",
+            fixed: "left",
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
         {
@@ -145,7 +147,6 @@ export default function CititesPage() {
         },
         {
             title: "",
-            key: "id",
             render: (_: any, record: any) => (
                 <Space size="middle">
                     <Button
@@ -156,11 +157,21 @@ export default function CititesPage() {
                         Delete
                     </Button>
                     <Button
-                        type="default"
+                        variant="outlined"
+                        color="cyan"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
                         Edit
                     </Button>
+                </Space>
+            ),
+        }
+        ,
+        {
+            title: "",
+            fixed: "right",
+            render: (_: any, record: any) => (
+                <Space size="middle">
                     <Button
                         variant="solid"
                         color="cyan"
@@ -314,7 +325,7 @@ export default function CititesPage() {
                 trigger={['click']}
             >
                 <Button className="px-4 py-2 border rounded">
-                    المناطق 
+                    المناطق
                 </Button>
             </Dropdown>
         </Modal>
@@ -337,6 +348,10 @@ export default function CititesPage() {
         </Button>
 
         <Table
+            style={{ maxWidth: 1100 }}
+            pagination={{
+                placement: ['topEnd'],
+            }}
             scroll={{ x: "max-content" }}
             columns={columns} dataSource={dataCities} />
     </div>

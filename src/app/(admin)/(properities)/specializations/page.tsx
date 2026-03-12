@@ -6,10 +6,11 @@ import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
 import { Doctor } from "../../../../stores/medical-store-interfaces";
+import { ColumnsType } from "antd/es/table";
 
 
 export default function SpecializationsPage() {
-    const { getSpecializationsData, dataSpecializations, typesForSpecialization,
+    const { getSpecializationsData, dataSpecializations, dataTypesForSpecialization,
         getTypesForSpecializationData, deleteSpecialization, editSpecialization, addSpecialization } = useMedicalStore();
 
     //Add Modal
@@ -89,7 +90,7 @@ export default function SpecializationsPage() {
         setName(specialization?.name || "");
         setItems(specialization?.doctors?.map(e => { return { key: e.id, label: e.first_name } }) || [])
         getTypesForSpecializationData(specialization.id);
-        setTypesItems(typesForSpecialization?.map(e => { return { key: e.id, label: e.name } }) || [])
+        setTypesItems(dataTypesForSpecialization?.map(e => { return { key: e.id, label: e.name } }) || [])
         setOpenShowModal(true);
     }
 
@@ -110,10 +111,11 @@ export default function SpecializationsPage() {
         XLSX.writeFile(workbook, "Cities.xlsx");
     };
     useEffect(() => { getSpecializationsData(); }, []);
-    const columns = [
+    const columns: ColumnsType<any> = [
         {
             title: "الرقم",
             dataIndex: "id",
+            fixed: "left",
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
         {
@@ -128,15 +130,12 @@ export default function SpecializationsPage() {
             render: (value: Doctor[]) => { return value.length }
         },
         {
-            title: "الوصف",
-            dataIndex: "description"
-        },
-        {
             title: "تاريخ الإضافة",
             dataIndex: "created_at",
             sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
             render: (value: string) => { return value?.slice(0, 10) }
-        },
+        }
+        ,
         {
             title: "",
             key: "id",
@@ -155,6 +154,15 @@ export default function SpecializationsPage() {
                     >
                         Edit
                     </Button>
+                </Space>
+            ),
+        }
+        ,
+        {
+            title: "",
+            fixed: 'right',
+            render: (_: any, record: any) => (
+                <Space size="middle">
                     <Button
                         variant="solid"
                         color="cyan"
@@ -307,6 +315,10 @@ export default function SpecializationsPage() {
         </Button>
 
         <Table
+            style={{ maxWidth: 1100 }}
+            pagination={{
+                position: ["topRight"],
+            }}
             scroll={{ x: "max-content" }}
             columns={columns} dataSource={dataSpecializations} />
     </div>

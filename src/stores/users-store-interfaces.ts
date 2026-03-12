@@ -10,6 +10,8 @@ export interface Salesman {
     first_name: string;
     last_name: string;
 
+    admin_description: string;
+
     lan?: string;
     lat?: string;
 
@@ -21,6 +23,8 @@ export interface Salesman {
 
     birth_date: string;
 
+    sex: number;
+
     governorate_Id: number;
     level: number;
     team_profit: number;
@@ -28,11 +32,12 @@ export interface Salesman {
     sales_profit: number;
     leader_id: number;
 
-    city_Id: number;
+    governorate_id: number;
+    city_id: number;
     area_id: number;
     street_id: number;
-    building_id: number;
 
+    account_status_id: number;
     role: ROLE.SALESMAN;
 }
 
@@ -42,6 +47,13 @@ export interface Assistant {
     first_name: string;
     last_name: string;
 
+    lan?: number;
+    lat?: number;
+
+    admin_description: string;
+
+    sex: number;
+
     email: string;
     password: string;
 
@@ -50,12 +62,12 @@ export interface Assistant {
 
     birth_date: string;
 
-    governorate_Id?: number;
-    city_Id: number;
+    governorate_id: number;
+    city_id: number;
     area_id: number;
     street_id: number;
-    building_id: number;
 
+    account_status_id: number;
     role: ROLE.ASSISTANT;
 }
 
@@ -69,6 +81,10 @@ export interface AddingSalesman {
     lan?: string;
     lat?: string;
 
+    admin_description?: string;
+
+    sex: number;
+
     email: string;
     password: string;
 
@@ -77,18 +93,19 @@ export interface AddingSalesman {
 
     birth_date: string;
 
-    governorate_Id: number;
-    level: number;
-    team_profit: number;
-    total_profit: number;
-    sales_profit: number;
-    leader_id: number;
+    level?: number;
+    team_profit?: number;
+    total_profit?: number;
+    sales_profit?: number;
+    leader_id?: number;
 
-    city_Id: number;
+    governorate_id: number;
+    city_id: number;
     area_id: number;
     street_id: number;
-    building_id: number;
 
+    account_status_id: number;
+    account_type_id: number;
     role: ROLE.SALESMAN;
 }
 
@@ -96,6 +113,10 @@ export interface AddingAssistant {
     first_name: string;
     last_name: string;
 
+    admin_description: string;
+
+    sex: number;
+
     email: string;
     password: string;
 
@@ -104,11 +125,27 @@ export interface AddingAssistant {
 
     birth_date: string;
 
-    governorate_Id?: number;
-    city_Id: number;
+    governorate_id: number;
+    city_id: number;
     area_id: number;
     street_id: number;
-    building_id: number;
 
+    account_status_id: number;
     role: ROLE.ASSISTANT;
+}
+
+
+export interface FilterSalesmanProps {
+    page: number;
+    limit: number;
+    filter_first_name: string;
+    filter_last_name: string;
+    filter_governorate_id: number;
+    filter_city_id: number;
+    filter_area_id: number;
+    filter_street_id: number;
+    filter_account_status_id: number;
+    filter_account_type_id: number;
+    filter_min_time: number;
+    filter_max_time: number;
 }

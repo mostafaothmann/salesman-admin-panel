@@ -1,11 +1,12 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, Modal, Space, Table } from "antd";
+import { Button, Dropdown, Input, Modal, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
 import { Type } from "../../../../stores/types-store-interfaces";
+import { ColumnsType } from "antd/es/table";
 
 
 export default function GroupTypesPage() {
@@ -106,10 +107,11 @@ export default function GroupTypesPage() {
         XLSX.writeFile(workbook, "Cities.xlsx");
     };
     useEffect(() => { getGroupTypesData(); }, []);
-    const columns = [
+    const columns: ColumnsType<any> = [
         {
             title: "الرقم",
             dataIndex: "id",
+            fixed: "left",
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
         {
@@ -123,10 +125,10 @@ export default function GroupTypesPage() {
             dataIndex: "description",
         },
         {
-            title: "عدد الأصناف",
+            title: "الأصناف",
             dataIndex: "types",
             sorter: (a: any, b: any) => Number(a.types.length) - Number(a.types.length),
-            render: (value: Type[]) => { return value?.map(e=><div>{e.name}</div> ) }
+            render: (value: Type[]) => { return value?.map(e => <div>{e.name}</div>) }
         },
         {
             title: "تاريخ الإضافة",
@@ -152,6 +154,15 @@ export default function GroupTypesPage() {
                     >
                         Edit
                     </Button>
+                </Space>
+            ),
+        }
+        ,
+        {
+            title: "",
+            fixed: "right",
+            render: (_: any, record: any) => (
+                <Space size="middle">
                     <Button
                         variant="solid"
                         color="cyan"
@@ -165,9 +176,7 @@ export default function GroupTypesPage() {
     ];
 
     return <div>
-        <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
-            تنزيل
-        </Button>
+
 
         {/*Adding Modal*/}
         <Modal
@@ -273,12 +282,22 @@ export default function GroupTypesPage() {
         >
         </Modal>
 
-        <Button variant="solid" color="purple" onClick={() => setOpen(true)}>
-            إضافة
-        </Button>
+
+        <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+            <Button className="col-span-5 bg-[#592C46]" variant="solid" color="purple" onClick={() => downloadExcel()}>
+                تنزيل
+            </Button>
+            <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
+                إضافة
+            </Button>
+        </div>
 
         <Table
+            style={{ maxWidth: 1100 }}
             scroll={{ x: "max-content" }}
+            pagination={{
+                position: ["topRight"],
+            }}
             columns={columns} dataSource={dataGroupTypes} />
     </div>
 }

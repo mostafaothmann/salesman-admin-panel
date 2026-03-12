@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
 import { useRouter } from "next/navigation";
+import { ColumnsType } from "antd/es/table";
 
 
-export default function TypesPage() {
+export default function IngredientsPage() {
     const { dataIngredients, getIngredientsData, dataTypesForIngredient, getTypesForIngredient, deleteIngredient, addIngredient, editIngredient } = useTypeStore();
     const router = useRouter();
     //showModal
@@ -139,10 +140,11 @@ export default function TypesPage() {
         XLSX.writeFile(workbook, "المكونات.xlsx");
     };
     useEffect(() => { getIngredientsData() }, []);
-    const columns = [
+    const columns: ColumnsType<any> = [
         {
             title: "الرقم",
             dataIndex: "id",
+            fixed: "left",
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
         {
@@ -164,7 +166,7 @@ export default function TypesPage() {
         },
         {
             title: "",
-            key: "id",
+            fixed: 'right',
             render: (_: any, record: any) => (
                 <Space size="middle">
                     <Button
@@ -181,6 +183,14 @@ export default function TypesPage() {
                     >
                         Edit
                     </Button>
+                </Space>
+            ),
+        },
+        {
+            title: "",
+            key: "id",
+            render: (_: any, record: any) => (
+                <Space size="middle">
                     <Button
                         variant="solid"
                         color="cyan"
@@ -442,7 +452,11 @@ export default function TypesPage() {
         </Button>
 
         <Table
+            style={{ maxWidth: 1100 }}
             scroll={{ x: "max-content" }}
+            pagination={{
+                position: ["topRight"],
+            }}
             columns={columns} dataSource={dataIngredients} />
     </div>
 }

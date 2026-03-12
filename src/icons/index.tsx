@@ -60,13 +60,40 @@ import ChartColumnIcon from "./chart-column-big.svg"
 import ChartScatterIcon from "./chart-scatter.svg"
 import DirectionsIcon from "./directions.svg"
 import FirstAidKitIcon from "./first-aid-kit.svg"
+import Licence from "./license.svg"
+import Order from "./order.svg"
+import OrderReject from "./order-reject.svg"
+import OrderAccept from "./order-accept.svg"
+import OrderDownload from "./order-download.svg"
+import OrderAdd from "./order-add.svg"
+import VisitAccept from "./visit-accept.svg"
+import VisitReject from "./visit-accept.svg"
+import DoctorVisit from "./doctor-visit.svg"
+import PharmacistVisit from "./pharmacist-visit.svg"
+import TimeLine from "./timeline.svg"
+import Online from "./online.svg"
+import Refresh from "./refresh.svg"
+import Mall from "./mall.svg"
 
 
 export {
+  Online,
+  TimeLine,
   FirstAidKitIcon,
+  DoctorVisit,
+  PharmacistVisit,
+  VisitAccept,
+  VisitReject,
+  Refresh, Mall,
+  Order,
+  OrderAccept,
+  OrderAdd,
+  OrderReject,
+  OrderDownload,
   DirectionsIcon,
   Building2Icon,
   ChartScatterIcon,
+  Licence,
   ChartBigIcon,
   ChartColumnIcon,
   ChartDecreasingIcon,

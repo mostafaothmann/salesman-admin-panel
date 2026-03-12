@@ -1,24 +1,30 @@
 "use client";
 
-import { AutoComplete, Button, DatePicker, Input, Modal, Slider, SliderSingleProps, Space, Table, TimePicker, TimePickerProps } from "antd";
+import { AutoComplete, Button, DatePicker, Divider, Input, InputNumber, Modal, Space, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
-import dayjs from 'dayjs';
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 import { useRouter } from "next/navigation";
-
 import dynamic from "next/dynamic";
+import { useUsersStore } from "../../../../stores/usersStore/data.store";
+import { ROLE } from "../../../../stores/users-store-interfaces";
+import { Eye, EyeClosed } from "lucide-react";
+import type { ColumnsType } from "antd/es/table";
 
 
-export default function PharmacistsPage() {
-    const { getPharmacistData, getPharmacistsData, total, filter_total, filteredDataPharmacisits, getFilteredDataPharmacists, dataPharmacists, pharmacistD, deletePharmacist, addPharmacist, editPharmacist } = useMedicalStore();
-    const { dataGovernorates, getGovernoratesData, getCitiesData, getAreasData, getStreetsData, dataCities, dataAreas, dataStreets } = usePlacesStore()
+export default function SalesmansPage() {
+    const { getSalesmansData, total, filter_total, filteredDataSalesmans,
+        getFilteredDataSalesmans, dataSalesmans, deleteSalesman, addSalesman,
+    } = useUsersStore();
+    const { dataGovernorates, getGovernoratesData, getCitiesData, getAreasData, getStreetsData,
+        dataCities, dataAreas, dataStreets } = usePlacesStore()
     const router = useRouter();
+
     const Map = dynamic(
         () => import("../../../../sharedComponents/maps/map/Map"),
         { ssr: false }
     );
+
     //table constants
     const [page, setPage] = useState(1)
     const [filter_page, setFilterPage] = useState(1)
@@ -31,32 +37,31 @@ export default function PharmacistsPage() {
     const [first_name, setFirstName] = useState("");
     const [last_name, setLastName] = useState("");
     const [admin_description, setAdminDescription] = useState("");
-    const [salesman_description, setSalesmanDescription] = useState("");
     const [open, setOpen] = useState(false);
+    const [leader_id, setLeaderId] = useState(null);
+    const [account_status_id, setAccountStatusId] = useState(1);
+    const [account_type_id, setAccountTypeId] = useState(1);
     const [city_id, setCityId] = useState(1);
     const [governorate_id, setGovernorateId] = useState(1);
     const [area_id, setAreaId] = useState(1);
     const [street_id, setStreetId] = useState(1);
-    const [specialization_id, setSpecializationId] = useState(1);
-    const [classificationId, setClassificationId] = useState(1);
-    const [loyaltyId, setLoyaltyId] = useState(0);
+    const [level, setLevel] = useState(0);
     const [birth_date, setBirthDate] = useState("");
-    const [sexId, setSexId] = useState(0);
+    const [sex_id, setSexId] = useState(0);
     const [phone_number, setPhoneNumber] = useState("");
     const [telephone_number, setTelephoneNumber] = useState("");
-    const [wife_husband_first_name, setWifeHusbandFirstName] = useState("");
-    const [wife_husband_last_name, setWifeHusbandLastName] = useState("");
-    const [graduation_university, setGraduationUniversity] = useState("");
-    const [graduation_country, setGraduationCountry] = useState("");
-    const [searchTextSpecilization, setSearchTextSpecilization] = useState("");
-    const [searchTextClassification, setSearchTextClassification] = useState("");
-    const [searchTextLoyalty, setSearchTextLoyalty] = useState("");
     const [searchTextSex, setSearchTextSex] = useState("");
     const [searchTextGovernorate, setSearchTextGovernorate] = useState("");
     const [searchTextCity, setSearchTextCity] = useState("");
     const [searchTextArea, setSearchTextArea] = useState("");
     const [searchTextStreet, setSearchTextStreet] = useState("");
+    const [searchTextAccountStatus, setSearchTextAccountStatus] = useState("");
+    const [searchTextLeader, setSearchTextLeader] = useState("");
+    const [searchTextAccountType, setSearchTextAccountType] = useState("");
 
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
 
     //for AddingModal 
@@ -67,54 +72,25 @@ export default function PharmacistsPage() {
         item => item.id === area_id)
     const [optionsStreets, setOptionsStreets] = useState([])
 
+    const [optionsLeaders, setOptionsLeaders] = useState(dataSalesmans?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } }) || []);
+
     const optionsSex = [
+        { value: 0, label: 'غير معروف' },
         { value: 1, label: 'ذكر' },
         { value: 2, label: 'أنثى' }]
-    const optionsLoyalty = [
-        { value: 1, label: 'مخلص جدا' },
-        { value: 2, label: 'مخلص' },
-        { value: 3, label: 'عادي' },
-        { value: 4, label: 'غير مخلص' },
-        { value: 5, label: 'سيء جدا' }
+
+    const optionsStatus = [
+        { value: 1, label: 'منتظر' },
+        { value: 2, label: 'مقبول' },
+        { value: 3, label: 'تحت المراجعة' },
+        { value: 4, label: 'متوقف' },
     ]
-    const optionsClassification = [
-        { value: 1, label: 'مهم جدا' },
-        { value: 2, label: 'مهم' },
-        { value: 3, label: 'عادي' },
-        { value: 4, label: 'سيء' },
-        { value: 5, label: 'سيء جدا' }]
 
-    const firstStartTime = dayjs('12:08:23', 'HH:mm:ss');
-    const firstEndTime = dayjs('12:08:23', 'HH:mm:ss');
-    const secondStartTime = dayjs('12:08:23', 'HH:mm:ss');
-    const secondEndTime = dayjs('12:08:23', 'HH:mm:ss');
-    const favouriteStartTime = dayjs('12:08:23', 'HH:mm:ss');
-    const favouriteEndTime = dayjs('12:08:23', 'HH:mm:ss');
-
-    const [first_time_opening, setFirstTimeOpening] = useState(firstStartTime.toString());
-    const [first_time_closing, setFirstTimeClosing] = useState(firstEndTime.toString());
-    const [second_time_opening, setSecondTimeOpening] = useState(secondStartTime.toString());
-    const [second_time_closing, setSecondTimeClosing] = useState(secondEndTime.toString());
-    const [favourite_time_opening, setFavouriteTimeOpening] = useState(favouriteStartTime.toString());
-    const [favourite_time_closing, setFavouriteTimeClosing] = useState(favouriteEndTime.toString());
-    const onChangeFirstTimeOpening: TimePickerProps['onChange'] = (time, timeString) => {
-        setFirstTimeOpening(timeString)
-    };
-    const onChangeFirstTimeClosing: TimePickerProps['onChange'] = (time, timeString) => {
-        setFirstTimeClosing(timeString)
-    };
-    const onChangeSecondTimeOpening: TimePickerProps['onChange'] = (time, timeString) => {
-        setSecondTimeOpening(timeString)
-    };
-    const onChangeSecondTimeClosing: TimePickerProps['onChange'] = (time, timeString) => {
-        setSecondTimeClosing(timeString)
-    };
-    const onChangeFavouriteTimeOpening: TimePickerProps['onChange'] = (time, timeString) => {
-        setFavouriteTimeOpening(timeString)
-    };
-    const onChangeFavouriteTimeClosing: TimePickerProps['onChange'] = (time, timeString) => {
-        setFavouriteTimeClosing(timeString)
-    };
+    const optionsAccountType = [
+        { value: 1, label: 'علمي' },
+        { value: 2, label: 'تجاري' },
+        { value: 3, label: "علمي تجاري" },
+    ]
 
 
 
@@ -141,6 +117,9 @@ export default function PharmacistsPage() {
 
     async function changeOpenModalAdd() {
         await getGovernoratesData();
+        await getSalesmansData(page, limit);
+
+        setOptionsLeaders(dataSalesmans?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } }))
         setOptionsGovernorates(dataGovernorates?.map(e => { return { value: e.id, label: e.name } }) || []);
         setOpen(true);
     }
@@ -148,55 +127,46 @@ export default function PharmacistsPage() {
     //addDoctor Function
     async function handleAdd() {
         setGovernorateId(governorate_id + 1);
-        setSpecializationId(specialization_id + 1);
         setCityId(city_id + 1)
         setAreaId(area_id + 1)
         setStreetId(street_id + 1)
-        await addPharmacist({
+        await addSalesman({
             first_name: first_name,
+            level: level,
+            password: password,
+            email: email,
+            leader_id: leader_id,
             last_name: last_name,
-            favourite_time_opening: favourite_time_opening,
-            favourite_time_closing: favourite_time_closing,
-            first_work_time_opening: first_time_opening,
-            first_work_time_closing: first_time_closing,
-            second_work_time_opening: second_time_opening,
-            second_work_time_closing: second_time_closing,
+            birth_date: birth_date,
+            admin_description: admin_description,
+            account_status_id: account_status_id,
+            account_type_id: account_type_id,
+            sex: sex_id,
+            phone_number: phone_number,
+            telephone_number: telephone_number,
+            role: ROLE.SALESMAN,
             governorate_id: governorate_id,
             city_id: city_id,
             street_id: street_id,
             area_id: area_id,
-            graduation_country: graduation_country,
-            graduation_university: graduation_university,
-            birth_date: birth_date,
-            classification: classificationId,
-            loyalty: loyaltyId,
-            admin_description: admin_description,
-            salesman_description: salesman_description,
-            sex: sexId,
-            wife_husband_first_name: wife_husband_first_name,
-            wife_husband_last_name: wife_husband_first_name,
-            phone_number: phone_number,
-            telephone_number: telephone_number
         })
-        getPharmacistsData(page, limit);
+        getSalesmansData(page, limit);
         setBirthDate("");
         setFirstName("");
+        setSexId(0);
         setLastName("");
-        setGraduationUniversity("");
-        setWifeHusbandFirstName("");
-        setWifeHusbandLastName("");
+        setAccountTypeId(null)
         setTelephoneNumber("");
         setPhoneNumber("");
-        setSearchTextSpecilization("");
-        setSearchTextLoyalty("");
-        setSearchTextClassification("");
         setSearchTextSex("");
         setSearchTextGovernorate("");
-        setSearchTextCity("");
+        setSearchTextAccountType("");
+        setSearchTextAccountStatus("");
         setSearchTextArea("");
         setSearchTextStreet("");
         setAdminDescription("");
-        setSalesmanDescription("");
+        setSearchTextLeader("");
+        setLeaderId(null)
         setOpen(false)
     }
 
@@ -206,57 +176,43 @@ export default function PharmacistsPage() {
         setFirstName("");
         setLastName("");
         setBirthDate("")
-        setGraduationUniversity("");
-        setWifeHusbandFirstName("")
-        setWifeHusbandLastName("")
         setTelephoneNumber("");
         setPhoneNumber("");
-        setSearchTextSpecilization("");
-        setSearchTextLoyalty("");
-        setSearchTextClassification("");
         setSearchTextSex("");
         setSearchTextGovernorate("");
         setSearchTextCity("");
         setSearchTextArea("");
         setSearchTextStreet("");
         setAdminDescription("");
-        setSalesmanDescription("");
-        setGraduationCountry("");
-        setGraduationCountry("")
-        setOpen(false)
+        setSearchTextAccountStatus("");
+        setAccountTypeId(0);
+        setFilterMinTime(-1);
+        setFilterMaxTime(31);
+        setAccountStatusId(0);
+        setFilterAccountStatusId(0);
+        setFilterAccountTypeId(0);
+        setOpen(false);
     }
 
     //Filter Modal 
     const [filter_first_name, setFilterFirstName] = useState("")
     const [filter_last_name, setFilterLastName] = useState("")
-    const [filter_min_age, setFilterMinAge] = useState(-1)
-    const [filter_max_age, setFilterMaxAge] = useState(101)
-    const [filter_min_classification, setFilterMinClassification] = useState(-1)
-    const [filter_max_classification, setFilterMaxClassification] = useState(6)
-    const [filter_min_loyalty, setFilterMinLoyalty] = useState(-1)
-    const [filter_max_loyalty, setFilterMaxLoyalty] = useState(6)
-    const [filter_specialization_id, setFilterSpecializationId] = useState(0)
     const [filter_governorate_id, setFilterGovernorateId] = useState(0)
     const [filter_city_id, setFilterCityId] = useState(0)
     const [filter_area_id, setFilterAreaId] = useState(0)
     const [filter_street_id, setFilterStreetId] = useState(0)
-    const marks: SliderSingleProps['marks'] = {
-        0: 'سيء جدا',
-        1: 'سيء',
-        2: 'عادي',
-        3: 'مهم',
-        5: {
-            style: {
-                color: '#f50',
-            },
-            label: <strong>مهم جدا</strong>,
-        },
-    };
+    const [filter_account_status_id, setFilterAccountStatusId] = useState(0)
+    const [filter_account_type_id, setFilterAccountTypeId] = useState(0)
+    const [filter_max_time, setFilterMaxTime] = useState(31)
+    const [filter_min_time, setFilterMinTime] = useState(-1)
+
+
     const OpenFilterModal = () => {
         if (!filtered) {
             //  getSpecializationsData();
-
-            // setOptionsSpecializations(dataSpecializations?.map(e => { return { value: e.id, label: e.name } }));
+            getGovernoratesData();
+            setOptionsGovernorates(dataGovernorates?.map(e => { return { value: e.id, label: e.name } }) || []);
+            setOptionsLeaders(dataSalesmans?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } }))
             setOpenFilterModal(true);
         }
         else {
@@ -264,22 +220,19 @@ export default function PharmacistsPage() {
         }
     }
     const getFilteredData = (page: number, limit: number) => {
-        getFilteredDataPharmacists({
+        getFilteredDataSalesmans({
             filter_first_name,
             filter_last_name,
             page,
             limit,
-            filter_max_age,
-            filter_min_age,
-            filter_min_classification,
-            filter_max_classification,
-            filter_min_loyalty,
-            filter_max_loyalty,
-            filter_governorate_id,
-            filter_area_id,
-            filter_city_id,
-            filter_specialization_id,
-            filter_street_id
+            filter_governorate_id: governorate_id,
+            filter_area_id: area_id,
+            filter_city_id: city_id,
+            filter_street_id: street_id,
+            filter_account_status_id,
+            filter_account_type_id,
+            filter_min_time,
+            filter_max_time,
         })
         setFiltered(true);
     }
@@ -296,8 +249,8 @@ export default function PharmacistsPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deletePharmacist(id);
-        getPharmacistsData(page, limit);
+        await deleteSalesman(id);
+        getSalesmansData(page, limit);
         setLoading2(false);
         setOpenDeleteModal(false);
     }
@@ -305,11 +258,11 @@ export default function PharmacistsPage() {
 
     //location 
     async function OpenLocationModal(id: number) {
-        const pharmacist = dataPharmacists?.find(e => e.id == id)
-        console.log(pharmacist)
+        const salesman = dataSalesmans?.find(e => e.id == id)
+        console.log(salesman)
         console.log(id)
-        setLan(Number(pharmacist?.lan));
-        setLat(Number(pharmacist?.lat));
+        setLan(Number(salesman?.lan));
+        setLat(Number(salesman?.lat));
         // setLoading4(true);
         setOpenLocationModal(true);
     }
@@ -317,17 +270,18 @@ export default function PharmacistsPage() {
 
     //downloadExcele
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataPharmacists ?? []);
+        const worksheet = XLSX.utils.json_to_sheet(dataSalesmans ?? []);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "الأطباء");
-        XLSX.writeFile(workbook, "الأطباء.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "المندوبين");
+        XLSX.writeFile(workbook, "المندوبين.xlsx");
     };
-    useEffect(() => { getPharmacistsData(page, limit); }, []);
+    useEffect(() => { getSalesmansData(page, limit); console.log("dataSalesmans  : ", dataSalesmans) }, []);
 
-    const columns = [
+    const columns: ColumnsType<any> = [
         {
             title: "الرقم",
             dataIndex: "id",
+            fixed: 'left',
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
         {
@@ -340,22 +294,7 @@ export default function PharmacistsPage() {
             dataIndex: "last_name",
             sorter: (a: any, b: any) => a.last_name.localeCompare(b.last_name),
         },
-        {
-            title: "التصنيف",
-            dataIndex: "classification",
-            sorter: (a: any, b: any) => Number(a.classification) - Number(b.classification),
-            render: (value: number) => {
-                return optionsClassification?.find(e => e.value == Number(value))?.label;
-            }
-        },
-        {
-            title: "الولاء",
-            dataIndex: "loyalty",
-            sorter: (a: any, b: any) => Number(a.loyalty) - Number(b.loyalty),
-            render: (value: number) => {
-                return optionsLoyalty?.find(e => e.value == Number(value))?.label;
-            }
-        },
+
         {
             title: "المدينة",
             dataIndex: "city_id",
@@ -364,6 +303,7 @@ export default function PharmacistsPage() {
                 return dataCities?.find(e => e.id == Number(value))?.name;
             }
         },
+
         {
             title: "المنطقة",
             dataIndex: "area_id",
@@ -384,18 +324,111 @@ export default function PharmacistsPage() {
             title: "رقم الهاتف",
             dataIndex: "phone_number"
         },
-        /*  {
-             title: "تاريخ الإضافة",
-             dataIndex: "created_at",
-             sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
-             render: (value: string) => { return value?.slice(0, 10) }
-         }, */
+        {
+            title: 'العضوية',
+            dataIndex: "leader_id",
+            sorter: (a: any, b: any) => Number(a.leader_id) - Number(b.leader_id),
+            render: (value: number) => {
+                const salesman = dataSalesmans?.find(e => e.id === Number(value));
+                const isSalesman = value != null;
+
+                if (!salesman && isSalesman) return null;
+
+                return (
+                    <Tag color={isSalesman ? "#592C46" : "#01B9B0"}>
+                        {isSalesman ? "مندوب مبيعات" : "مشرف مبيعات"}
+                        {isSalesman && (
+                            <>
+                                <Divider type="horizontal" style={{ borderColor: "white", margin: "0 5px" }} />
+                                قائده {salesman?.first_name} {salesman?.last_name}
+                            </>
+                        )}
+                    </Tag>
+                );
+            }
+        },
+        {
+            title: 'نوع الحساب',
+            dataIndex: "account_type_id",
+            sorter: (a: any, b: any) => Number(a.account_status_id) - Number(b.account_status_id),
+            render: (value: number) => {
+                let tagColor = "#01B9B0";
+                let mainLabel = "";
+                console.log(value)
+                switch (value) {
+                    case 1:
+                        tagColor = "#355872";
+                        mainLabel = "علمي";
+                        break;
+                    case 2:
+                        tagColor = "#1C0770";
+                        mainLabel = "تجاري";
+                        break;
+                    case 3:
+                        tagColor = "#FF5A5A";
+                        mainLabel = "علمي تجاري";
+                        break;
+                    default:
+                        tagColor = "#d9d9d9";
+                        mainLabel = "غير معروف";
+                }
+
+                return (
+                    <Tag color={tagColor}>
+                        {mainLabel}
+                    </Tag>
+                );
+            }
+        },
+        {
+            title: 'حالة الحساب',
+            dataIndex: "account_status_id",
+            sorter: (a: any, b: any) => Number(a.account_status_id) - Number(b.account_status_id),
+            render: (value: number) => {
+                let tagColor = "#01B9B0";
+                let mainLabel = "مشرف مبيعات";
+                let showLeader = false;
+                switch (value) {
+                    case 1:
+                        tagColor = "#01B9B0";
+                        mainLabel = "منتظر";
+                        break;
+                    case 2:
+                        tagColor = "#196A0B";
+                        mainLabel = "مقبول";
+                        break;
+                    case 3:
+                        tagColor = "#FF9800";
+                        mainLabel = "تحت المراجعة";
+                        break;
+                    case 4:
+                        tagColor = "#650304";
+                        mainLabel = "متوقف";
+                        break;
+                    // add more cases here
+                    default:
+                        tagColor = "#d9d9d9";
+                        mainLabel = "غير معروف";
+                }
+
+                return (
+                    <Tag color={tagColor}>
+                        {mainLabel}
+                    </Tag>
+                );
+            }
+        },
+        {
+            title: "تاريخ الإضافة",
+            dataIndex: "created_at",
+            sorter: (a: any, b: any) => a?.created_at.localeCompare(b?.created_at),
+            render: (value: string) => { return value?.slice(0, 10) }
+        },
         {
             title: "",
             key: "id",
             render: (_: any, record: any) => (
                 <Space size="middle">
-
                     <Button
                         type="default"
                         danger
@@ -410,6 +443,15 @@ export default function PharmacistsPage() {
                     >
                         Location
                     </Button>
+                </Space>
+            ),
+        },
+        {
+            title: "",
+            key: "id",
+            fixed: 'right',
+            render: (_: any, record: any) => (
+                <Space size="middle">
                     <Button
                         variant="solid"
                         color="cyan"
@@ -423,19 +465,11 @@ export default function PharmacistsPage() {
     ];
 
     return <div>
-        <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
-            تنزيل
-        </Button>
-        <Button variant="solid" color="purple" onClick={() => OpenFilterModal()}>
-            فلترة
-        </Button>
-
-
         {/*Adding Modal*/}
         <Modal
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
-                    <span> إضافة طبيب</span>
+                    <span> إضافة مندوب</span>
                 </div>
             }
             open={open}
@@ -445,7 +479,7 @@ export default function PharmacistsPage() {
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
-                <div className="col-span-6 xl:col-span-4">
+                <div className="col-span-6 xl:col-span-6">
                     <h3>
                         الاسم الأول :
                     </h3>
@@ -456,7 +490,7 @@ export default function PharmacistsPage() {
                         placeholder=" الاسم الأول "
                     />
                 </div>
-                <div className="col-span-6 xl:col-span-4">
+                <div className="col-span-6 xl:col-span-6">
                     <h3>
                         الاسم الثاني :
                     </h3>
@@ -469,38 +503,7 @@ export default function PharmacistsPage() {
                 </div>
 
 
-                <div className="col-span-6 xl:col-span-4">
-                    <div>
-                        <h3>
-                            التصنيف :
-                        </h3>
-                    </div>
-                    <AutoComplete
-                        style={{ width: '100%' }}
-                        options={optionsClassification}
-                        placeholder="التصنيف"
-                        // what user sees & types
-                        value={searchTextClassification}
-                        // typing updates text
-                        onChange={(text) => {
-                            setSearchTextClassification(text);
-                            setClassificationId(undefined); // clear ID while typing
-                        }}
-                        // when user selects from dropdown
-                        onSelect={(value, option) => {
-                            setClassificationId(option.value);                 // ID
-                            setSearchTextClassification(option?.label as string);  // show name
-
-                        }}
-                        filterOption={(inputValue, option) =>
-                            (option?.label as string)
-                                ?.toLowerCase()
-                                .includes(inputValue.toLowerCase())
-                        }
-                    />
-                </div>
-
-                <div className="col-span-12 xl:col-span-4">
+                <div className="col-span-6 xl:col-span-6">
                     <h3>
                         رقم الهاتف  :
                     </h3>
@@ -513,7 +516,8 @@ export default function PharmacistsPage() {
                 </div>
 
 
-                <div className="col-span-12 xl:col-span-4">
+
+                <div className="col-span-6 xl:col-span-6">
                     <h3>
                         رقم الأرضي  :
                     </h3>
@@ -525,7 +529,36 @@ export default function PharmacistsPage() {
                     />
                 </div>
 
-                <div className="col-span-12 xl:col-span-4">
+                <div className="col-span-12 xl:col-span-6">
+                    <h3>
+                        البريد   :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={email}
+                        type={"email"}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="البريد"
+                    />
+                </div>
+
+
+                <div className="col-span-6 xl:col-span-6">
+                    <h3>
+                        كلمة السر   :
+                    </h3>
+                    <Input.Password
+                        placeholder="كلمة السر"
+                        className="w-full"
+                        value={password}
+
+                        onChange={(e) => setPassword(e.target.value)}
+                        iconRender={(visible) => (visible ? <Eye /> : <EyeClosed />)}
+                    />
+
+                </div>
+
+                <div className="col-span-6 xl:col-span-6">
                     <h3>
                         تاريخ الولادة  :
                     </h3>
@@ -536,7 +569,7 @@ export default function PharmacistsPage() {
                 </div>
 
 
-                <div className="col-span-6 xl:col-span-4">
+                <div className="col-span-6 xl:col-span-6">
                     <div>
                         <h3>
                             الجنس :
@@ -566,28 +599,27 @@ export default function PharmacistsPage() {
                     />
                 </div>
 
-
                 <div className="col-span-6 xl:col-span-4">
                     <div>
                         <h3>
-                            الولاء :
+                            قائد الفريق :
                         </h3>
                     </div>
                     <AutoComplete
                         style={{ width: '100%' }}
-                        options={optionsLoyalty}
-                        placeholder="الولاء"
+                        options={optionsLeaders}
+                        placeholder="قائد الفريق"
                         // what user sees & types
-                        value={searchTextLoyalty}
+                        value={searchTextLeader}
                         // typing updates text
                         onChange={(text) => {
-                            setSearchTextLoyalty(text);
-                            setLoyaltyId(undefined); // clear ID while typing
+                            setSearchTextLeader(text);
+                            setLeaderId(undefined); // clear ID while typing
                         }}
                         // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setLoyaltyId(option.value);                 // ID
-                            setSearchTextLoyalty(option?.label as string);  // show name
+                            setLeaderId(option.value);                 // ID
+                            setSearchTextLeader(option?.label as string);  // show name
                         }}
                         filterOption={(inputValue, option) =>
                             (option?.label as string)
@@ -597,54 +629,70 @@ export default function PharmacistsPage() {
                     />
                 </div>
 
-                <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
-                    <div className="col-span-12">
+
+
+                <div className="col-span-6 xl:col-span-4">
+                    <div>
                         <h3>
-                            موعد الدوام  الأول :
+                            حالة الحساب :
                         </h3>
                     </div>
-                    <div className="col-span-6 xl:col-span-6">
-                        <h4>من :</h4>
-                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeFirstTimeOpening} />
-                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsStatus}
+                        placeholder="حالة الحساب"
+                        // what user sees & types
+                        value={searchTextAccountStatus}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextAccountStatus(text);
+                            setAccountStatusId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
 
-                    <div className="col-span-6 xl:col-span-6">
-                        <h4>إلى :</h4>
-                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeFirstTimeClosing} />
-                    </div>
+                            setAccountStatusId(option.value);                 // ID
+                            setSearchTextAccountStatus(option?.label as string);
+
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
                 </div>
 
-                <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
-                    <div className="col-span-12">
+                <div className="col-span-6 xl:col-span-4">
+                    <div>
                         <h3>
-                            موعد الدوام  الثاني :
+                            نوع الحساب :
                         </h3>
                     </div>
-                    <div className="col-span-6 xl:col-span-6">
-                        <h3>من :</h3>
-                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeSecondTimeOpening} />
-                    </div>
-                    <div className="col-span-6 xl:col-span-6">
-                        <h4>إلى :</h4>
-                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeSecondTimeClosing} />
-                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsAccountType}
+                        placeholder="نوع الحساب "
+                        // what user sees & types
+                        value={searchTextAccountType}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextAccountType(text);
+                            setAccountTypeId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setAccountTypeId(option.value);                 // ID
+                            setSearchTextAccountType(option?.label as string);
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
                 </div>
 
-                <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
-                    <div className="col-span-12">
-                        <h3>
-                            موعد الزيارة المفضل :
-                        </h3>
-                    </div>
-                    <div className="col-span-6 xl:col-span-6">
-                        <h3>من :</h3>
-                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeFavouriteTimeOpening} />
-                    </div>
-                    <div className="col-span-6 xl:col-span-6">
-                        <h4>إلى :</h4>
-                        <TimePicker className="w-full" use12Hours format="h:mm a" onChange={onChangeFavouriteTimeClosing} />
-                    </div>
-                </div>
 
                 <div className="col-span-6 xl:col-span-3">
                     <div>
@@ -805,54 +853,6 @@ export default function PharmacistsPage() {
                     />
                 </div>
 
-                <div className="col-span-6 xl:col-span-6">
-                    <h3>
-                        بلد التخرج:
-                    </h3>
-                    <Input
-                        className="w-full"
-                        value={graduation_country}
-                        onChange={(e) => setGraduationCountry(e.target.value)}
-                        placeholder="بلد التخرج"
-                    />
-                </div>
-
-                <div className="col-span-6 xl:col-span-6">
-                    <h3>
-                        جامعة التخرج:
-                    </h3>
-                    <Input
-                        className="w-full"
-                        value={graduation_university}
-                        onChange={(e) => setGraduationUniversity(e.target.value)}
-                        placeholder="جامعة التخرج"
-                    />
-                </div>
-
-
-                <div className="col-span-6 xl:col-span-6">
-                    <h3>
-                        اسم الزوج/الزوجة الأول:
-                    </h3>
-                    <Input
-                        className="w-full"
-                        value={wife_husband_first_name}
-                        onChange={(e) => setWifeHusbandFirstName(e.target.value)}
-                        placeholder="اسم الزوج/الزوجة الأول"
-                    />
-                </div>
-
-                <div className="col-span-6 xl:col-span-6">
-                    <h3>
-                        اسم الزوج/الزوجة الثاني:
-                    </h3>
-                    <Input
-                        className="w-full"
-                        value={wife_husband_last_name}
-                        onChange={(e) => setWifeHusbandLastName(e.target.value)}
-                        placeholder="اسم الزوج/الزوجة الثاني"
-                    />
-                </div>
 
                 <div className="col-span-12">
                     <h3>
@@ -867,18 +867,6 @@ export default function PharmacistsPage() {
                     />
                 </div>
 
-                <div className="col-span-12">
-                    <h3>
-                        وصف المندوبين :
-                    </h3>
-                    <TextArea
-                        value={salesman_description}
-                        style={{ maxWidth: '100%' }}
-                        onChange={(e) => setSalesmanDescription(e.target.value)}
-                        rows={4}
-                        placeholder="وصف المندوبين"
-                    />
-                </div>
             </div>
         </Modal>
 
@@ -916,7 +904,7 @@ export default function PharmacistsPage() {
             title="فلترة النتائج"
             open={openFilterModal}
             onOk={() => handleFilter()}
-            onCancel={() => setOpenFilterModal(false)}
+            onCancel={() => { setOpenFilterModal(false); emptyFields() }}
             confirmLoading={loading3}
             mask={false}
 
@@ -943,55 +931,300 @@ export default function PharmacistsPage() {
                         className="w-full"
                         value={filter_last_name}
                         onChange={(e) => setFilterLastName(e.target.value)}
-                        placeholder=" الاسم الثاني "
+                        placeholder="الاسم الثاني"
                     />
                 </div>
 
-                <div className="col-span-12 xl:col-span-12">
-                    <div>
+                <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
+                    <div className="col-span-12">
                         <h3>
-                            التصنيف :
+                            مدة العمل:
                         </h3>
                     </div>
-                    <Slider min={0} max={5} range marks={marks} step={1} defaultValue={[0, 4]} />
+                    <div className="col-span-6 xl:col-span-6">
+                        <h3>من :</h3>
+                        <InputNumber style={{ width: '100%' }}
+                            min={0} max={30} onChange={(e) => setFilterMinTime(e)} />
 
+                    </div>
+                    <div className="col-span-6 xl:col-span-6">
+                        <h4>إلى :</h4>
+                        <InputNumber style={{ width: '100%' }}
+                            min={filter_min_time} max={30} onChange={(e) => setFilterMaxTime(e)} />
+                    </div>
+                </div>
+
+
+                <div className="col-span-6 xl:col-span-6">
+                    <div>
+                        <h3>
+                            نوع الحساب :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsAccountType}
+                        placeholder="نوع الحساب"
+                        // what user sees & types
+                        value={searchTextAccountType}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextAccountType(text);
+                            setFilterAccountTypeId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setFilterAccountTypeId(option.value);                 // ID
+                            setSearchTextAccountType(option?.label as string);  // show name
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+
+                <div className="col-span-6 xl:col-span-6">
+                    <div>
+                        <h3>
+                            حالة الحساب :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsStatus}
+                        placeholder="حالة الحساب"
+                        // what user sees & types
+                        value={searchTextAccountStatus}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextAccountStatus(text);
+                            setFilterAccountStatusId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setFilterAccountStatusId(option.value);                 // ID
+                            setSearchTextAccountStatus(option?.label as string);  // show name
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+
+
+                <div className="col-span-6 xl:col-span-3">
+                    <div>
+                        <h3>
+                            المحافظة :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsGovernorates}
+                        placeholder="المحافظة"
+                        // what user sees & types
+                        value={searchTextGovernorate}
+                        // typing updates text
+                        onChange={(text) => {
+                            getCitiesData()
+                            setSearchTextGovernorate(text);
+                            setSearchTextCity("");
+                            setSearchTextArea("");
+                            setSearchTextStreet("");
+                            setGovernorateId(undefined); // clear ID while typing
+                            setCityId(undefined); // clear ID while typing
+                            setAreaId(undefined); // clear ID while typing
+                            setStreetId(undefined); // clear ID while typing
+                            const governorate = dataGovernorates?.find(
+                                item => item.id === governorate_id)
+                            setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            getCitiesData()
+                            setGovernorateId(option.value);                 // ID
+                            setSearchTextGovernorate(option?.label as string);  // show name
+                            const governorate = dataGovernorates?.find(
+                                item => item.id === governorate_id)
+                            setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-3">
+                    <div>
+                        <h3>
+                            المدينة :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsCities}
+                        placeholder="المدينة"
+                        // what user sees & types
+                        value={searchTextCity}
+                        // typing updates text
+                        onChange={(text) => {
+                            getAreasData()
+                            setSearchTextCity(text);
+                            setSearchTextArea("");
+                            setSearchTextStreet("");
+                            setCityId(undefined); // clear ID while typing
+                            setAreaId(undefined); // clear ID while typing
+                            setStreetId(undefined); // clear ID while typing
+                            const city = dataCities?.find(
+                                item => item.id === city_id)
+                            setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            getAreasData()
+                            setCityId(option.value);                 // ID
+                            setSearchTextCity(option?.label as string);  // show name
+                            const city = dataCities?.find(
+                                item => item.id === city_id)
+                            setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
+
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-3">
+                    <div>
+                        <h3>
+                            المنطقة :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsAreas}
+                        placeholder="المنطقة"
+                        // what user sees & types
+                        value={searchTextArea}
+                        // typing updates text
+                        onChange={(text) => {
+                            getStreetsData()
+                            setSearchTextArea(text);
+                            setSearchTextStreet("");
+                            setAreaId(undefined); // clear ID while typing
+                            setStreetId(undefined); // clear ID while typing
+                            const area = dataAreas?.find(
+                                item => item.id === area_id)
+                            setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
+
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            getStreetsData()
+                            setAreaId(option.value);                 // ID
+                            setSearchTextArea(option?.label as string);  // show name
+                            const area = dataAreas?.find(
+                                item => item.id === area_id)
+                            setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
+
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+
+                <div className="col-span-6 xl:col-span-3">
+                    <div>
+                        <h3>
+                            الشارع :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={optionsStreets}
+                        placeholder="الشارع"
+                        // what user sees & types
+                        value={searchTextStreet}
+                        // typing updates text
+                        onChange={(text) => {
+                            setSearchTextStreet(text);
+                            setStreetId(undefined); // clear ID while typing
+                        }}
+                        // when user selects from dropdown
+                        onSelect={(value, option) => {
+                            setStreetId(option.value);                 // ID
+                            setSearchTextStreet(option?.label as string);  // show name
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
                 </div>
             </div>
         </Modal>
-
-        <Button variant="solid" color="purple" onClick={() => changeOpenModalAdd()}>
-            إضافة
-        </Button>
-        {filtered ? <Table
-            scroll={{ x: "max-content" }}
-            columns={columns}
-            pagination={{
-                current: filter_page,
-                pageSize: limit,
-                total: filter_total,
-                onChange: (page, pageSize) => {
-                    setFilterPage(filter_page)
-                    getFilteredData(page, pageSize)
-                    // setPage(lastPage)
-                },
-            }}
-            dataSource={filteredDataPharmacisits || []} />
-            :
-            <Table
+        <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+            <Button className="col-span-4" variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
+            </Button>
+            <Button className="col-span-4" variant="solid" color="cyan" onClick={() => changeOpenModalAdd()}>
+                إضافة
+            </Button>
+            <Button className="col-span-4" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
+                فلترة
+            </Button>
+        </div>
+        <div className="max-w-full">
+            {filtered ? <Table
                 scroll={{ x: "max-content" }}
                 columns={columns}
                 pagination={{
-                    current: page,
+                    position: ["topRight"],
+                    current: filter_page,
                     pageSize: limit,
-                    total: total,
+                    total: filter_total,
                     onChange: (page, pageSize) => {
-                        getPharmacistsData(page, pageSize);
-                        setPage(page)
+                        setFilterPage(filter_page)
+                        getFilteredData(page, pageSize)
                         // setPage(lastPage)
                     },
                 }}
-                dataSource={dataPharmacists || []} />
-        }
+                dataSource={filteredDataSalesmans || []} />
+                :
+                <Table
+                    scroll={{ x: "max-content" }}
+                    style={{ maxWidth: 1100 }}
+                    columns={columns}
+                    pagination={{
+                        position: ["topRight"],
+                        current: page,
+                        pageSize: limit,
+                        total: total,
+                        onChange: (page, pageSize) => {
+                            getSalesmansData(page, pageSize);
+                            setPage(page)
+                            //setPage(lastPage)
+                        },
+                    }}
+                    dataSource={dataSalesmans || []} />
+            }
+
+        </div>
 
     </div>
 }

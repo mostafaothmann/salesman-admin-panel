@@ -10,7 +10,7 @@ function SetView({ center }: { center: [number, number] }) {
     const map = useMap()
 
     useEffect(() => {
-        map.setView(center, 13)
+        map.setView(center, 18)
     }, [center, map])
 
     return null
@@ -31,12 +31,14 @@ export default function Map({ lat, lan }: MapProps) {
     })
     return (
         <MapContainer
-            style={{ height: '500px', width: '100%' }}
+
+            style={{ height: '100%', width: '100%' }}
         >
             <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <SetView center={position} />
+            <SetView center={position}    // <-- change zoom here
+            />
             <Marker position={position} >
                 <Popup>Doctor</Popup>
             </Marker>

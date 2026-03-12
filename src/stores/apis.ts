@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = `http://192.168.1.125:4000`
+const url = `http://192.168.1.113:4000`
 
 //for RohAlarad
 
@@ -34,7 +34,7 @@ export const apiGovernorate = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiGovernorate.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -57,7 +57,7 @@ export const apiCity = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiCity.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -80,7 +80,7 @@ export const apiArea = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiArea.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -103,7 +103,7 @@ export const apiStreet = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiStreet.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -126,7 +126,7 @@ export const apiBuilding = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiBuilding.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -150,7 +150,7 @@ export const apiSpecialization = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiSpecialization.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -167,13 +167,57 @@ apiSalesman.interceptors.request.use(
 
 //for Associations
 export const apiAssociation = axios.create({
-  baseURL: `${url}/association `,
+  baseURL: `${url}/association`,
   headers: { 'Content-Type': 'application/json' },
 });
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiAssociation.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+//for Associations
+export const apiِAssociationPharmacist = axios.create({
+  baseURL: `${url}/association-pharmacist`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiِAssociationPharmacist.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+//for Associations
+export const apiAssociationDoctor = axios.create({
+  baseURL: `${url}/association-doctor`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiAssociationDoctor.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -195,7 +239,7 @@ export const apiSpecializationType = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiSpecializationType.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -220,7 +264,7 @@ export const apiDoctorPharmacist = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiDoctorPharmacist.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -244,7 +288,7 @@ export const apiDoctor = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiDoctor.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -268,7 +312,7 @@ export const apiPharmacist = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiPharmacist.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -284,37 +328,14 @@ apiSalesman.interceptors.request.use(
 
 
 //for DoctorVisits
-export const apiDoctorVisit = axios.create({
-  baseURL: `${url}/doctor-visit`,
+export const apiVisit = axios.create({
+  baseURL: `${url}/visit`,
   headers: { 'Content-Type': 'application/json' },
 });
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
-  (config) => {
-    const token = useAuthStore.getState().authData?.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      delete config.headers.Authorization;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
- */
-
-
-//for PharmacistVisits
-export const apiPharmacistVisit = axios.create({
-  baseURL: `${url}/pharmacist-visit`,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-/*
- // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiVisit.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -341,7 +362,7 @@ export const apiGroupType = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiGroupType.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -364,7 +385,7 @@ export const apiType = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiType.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -387,7 +408,7 @@ export const apiIngredient = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiIngredient.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -411,7 +432,7 @@ export const apiTypeIngredient = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiTypeIngredient.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -435,7 +456,7 @@ export const apiRecoveryCase = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiRecoveryCase.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -459,7 +480,7 @@ export const apiRecoveryCaseImage = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiRecoveryCaseImage.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -483,7 +504,7 @@ export const apiAssistant = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiAssistant.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -500,6 +521,29 @@ apiSalesman.interceptors.request.use(
 
 
 //for Order
+export const apiMall = axios.create({
+  baseURL: `${url}/mall`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiMall.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+//for Order
 export const apiOrder = axios.create({
   baseURL: `${url}/order`,
   headers: { 'Content-Type': 'application/json' },
@@ -507,7 +551,7 @@ export const apiOrder = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiOrder.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -531,7 +575,7 @@ export const apiOnlineOrder = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiOnlineOrder.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -555,7 +599,7 @@ export const apiProduct = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiProduct.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -579,7 +623,7 @@ export const apiOnlineProduct = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiOnlineProduct.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -604,7 +648,7 @@ export const apiOffer = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiOffer.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -628,7 +672,7 @@ export const apiOnlineOffer = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiOnlineOffer.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -653,7 +697,7 @@ export const apiBaseOffer = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiBaseOffer.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -680,7 +724,30 @@ export const apiOnlineCustomer = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiOnlineCustomer.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+//for Hospital Doctor
+export const apiHospital = axios.create({
+  baseURL: `${url}/hospital`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiHospital.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -704,7 +771,7 @@ export const apiHospitalDoctor = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiHospitalDoctor.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -730,7 +797,7 @@ export const apiHospitalPharmacist = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiHospitalPharmacist.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -745,45 +812,20 @@ apiSalesman.interceptors.request.use(
  */
 
 
-
-
-
-
-//for Sample Pharmacist
-export const apiSamplePharmacist = axios.create({
-  baseURL: `${url}/hospital-pharmacist`,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-/*
- // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
-  (config) => {
-    const token = useAuthStore.getState().authData?.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      delete config.headers.Authorization;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
- */
 
 
 
 
 
 //for Sample Doctor
-export const apiSampleDoctor = axios.create({
-  baseURL: `${url}/hospital-pharmacist`,
+export const apiSample = axios.create({
+  baseURL: `${url}/sample`,
   headers: { 'Content-Type': 'application/json' },
 });
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiSample.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -796,36 +838,6 @@ apiSalesman.interceptors.request.use(
   (error) => Promise.reject(error)
 );
  */
-
-
-
-
-
-
-//for Association Pharmacist
-export const apiِAssociationPharmacist = axios.create({
-  baseURL: `${url}/hospital-pharmacist`,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-/*
- // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
-  (config) => {
-    const token = useAuthStore.getState().authData?.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      delete config.headers.Authorization;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
- */
-
-
-
 
 
 //for Association Doctor
@@ -836,7 +848,91 @@ export const apiِAssociationDoctor = axios.create({
 
 /*
  // 🧠 Automatically attach the latest token before each request
-apiSalesman.interceptors.request.use(
+apiِAssociationDoctor.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+
+
+
+//for Salesman Message
+export const apiSalesmanMessage = axios.create({
+  baseURL: `${url}/salesman-message`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiSalesmanMessage.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+
+
+
+//for Gift Visit
+export const apiGiftVisit = axios.create({
+  baseURL: `${url}/gift-visit`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiGiftVisit.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+
+
+
+
+//for Base Gift
+export const apiBaseGift = axios.create({
+  baseURL: `${url}/base-gift`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiBaseGift.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().authData?.token;
     if (token) {
@@ -857,7 +953,24 @@ apiSalesman.interceptors.request.use(
 
 
 
+//for Video Link
+export const apiVideoLink = axios.create({
+  baseURL: `${url}/video-link`,
+  headers: { 'Content-Type': 'application/json' },
+});
 
-
-
-
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiVideoLink.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */

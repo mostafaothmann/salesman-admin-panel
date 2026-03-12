@@ -4,7 +4,7 @@ import { useAuthStore } from '../usersStore/auth.store';
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { apiGroupType, apiIngredient, apiType } from '../apis';
 import { AddingGroupType, AddingIngredient, AddingType, BaseOffer, GroupType, Ingredient, OnlineProduct, Product, RecoveryCase, Type } from '../types-store-interfaces';
-import { Doctor, DoctorSample, Pharmacist, PharmacistSample, Specialization } from '../medical-store-interfaces';
+import { Doctor, DoctorSample, Pharmacist, PharmacistSample  } from '../medical-store-interfaces';
 
 
 
@@ -512,6 +512,6 @@ export const useTypeStore = create<DataStore>()(
             name: 'types-data-storage',
             storage: createJSONStorage(() => localStorage),
             //partialize: (state) => ({ data: state.dataGovernorates })
-        } // AsyncStorage (React Native)
+        } 
     )
 );

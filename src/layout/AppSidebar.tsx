@@ -5,18 +5,21 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
-  BoxCubeIcon,
-  Building2Icon,
   BuildingIcon,
-  CalenderIcon,
   ChevronDownIcon,
   DirectionsIcon,
   FirstAidKitIcon,
   GridIcon,
-  GroupIcon,
   HorizontaLDots,
+  Licence,
+  Online,
+  Order,
   ToolCaseIcon,
   UserCircleIcon,
+  DoctorVisit,
+  PharmacistVisit,
+  Mall,
+
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
 
@@ -24,7 +27,7 @@ type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[]
 };
 
 const navItems: NavItem[] = [
@@ -42,7 +45,6 @@ const navItems: NavItem[] = [
       { name: "مجموعات الأصناف", path: "/group-types", pro: false },
       { name: "الأصناف", path: "/types", pro: false },
       { name: "المكونات", path: "/ingredients", pro: false },
-      { name: "حالات الشفاء", path: "/recovery-cases", pro: false },
     ],
   },
   {
@@ -53,6 +55,15 @@ const navItems: NavItem[] = [
       { name: "الأطباء", path: "/doctors", pro: false },
       { name: "الصيادلة", path: "/pharmacists", pro: false },
       { name: "الجمعيات", path: "/associations", pro: false },
+      { name: "المراكز الطبية والمشافي", path: "/hospitals", pro: false },
+
+    ],
+  },
+  {
+    icon: <Mall />,
+    name: "تجاري",
+    subItems: [
+      { name: "مولات", path: "/malls", pro: false },
     ],
   }
   ,
@@ -60,41 +71,49 @@ const navItems: NavItem[] = [
     icon: <UserCircleIcon />,
     name: "المندوبين",
     subItems: [
-      { name: "الكل", path: "/salesman", pro: false },
-      { name: "مندوبين علميين", path: "/commercial-salesmans", pro: false },
-      { name: "مندوبين تجاريين", path: "/sientafic-salesmans", pro: false },
+      { name: "الكل", path: "/salesmans", pro: false },
     ],
   }
   ,
   {
-    icon: <BuildingIcon />,
-    name: "online",
+    icon: <DoctorVisit />,
+    name: "مقدمات",
     subItems: [
-      { name: "المندوبين", path: "/salesman", pro: false },
-      { name: "زبائن", path: "/commercial-salesmans", pro: false },
-      { name: "طلبات", path: "/sientafic-salesmans", pro: false },
+      { name: "الهدايا الأساسية", path: "/base-gifts", pro: false },
+      { name: "هدايا", path: "/gifts-visits", pro: false },
+      { name: "عينات", path: "/samples", pro: false },
     ],
   }
   ,
+  ,
   {
-    icon: <BuildingIcon />,
-    name: "الزيارات",
+    icon: <DoctorVisit />,
+    name: "الدعاية العلمية",
     subItems: [
+      { name: "إحصائيات الأطباء", path: "/doctors-analysis", pro: false },
       { name: "زيارات الأطباء", path: "/doctors-visits", pro: false },
-      { name: "زيارات الصيادلة", path: "/pharmacists-visits", pro: false },
+      { name: "عينات الأطباء", path: "/doctors-samples", pro: false },
     ],
   }
   ,
   {
-    icon: <BuildingIcon />,
+    icon: <PharmacistVisit />,
+    name: "الدعاية التجارية",
+    subItems: [
+      { name: "إحصائيات الصيادلة", path: "/pharmacists-analysis", pro: false },
+      { name: "زيارات الصيادلة", path: "/pharmacists-visits", pro: false },
+      { name: "عينات الصيادلة", path: "/pharmacists-samples", pro: false },
+    ],
+  }
+  ,
+  {
+    icon: <Order />,
     name: "فواتير",
     subItems: [
-      { name: "فواتير", path: "/salesman", pro: false },
-      { name: "مرتجعات", path: "/sientafic-salesmans", pro: false },
-      { name: "فواتير أون لاين", path: "/commercial-salesmans", pro: false },
-      { name: "عروض مباعة", path: "/commercial-salesmans", pro: false },
-      { name: "منتجات مباعة", path: "/commercial-salesmans", pro: false },
-
+      { name: "فواتير", path: "/orders", pro: false },
+      { name: "مرتجعات", path: "/returns", pro: false },
+      { name: "عروض مباعة", path: "/offers", pro: false },
+      { name: "منتجات مباعة", path: "/products", pro: false },
     ],
   }
   ,
@@ -106,6 +125,16 @@ const navItems: NavItem[] = [
       { name: "المدن", path: "/cities", pro: false },
       { name: "المناطق", path: "/areas", pro: false },
       { name: "الشوراع", path: "/streets", pro: false },
+    ],
+  }
+  ,
+  {
+    icon: <Licence />,
+    name: "إداري",
+    subItems: [
+      { name: "المشرفين", path: "/assistants", pro: false },
+      { name: "رسائل المندوبين", path: "/salesmans-messages", pro: false },
+      { name: "فيديوهات الأطباء", path: "/videos-links", pro: false },
     ],
   }
 ];
@@ -347,7 +376,7 @@ const AppSidebar: React.FC = () => {
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 h-full">
             <div>
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
@@ -356,7 +385,7 @@ const AppSidebar: React.FC = () => {
                   }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "nothing"
+                  ""
                 ) : (
                   <HorizontaLDots />
                 )}
@@ -364,11 +393,15 @@ const AppSidebar: React.FC = () => {
               {renderMenuItems(navItems, "main")}
             </div>
 
-
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+
       </div>
+      {isExpanded || isHovered || isMobileOpen ? (
+        <div className="mt-auto">
+          <SidebarWidget />
+        </div>
+      ) : null}
     </aside>
   );
 };

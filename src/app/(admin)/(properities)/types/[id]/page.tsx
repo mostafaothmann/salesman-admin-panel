@@ -7,6 +7,8 @@ import { Button, ConfigProvider, Tabs } from "antd";
 import { useEffect, useState } from "react";
 import TypesSpecifications from "../../../../../sharedComponents/pagesComponents/typePage/typeSpecifications/TypeSpecifications";
 import { useTypeStore } from "../../../../../stores/typesStore/data.store";
+
+
 export default function TypePage() {
     const params = useParams()
     const router = useRouter()

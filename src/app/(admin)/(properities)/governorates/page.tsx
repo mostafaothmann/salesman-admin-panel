@@ -5,6 +5,7 @@ import { Button, Dropdown, Input, Modal, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
+import { ColumnsType } from "antd/es/table";
 
 
 export default function GovernoratesPage() {
@@ -105,10 +106,11 @@ export default function GovernoratesPage() {
     XLSX.writeFile(workbook, "Cities.xlsx");
   };
   useEffect(() => { getGovernoratesData(); }, []);
-  const columns = [
+  const columns: ColumnsType<any> = [
     {
       title: "الرقم",
       dataIndex: "id",
+      fixed: "left",
       sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
     },
     {
@@ -142,6 +144,15 @@ export default function GovernoratesPage() {
           >
             Edit
           </Button>
+        </Space>
+      ),
+    }
+    ,
+    {
+      title: "",
+      fixed: "right",
+      render: (_: any, record: any) => (
+        <Space size="middle">
           <Button
             variant="solid"
             color="cyan"
@@ -281,6 +292,10 @@ export default function GovernoratesPage() {
     </Button>
 
     <Table
+      style={{ maxWidth: 1100 }}
+      pagination={{
+        position: ["topRight"],
+      }}
       scroll={{ x: "max-content" }}
       columns={columns} dataSource={dataGovernorates} />
   </div>

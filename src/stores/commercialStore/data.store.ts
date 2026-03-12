@@ -1,10 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { AddingOffer, AddingOnlineCustomer, AddingOnlineOffer, AddingOnlineOrder, AddingOrder, Offer, OnlineCustomer, OnlineOffer, OnlineOrder, Order } from '../commercial-store-interfaces';
-import { apiBaseOffer, apiOffer, apiOnlineCustomer, apiOnlineOffer, apiOnlineOrder, apiOnlineProduct, apiOrder, apiProduct } from '../apis';
+import { AddingMall, AddingOffer, AddingOnlineCustomer, AddingOnlineOffer, AddingOnlineOrder, AddingOrder, Mall, Offer, OnlineCustomer, OnlineOffer, OnlineOrder, Order } from '../commercial-store-interfaces';
+import { apiBaseOffer, apiMall, apiOffer, apiOnlineCustomer, apiOnlineOffer, apiOnlineOrder, apiOnlineProduct, apiOrder, apiProduct } from '../apis';
 import { AddingBaseOffer, AddingOnlineProduct, AddingProduct, BaseOffer, OnlineProduct, Product } from '../types-store-interfaces';
-
-
 
 
 interface DataStore {
@@ -32,8 +30,18 @@ interface DataStore {
     dataOnlineCustomers: OnlineCustomer[] | undefined;
     onlineCustomerD: OnlineCustomer,
 
+    dataMalls: Mall[] | undefined;
+    mallD: Mall,
+
     loading: boolean;
     error: string | null;
+
+    // For Malls
+    getMallsData: () => Promise<void>;
+    getMallData: (id: number) => Promise<void>;
+    addMall: (product: AddingMall) => Promise<void>;
+    deleteMall: (id: number) => Promise<void>;
+    editMall: (id: number, product: AddingMall) => Promise<void>;
 
     //for Orders
     getOrdersData: () => Promise<void>;
@@ -92,14 +100,99 @@ interface DataStore {
     editOnlineCustomer: (id: number, onlineCustomer: AddingOnlineCustomer) => Promise<void>;
 }
 //gettig the token from Auth Store 
-export const usePlacesStore = create<DataStore>()(
+export const useCommercialStore = create<DataStore>()(
     persist(
         (set, get) => ({
+            //Malls
+            dataMalls: undefined,
+            mallD: null,
+            loading: false,
+            error: null,
+            // Get Orders Data
+            getMallsData: async () => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiMall.get(``);
+                    const dataMalls = res.data
+                    set({ dataMalls, loading: false });
+                    return dataMalls
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Loading Malls',
+                        loading: false,
+                    });
+                }
+            },
+            // get One order Data  👈
+            getMallData: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiMall.get(`/${id}`);
+                    const mallD = res.data
+                    set({ mallD, loading: false });
+                    return mallD
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Loading Mall',
+                        loading: false,
+                    });
+                }
+            },
+            deleteMall: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    await apiMall.delete(`/${id}`);
+                    set((state) => ({
+                        dataMalls: state.dataMalls?.filter((a) => a.id !== id),
+                        loading: false,
+                    }));
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Deleting Mall',
+                        loading: false,
+                    });
+                }
+            },
+            //Editing order
+            editMall: async (id: number, mall: AddingMall) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiMall.patch(`/${id}`, mall);
+                    if (res.status != 201) { }
+
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Loading Mall',
+                        loading: false,
+                    });
+                }
+            },
+            //Adding New order
+            addMall: async (mall: AddingMall) => {
+                set({ loading: true, error: null });
+                try {
+                    if (mall !== null) {
+                        //   const { authData } = useAuthStore.getState(); // ✅ dynamically get latest auth data
+                        //    property.customerId = authData?.id || 0;
+                        const res = await apiMall.post(``, mall);
+                        set({ loading: false });
+                        if (res.status == 201) {
+
+                        }
+                    }
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Loading Mall',
+                        loading: false,
+                    });
+                }
+            },
+
+
+
             //Orders
             dataOrders: undefined,
             orderD: null,
-            loading: false,
-            error: null,
             // Get Orders Data
             getOrdersData: async () => {
                 set({ loading: true, error: null });
@@ -182,7 +275,6 @@ export const usePlacesStore = create<DataStore>()(
 
 
 
-
             //OnlineOrders
             dataOnlineOrders: undefined,
             onlineOrderD: null,
@@ -247,15 +339,9 @@ export const usePlacesStore = create<DataStore>()(
 
 
 
-
-
-
-
-
             //Products
             dataProducts: undefined,
             productD: null,
-
 
             getProductsData: async () => {
                 set({ loading: true, error: null });
@@ -382,7 +468,6 @@ export const usePlacesStore = create<DataStore>()(
             // Offers
             dataOffers: undefined,
             offerD: null,
-
             getOffersData: async () => {
                 set({ loading: true, error: null });
                 try {
@@ -505,11 +590,9 @@ export const usePlacesStore = create<DataStore>()(
 
 
 
-
             // BaseOffers
             dataBaseOffers: undefined,
             baseOfferD: null,
-
             getBaseOffersData: async () => {
                 set({ loading: true, error: null });
                 try {
@@ -573,7 +656,6 @@ export const usePlacesStore = create<DataStore>()(
             // OnlineCustomers
             dataOnlineCustomers: undefined,
             onlineCustomerD: null,
-
             getOnlineCustomersData: async () => {
                 set({ loading: true, error: null });
                 try {
@@ -638,6 +720,6 @@ export const usePlacesStore = create<DataStore>()(
             name: 'users-data-storage',
             storage: createJSONStorage(() => localStorage),
             //partialize: (state) => ({ data: state.dataOrders })
-        } // AsyncStorage (React Native)
+        }
     )
 );

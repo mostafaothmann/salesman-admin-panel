@@ -85,6 +85,6 @@ export const useAuthStore = create<AuthStore>()(
     {name: 'customer-auth-storage',
   //  storage: createJSONStorage(() => AsyncStorage),
    // partialize: (state) => ({ authData: state.authData })
-    } // AsyncStorage (React Native)
+    } 
   )
 );

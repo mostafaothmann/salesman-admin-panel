@@ -5,6 +5,7 @@ import { AutoComplete, Button, Dropdown, Input, Menu, Modal, Space, Table, Tag, 
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
+import { ColumnsType } from "antd/es/table";
 
 
 export default function AreasPage() {
@@ -113,7 +114,7 @@ export default function AreasPage() {
         XLSX.writeFile(workbook, "Cities.xlsx");
     };
     useEffect(() => { getAreasData(); }, []);
-    const columns = [
+    const columns: ColumnsType<any> = [
         {
             title: "الرقم",
             dataIndex: "id",
@@ -178,7 +179,7 @@ export default function AreasPage() {
 
     return <div>
         <Button variant="solid" color="purple"
-         onClick={() => downloadExcel()}>
+            onClick={() => downloadExcel()}>
             تنزيل
         </Button>
 
@@ -332,10 +333,16 @@ export default function AreasPage() {
 
         <Button
             variant="solid" color="purple"
-             onClick={() => setOpen(true)}>
+            onClick={() => setOpen(true)}>
             إضافة
         </Button>
 
-        <Table columns={columns} dataSource={dataAreas} />
+        <Table
+            style={{ maxWidth: 1100 }}
+            pagination={{
+                position: ["topRight"],
+            }}
+            scroll={{ x: "max-content" }}
+            columns={columns} dataSource={dataAreas} />
     </div>
 }

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
 import { useRouter } from "next/navigation";
+import { ColumnsType } from "antd/es/table";
 
 
 export default function TypesPage() {
@@ -68,20 +69,20 @@ export default function TypesPage() {
     const [loading2, setLoading2] = useState(false);
 
 
-/*     //handleEdit
-    async function handleEdit() {
-        setLoading(true);
-        await editType(editedId, { name: name });
-        setLoading(false);
-        setOpenEditModal(false);
-        getTypesData();
-    } */
+    /*     //handleEdit
+        async function handleEdit() {
+            setLoading(true);
+            await editType(editedId, { name: name });
+            setLoading(false);
+            setOpenEditModal(false);
+            getTypesData();
+        } */
 
     //addType function
     async function handleAdd() {
         console.log(
             {
-                name, admin_description, grouptype_id,salesman_description,
+                name, admin_description, grouptype_id, salesman_description,
                 brand: searchTextBrand, type, manufacturing_date, quantity,
                 percentage, price_for_piece, price_for_sale,
                 online_percentage
@@ -140,9 +141,10 @@ export default function TypesPage() {
         XLSX.writeFile(workbook, "الأصناف.xlsx");
     };
     useEffect(() => { getTypesData() }, []);
-    const columns = [
+    const columns: ColumnsType<any> = [
         {
             title: "الرقم",
+            fixed: 'left',
             dataIndex: "id",
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
@@ -186,30 +188,28 @@ export default function TypesPage() {
             sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
             render: (value: string) => { return value.slice(0, 10) }
         },
-        /*         {
-                    title: "تاريخ بداية التصنيع",
-                    dataIndex: "manufacturing_date",
-                    sorter: (a: any, b: any) => a.manufacturing_date.localeCompare(b.manufacturing_date),
-                    render: (value1: string) => { return value1.slice(0, 10) }
-                }, */
         {
             title: "",
-            key: "id",
             render: (_: any, record: any) => (
                 <Space size="middle">
                     <Button
-                        type="default"
+                        variant="solid"
                         danger
-                        onClick={() => { OpenDeleteModal(record.id); }}
+                        onClick={() => {
+                            OpenDeleteModal(record.id)
+                        }}
                     >
                         Delete
                     </Button>
-                  {/*   <Button
-                        type="default"
-                        onClick={() => { OpenEditModal(record.id); }}
-                    >
-                        Edit
-                    </Button> */}
+                </Space>
+            ),
+        },
+
+        {
+            title: "",
+            fixed: 'right',
+            render: (_: any, record: any) => (
+                <Space size="middle">
                     <Button
                         variant="solid"
                         color="cyan"
@@ -454,7 +454,7 @@ export default function TypesPage() {
 
         </Modal>
 
-     {/*    <Modal
+        {/*    <Modal
             title="تعديل الصنف"
             open={open1}
             okButtonProps={{ variant: "outlined", color: "blue" }}
@@ -496,6 +496,10 @@ export default function TypesPage() {
 
         <Table
             scroll={{ x: "max-content" }}
+            style={{ maxWidth: 1100 }}
+            pagination={{
+                position: ["topRight"],
+            }}
             columns={columns} dataSource={dataTypes} />
     </div>
 }

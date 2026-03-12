@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { AddingAssistant, AddingSalesman, Assistant, Salesman } from '../users-store-interfaces';
-import { apiSalesman } from '../api';
+import { AddingAssistant, AddingSalesman, Assistant, FilterSalesmanProps, Salesman } from '../users-store-interfaces';
+import { apiSalesman } from '../apis';
 import { apiAssistant } from '../apis';
 
 
@@ -9,19 +9,26 @@ import { apiAssistant } from '../apis';
 interface DataStore {
     dataSalesmans: Salesman[] | undefined;
     salesmanD: Salesman,
+    filteredDataSalesmans: Salesman[];
+
+
     dataAssistants: Assistant[] | undefined;
     assistantD: Assistant,
 
 
     loading: boolean;
     error: string | null;
+    total: number,
+    filter_total: number,
+    lastPage: number,
 
     //for Salesmans
-    getSalesmansData: () => Promise<void>;
+    getSalesmansData: (page: number, limit: number) => Promise<void>;
     getSalesmanData: (id: number) => Promise<void>;
     addSalesman: (salesman: AddingSalesman) => Promise<void>;
     deleteSalesman: (id: number) => Promise<void>;
     editSalesman: (id: number, salesman: AddingSalesman) => Promise<void>;
+    getFilteredDataSalesmans: (filters: FilterSalesmanProps) => Promise<void>;
 
     // For Assistants
     getAssistantsData: () => Promise<void>;
@@ -32,30 +39,47 @@ interface DataStore {
 
 }
 //gettig the token from Auth Store 
-export const usePlacesStore = create<DataStore>()(
+export const useUsersStore = create<DataStore>()(
     persist(
         (set, get) => ({
 
             //Salesmans
             dataSalesmans: undefined,
             salesmanD: null,
+            filteredDataSalesmans: undefined,
             loading: false,
             error: null,
+            total: 0,
+            filter_total: 0,
+            lastPage: 1,
+
             // Get Salesmans Data
-            getSalesmansData: async () => {
+            getSalesmansData: async (page: number, limit: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiSalesman.get(``);
-                    const dataSalesmans = res.data
-                    set({ dataSalesmans, loading: false });
-                    return dataSalesmans
+                    const res = await apiSalesman.get(``, {
+                        params: {
+                            page,
+                            limit,
+                        }
+                    });
+                    const dataSalesmans = res.data.data;
+                    const total = res.data.total
+                    const lastPage = res.data.lastPage
+                    console.log(res.data)
+                    set({ dataSalesmans, loading: false, total: total, lastPage });
+                    return dataSalesmans;
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || 'Error Loading Properties',
+                        error:
+                            err.response?.data?.message ||
+                            "Error Loading Salesmans ",
                         loading: false,
                     });
                 }
             },
+
+
             // get One Salesman Data  👈
             getSalesmanData: async (id: number) => {
                 set({ loading: true, error: null });
@@ -116,6 +140,34 @@ export const usePlacesStore = create<DataStore>()(
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading Properties',
+                        loading: false,
+                    });
+                }
+            },
+            //Get Filtered Data
+            getFilteredDataSalesmans: async (
+                filters: FilterSalesmanProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiSalesman.post(
+                        `/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+                        console.log(res.data)
+
+                        const filteredDataSalesmans = res.data.data;
+                        const filter_total = res.data.total;
+
+                        set({ filteredDataSalesmans, loading: false, filter_total });
+                        return filteredDataSalesmans;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Adding Doctor",
                         loading: false,
                     });
                 }
@@ -194,6 +246,6 @@ export const usePlacesStore = create<DataStore>()(
             name: 'users-data-storage',
             storage: createJSONStorage(() => localStorage),
             //partialize: (state) => ({ data: state.dataSalesmans })
-        } // AsyncStorage (React Native)
+        } 
     )
 );
