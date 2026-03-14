@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { AddingMall, AddingOffer, AddingOnlineCustomer, AddingOnlineOffer, AddingOnlineOrder, AddingOrder, EditingProduct, FilterProductProps, Mall, Offer, OnlineCustomer, OnlineOffer, OnlineOrder, Order } from '../commercial-store-interfaces';
+import { AddingMall, AddingOffer, AddingOnlineCustomer, AddingOnlineOffer, AddingOnlineOrder, AddingOrder, AddingProduct, EditingProduct, FilterProductProps, Mall, Offer, OnlineCustomer, OnlineOffer, OnlineOrder, Order, Product } from '../commercial-store-interfaces';
 import { apiBaseOffer, apiMall, apiOffer, apiOnlineCustomer, apiOnlineOffer, apiOnlineOrder, apiOnlineProduct, apiOrder, apiProduct } from '../apis';
-import { AddingBaseOffer, AddingOnlineProduct, AddingProduct, BaseOffer, OnlineProduct, Product } from '../types-store-interfaces';
+import { AddingBaseOffer, AddingOnlineProduct, BaseOffer, OnlineProduct } from '../types-store-interfaces';
 
 
 interface DataStore {

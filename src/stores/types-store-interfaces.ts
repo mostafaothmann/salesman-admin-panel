@@ -53,20 +53,6 @@ export interface Type {
     online_percentage: number;
 }
 
-export interface Product {
-    id: number,
-    order_id: number;
-    type_id: number,
-    return_discount: number,
-    return_quantity: number,
-    price_for_piece: number;
-    base_quantity: number;
-    total_price: number;
-    total_quantity: number,
-    has_return: boolean,
-    total_percentage: number;
-}
-
 export interface OnlineProduct {
     id: number,
     order_id: number;
@@ -131,19 +117,7 @@ export interface AddingType {
     online_percentage: number;
 }
 
-export interface AddingProduct {
-    order_id: number;
-    type_id: number,
-    base_total_price: number;
-    return_discount: number,
-    return_quantity: number,
-    price_for_piece: number;
-    base_quantity: number;
-    total_price: number;
-    total_quantity: number,
-    has_return: boolean,
-    total_percentage: number;
-}
+
 
 export interface AddingOnlineProduct {
     order_id: number;

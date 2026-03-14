@@ -32,6 +32,7 @@ export interface OnlineOrder {
 export interface Product {
     id: number;
     quantity: number;
+    total_delivery_percentage: number;
     type_id: number;
     order_id: number;
     price_for_piece: number;
@@ -216,7 +217,7 @@ export interface EditingProduct {
     return_quantity: number;
     total_quantity: number;
     return_discount: number;
-    delivery_percentage: number;
+    total_delivery_percentage: number;
     delivery_percentage_for_piece?: number;
     percentage_for_piece?: number;
     //return_date?: Date;

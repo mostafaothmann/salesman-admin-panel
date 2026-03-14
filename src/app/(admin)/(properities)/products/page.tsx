@@ -28,7 +28,7 @@ export default function ProductsPage() {
     const [total_quantity, setTotalQuantity] = useState(0);
     const [price_for_piece, setPriceForPiece] = useState(0);
     const [total_price, setTotalPrice] = useState(0);
-    const [delivery_percentage, setDeliveryPercentage] = useState(0);
+    const [total_delivery_percentage, setTotalDeliveryPercentage] = useState(0);
     const [delivery_percentage_for_piece, setDeliveryPercentageForPiece] = useState(0);
     const [percentage_for_piece, setPercentageForPiece] = useState(0);
     const [base_percentage, setBasePercentage] = useState(0);
@@ -61,7 +61,7 @@ export default function ProductsPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editProduct(editedId, { delivery_percentage, return_discount, return_quantity, base_quantity, total_quantity, price_for_piece });
+        await editProduct(editedId, { total_delivery_percentage, return_discount, return_quantity, base_quantity, total_quantity, price_for_piece });
         setLoading(false);
         setOpenEditModal(false);
         getProductsData(page, limit);
@@ -83,10 +83,23 @@ export default function ProductsPage() {
         const product = dataProducts?.find(
             item => item.id === id
         );
-        setPriceForPiece(product?.price_for_piece || 0);
-        setRetunDiscount(product?.return_discount || 0);
+        setBaseQuantity(product?.base_quantity || 0);
         setReturnQuantity(product?.return_quantity || 0);
         setTotalQuantity(product?.total_quantity || 0);
+        setPercentageForPiece(product?.percentage_for_piece || 0);
+        setBasePercentage(product?.base_percentage || 0);
+        setReturnPercentage(product?.return_percentage);
+        setTotalPercentage(product?.total_percentage || 0);
+        setPriceForPiece(product?.price_for_piece || 0);
+        setBaseTotalPrice(product?.base_total_price || 0);
+        setReturnTotalPrice(product?.return_total_price || 0);
+        setTotalPrice(product?.total_price || 0);
+        setDeliveryPercentageForPiece(product?.delivery_percentage_for_piece || 0);
+        setTotalDeliveryPercentage(product?.total_delivery_percentage || 0);
+        setRetunDiscount(product?.return_discount || 0);
+        setOrderId(product?.order_id || 0)
+        setId(product?.id || 0);
+        setTotalPrice(product?.total_price || 0);
         setOpenEditModal(true);
     }
     //deleteModal
@@ -99,15 +112,22 @@ export default function ProductsPage() {
         const product = dataProducts?.find(
             item => item.id === id
         );
-        setPriceForPiece(product?.price_for_piece || 0);
-        setRetunDiscount(product?.return_discount || 0);
-        setOrderId(product?.order_id)
-        setId(product?.id);
-        setTotalPercentage(product?.total_percentage);
-        setTotalQuantity(product?.total_quantity);
-        setTotalPrice(product?.total_price);
+        setBaseQuantity(product?.base_quantity || 0);
         setReturnQuantity(product?.return_quantity || 0);
         setTotalQuantity(product?.total_quantity || 0);
+        setPercentageForPiece(product?.percentage_for_piece || 0);
+        setBasePercentage(product?.base_percentage || 0);
+        setReturnPercentage(product?.return_percentage);
+        setTotalPercentage(product?.total_percentage || 0);
+        setPriceForPiece(product?.price_for_piece || 0);
+        setBaseTotalPrice(product?.base_total_price || 0);
+        setReturnTotalPrice(product?.return_total_price || 0);
+        setTotalPrice(product?.total_price || 0);
+        setDeliveryPercentageForPiece(product?.delivery_percentage_for_piece || 0);
+        setTotalDeliveryPercentage(product?.total_delivery_percentage || 0);
+        setRetunDiscount(product?.return_discount || 0);
+        setOrderId(product?.order_id || 0)
+        setId(product?.id || 0);
         setOpenShowModal(true);
     }
 
@@ -398,7 +418,7 @@ export default function ProductsPage() {
         <Modal
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span> تعديل رابط</span>
+                    <span>p:{order_id}:{id}</span>
                 </div>
             }
             open={open1}
@@ -408,17 +428,211 @@ export default function ProductsPage() {
             confirmLoading={loading}   // ✅ spinner on OK button
             mask={false}
         >
-            <div >
-                <h3>
-                    اسم الطبيب
-                </h3>
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12">
+                    <h3>
+                        الكمية
+                    </h3>
+                </div>
+                <div className="col-span-6 md:col-span-6">
+                    <div >
+                        <h3>
+                            الأساسي
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        value={base_quantity}
+                        onChange={(e) => setBaseQuantity(e)}
+                        placeholder="الأساسي"
+                    />
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            المرتجع
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        value={return_quantity}
+                        onChange={(e) => setReturnQuantity(e)}
+                        placeholder="المرتجع"
+                    />
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            النهائي
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={total_quantity}
+                        onChange={(e) => setBaseQuantity(e)}
+                        placeholder="النهائي"
+                    />
+                </div>
+
+                <div className="col-span-12">
+                    <h3>
+                        النسبة
+                    </h3>
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            للقطعة
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        value={percentage_for_piece}
+                        onChange={(e) => setPercentageForPiece(e)}
+                        placeholder="للقطعة"
+                    />
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            الأساسي
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={base_percentage}
+                        onChange={(e) => setBasePercentage(e)}
+                        placeholder="الأساسي"
+                    />
+                </div>
+
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            المرتجع
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={return_percentage}
+                        onChange={(e) => setReturnPercentage(e)}
+                        placeholder="المرتجع"
+                    />
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            النهائي
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={total_percentage}
+                        onChange={(e) => setTotalPercentage(e)}
+                        placeholder="النهائي"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        التوصيل
+                    </h3>
+                </div>
+                <div className="col-span-6 md:col-span-9">
+                    <div >
+                        <h3>
+                            للقطعة
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        value={delivery_percentage_for_piece}
+                        onChange={(e) => setDeliveryPercentageForPiece(e)}
+                        placeholder="للقطعة"
+                    />
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            النهائي
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={total_delivery_percentage}
+                        onChange={(e) => setTotalDeliveryPercentage(e)}
+                        placeholder="النهائي"
+                    />
+                </div>
             </div>
-            <Input
-                className="w-full"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الطبيب"
-            />
+            <Divider type="horizontal" style={{ borderTop: '2px solid #d9d9d9' }} ></Divider>
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12">
+                    <h3>
+                        السعر
+                    </h3>
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            للقطعة
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        value={price_for_piece}
+                        onChange={(e) => setPriceForPiece(e)}
+                        placeholder="للقطعة"
+                    />
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            الأساسي
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={base_total_price}
+                        onChange={(e) => setBaseTotalPrice(e)}
+                        placeholder="الأساسي"
+                    />
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            المرتجع
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={return_total_price}
+                        onChange={(e) => setReturnTotalPrice(e)}
+                        placeholder="المرتجع"
+                    />
+                </div>
+
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            النهائي
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={total_price}
+                        onChange={(e) => setTotalPrice(e)}
+                        placeholder="النهائي"
+                    />
+                </div>
+            </div>
         </Modal>
 
         {/* Show Modal */}
@@ -453,7 +667,7 @@ export default function ProductsPage() {
                         disabled
                         value={base_quantity}
                         onChange={(e) => setBaseQuantity(e)}
-                        placeholder="عدد القطع"
+                        placeholder="الأساسي"
                     />
                 </div>
                 <div className="col-span-6 md:col-span-3">
@@ -467,7 +681,7 @@ export default function ProductsPage() {
                         disabled
                         value={return_quantity}
                         onChange={(e) => setReturnQuantity(e)}
-                        placeholder="مرتجع"
+                        placeholder="المرتجع"
                     />
                 </div>
                 <div className="col-span-6 md:col-span-3">
@@ -479,11 +693,110 @@ export default function ProductsPage() {
                     <InputNumber
                         style={{ width: '100%' }}
                         disabled
-                        value={base_quantity}
+                        value={total_quantity}
                         onChange={(e) => setBaseQuantity(e)}
-                        placeholder="نهائي"
+                        placeholder="النهائي"
                     />
                 </div>
+
+                <div className="col-span-12">
+                    <h3>
+                        النسبة
+                    </h3>
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            للقطعة
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={percentage_for_piece}
+                        onChange={(e) => setPercentageForPiece(e)}
+                        placeholder="للقطعة"
+                    />
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            الأساسي
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={base_percentage}
+                        onChange={(e) => setBasePercentage(e)}
+                        placeholder="الأساسي"
+                    />
+                </div>
+
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            المرتجع
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={return_percentage}
+                        onChange={(e) => setReturnPercentage(e)}
+                        placeholder="المرتجع"
+                    />
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            النهائي
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={total_percentage}
+                        onChange={(e) => setTotalPercentage(e)}
+                        placeholder="النهائي"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        التوصيل
+                    </h3>
+                </div>
+                <div className="col-span-6 md:col-span-9">
+                    <div >
+                        <h3>
+                            للقطعة
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={delivery_percentage_for_piece}
+                        onChange={(e) => setDeliveryPercentageForPiece(e)}
+                        placeholder="للقطعة"
+                    />
+                </div>
+                <div className="col-span-6 md:col-span-3">
+                    <div >
+                        <h3>
+                            النهائي
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        disabled
+                        value={total_delivery_percentage}
+                        onChange={(e) => setTotalDeliveryPercentage(e)}
+                        placeholder="النهائي"
+                    />
+                </div>
+            </div>
+            <Divider type="horizontal" style={{ borderTop: '2px solid #d9d9d9' }} ></Divider>
+            <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-12">
                     <h3>
                         السعر
@@ -526,7 +839,7 @@ export default function ProductsPage() {
                     <InputNumber
                         style={{ width: '100%' }}
                         disabled
-                        value={percentage_for_piece}
+                        value={return_total_price}
                         onChange={(e) => setReturnTotalPrice(e)}
                         placeholder="المرتجع"
                     />
@@ -541,109 +854,12 @@ export default function ProductsPage() {
                     <InputNumber
                         style={{ width: '100%' }}
                         disabled
-                        value={percentage_for_piece}
+                        value={total_price}
                         onChange={(e) => setTotalPrice(e)}
                         placeholder="النهائي"
                     />
                 </div>
-                <div className="col-span-12">
-                    <h3>
-                        النسبة
-                    </h3>
-                </div>
-                <div className="col-span-6 md:col-span-3">
-                    <div >
-                        <h3>
-                            للقطعة
-                        </h3>
-                    </div>
-                    <InputNumber
-                        style={{ width: '100%' }}
-                        disabled
-                        value={percentage_for_piece}
-                        onChange={(e) => setPercentageForPiece(e)}
-                        placeholder="للقطعة"
-                    />
-                </div>
-                <div className="col-span-6 md:col-span-3">
-                    <div >
-                        <h3>
-                            الأساسية
-                        </h3>
-                    </div>
-                    <InputNumber
-                        style={{ width: '100%' }}
-                        disabled
-                        value={percentage_for_piece}
-                        onChange={(e) => setBasePercentage(e)}
-                        placeholder="الأساسية"
-                    />
-                </div>
-
-                <div className="col-span-6 md:col-span-3">
-                    <div >
-                        <h3>
-                            المرتجعة
-                        </h3>
-                    </div>
-                    <InputNumber
-                        style={{ width: '100%' }}
-                        disabled
-                        value={percentage_for_piece}
-                        onChange={(e) => setReturnPercentage(e)}
-                        placeholder="المرتجعة"
-                    />
-                </div>
-                <div className="col-span-6 md:col-span-3">
-                    <div >
-                        <h3>
-                            النهائية
-                        </h3>
-                    </div>
-                    <InputNumber
-                        style={{ width: '100%' }}
-                        disabled
-                        value={percentage_for_piece}
-                        onChange={(e) => setTotalPercentage(e)}
-                        placeholder="النهائية"
-                    />
-                </div>
-                <div className="col-span-12">
-                    <h3>
-                        التوصيل
-                    </h3>
-                </div>
-                <div className="col-span-6 md:col-span-9">
-                    <div >
-                        <h3>
-                            للقطعة الواحدة
-                        </h3>
-                    </div>
-                    <InputNumber
-                        style={{ width: '100%' }}
-                        disabled
-                        value={delivery_percentage_for_piece}
-                        onChange={(e) => setDeliveryPercentageForPiece(e)}
-                        placeholder="للقطعة الواحدة"
-                    />
-                </div>
-                <div className="col-span-6 md:col-span-3">
-                    <div >
-                        <h3>
-                            النهائية
-                        </h3>
-                    </div>
-                    <InputNumber
-                        style={{ width: '100%' }}
-                        disabled
-                        value={delivery_percentage}
-                        onChange={(e) => setDeliveryPercentage(e)}
-                        placeholder="نسبة المبيع"
-                    />
-                </div>
             </div>
-            <Divider type="horizontal" style={{ borderTop: '2px solid #d9d9d9' }} ></Divider>
-
         </Modal>
 
         {/*Delete Modal*/}
