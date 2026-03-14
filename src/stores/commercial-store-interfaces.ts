@@ -254,6 +254,8 @@ export interface AddingOrder {
 
 
 export interface FilterProductProps {
+    page: number;
+    limit: number;
     filter_type_id: number;
     filter_min_quantity: number;
     filter_max_quantity: number;

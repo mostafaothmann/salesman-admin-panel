@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Divider, Input, InputNumber, Modal, Space, Table, Tag } from "antd";
+import { AutoComplete, Button, Divider, Input, InputNumber, Modal, Space, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { ColumnsType } from "antd/es/table";
@@ -9,12 +9,13 @@ import { apiType } from "../../../../stores/apis";
 
 
 export default function ProductsPage() {
-    const { getProductsData, editProduct, dataProducts, deleteProduct } = useCommercialStore();
+    const { getProductsData, editProduct, dataProducts, deleteProduct, getFilteredDataProducts, filteredDataProducts, total, filter_total } = useCommercialStore();
 
     const [page, setPage] = useState(1)
     const [filter_page, setFilterPage] = useState(1)
     const [limit, setLimit] = useState(10)
     const [typesNames, setTypesNames] = useState([])
+    const [filtered, setFiltered] = useState(false)
 
     //Add Modal
     const { TextArea } = Input;
@@ -33,11 +34,21 @@ export default function ProductsPage() {
     const [percentage_for_piece, setPercentageForPiece] = useState(0);
     const [base_percentage, setBasePercentage] = useState(0);
     const [return_percentage, setReturnPercentage] = useState(0);
-
     const [total_percentage, setTotalPercentage] = useState(0);
     const [type_id, setTypeId] = useState(0);
     const [order_id, setOrderId] = useState(0);
 
+    //filters
+    //Filter Modal 
+    const [openFilterModal, setOpenFilterModal] = useState(false);
+    const [loading3, setLoading3] = useState(false);
+    const [filter_min_quantity, setFilterMinQuantity] = useState(0);
+    const [filter_max_quantity, setFilterMaxQuantity] = useState(0);
+    const [filter_min_total_price, setFitlerMinTotalPrice] = useState(0);
+    const [filter_max_total_price, setFitlerMaxTotalPrice] = useState(0);
+    const [searchTextType, setSearchTextType] = useState("");
+
+    const [filter_type_id, setFilterTypeId] = useState(0);
 
     const [link, setLink] = useState("");
     const [open, setOpen] = useState(false);
@@ -71,6 +82,11 @@ export default function ProductsPage() {
     //emptyFields function
     const emptyFields = () => {
         setName("");
+        setFilterMaxQuantity(0);
+        setFilterMinQuantity(0);
+        setFitlerMaxTotalPrice(0);
+        setFitlerMinTotalPrice(0);
+        setFilterTypeId(0);
         setPriceForPiece(0);
         setTotalQuantity(0);
         setRetunDiscount(0);
@@ -144,8 +160,8 @@ export default function ProductsPage() {
     const downloadExcel = () => {
         const worksheet = XLSX.utils.json_to_sheet(dataProducts ?? []);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "مبيعات الأصناف المفردة");
+        XLSX.writeFile(workbook, "مبيعات الأصناف المفردة.xlsx");
     };
     useEffect(() => {
         const fetchData = async () => {
@@ -164,6 +180,38 @@ export default function ProductsPage() {
         getProductsData(page, limit);
 
     }, []);
+
+    //Filter
+    //Filter Modal Funcs
+    const OpenFilterModal = () => {
+        emptyFields();
+        if (!filtered) {
+            setOpenFilterModal(true);
+        }
+        else {
+            setFiltered(false);
+        }
+    }
+
+
+    const getFilteredData = (page: number, limit: number) => {
+        getFilteredDataProducts({
+            page,
+            limit,
+            filter_max_quantity,
+            filter_min_quantity,
+            filter_max_total_price,
+            filter_min_total_price,
+            filter_type_id
+        })
+        setFiltered(true);
+    }
+    const handleFilter = () => {
+        getFilteredData(page, limit);
+        setOpenFilterModal(false);
+        emptyFields();
+    }
+
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -862,6 +910,101 @@ export default function ProductsPage() {
             </div>
         </Modal>
 
+        {/*Filter Modal*/}
+        <Modal
+            title="فلترة النتائج"
+            open={openFilterModal}
+            onOk={() => handleFilter()}
+            onCancel={() => { setOpenFilterModal(false); emptyFields() }}
+            confirmLoading={loading3}
+            mask={false}
+
+            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+        >
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-6 xl:col-span-6">
+                    <div>
+                        <h3>
+                            الصنف :
+                        </h3>
+                    </div>
+                    <AutoComplete
+                        style={{ width: '100%' }}
+                        options={typesNames?.map(e => { return { value: e.id, label: `${e.name} ` } })
+                        }
+                        placeholder="الصنف"
+                        value={searchTextType}
+
+                        onChange={(text) => {
+                            setSearchTextType(text);
+                            setFilterTypeId(undefined);
+                        }}
+                        onSelect={(value, option) => {
+                            setFilterTypeId(option.value);
+                            setSearchTextType(option?.label as string);
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+                <div className="col-span-6 xl:col-span-6">
+                    <div>
+                        <h3>
+                            أقل كمية :
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        value={filter_min_quantity}
+                        onChange={(e) => setFilterMinQuantity(e)}
+                        placeholder="أقل كمية"
+                    />
+                </div>
+                <div className="col-span-6 xl:col-span-6">
+                    <div>
+                        <h3>
+                            أعلى كمية :
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        value={filter_max_quantity}
+                        onChange={(e) => setFilterMaxQuantity(e)}
+                        placeholder="أعلى كمية"
+                    />
+                </div>
+                <div className="col-span-6 xl:col-span-6">
+                    <div>
+                        <h3>
+                            أقل مجموع سعر نهائي :
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        value={filter_min_total_price}
+                        onChange={(e) => setFitlerMinTotalPrice(e)}
+                        placeholder="أقل مجموع سعر نهائي"
+                    />
+                </div>
+                <div className="col-span-6 xl:col-span-6">
+                    <div>
+                        <h3>
+                            أعلى مجموع سعر نهائي :
+                        </h3>
+                    </div>
+                    <InputNumber
+                        style={{ width: '100%' }}
+                        value={filter_max_total_price}
+                        onChange={(e) => setFitlerMaxTotalPrice(e)}
+                        placeholder="أعلى مجموع سعر نهائي"
+                    />
+                </div>
+            </div>
+        </Modal>
+
         {/*Delete Modal*/}
         <Modal
             title="تأكيد الحذف"
@@ -875,19 +1018,46 @@ export default function ProductsPage() {
         >
         </Modal>
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => setOpen(true)}>
+            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
                 تنزيل
             </Button>
-            <Button className="col-span-5" variant="solid" color="purple" onClick={() => setOpen(true)}>
+            <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
                 فلترة
             </Button>
         </div>
-        <Table
-            style={{ maxWidth: 1100 }}
-            pagination={{
-                position: ["topRight"],
-            }}
+        {filtered ? <Table
             scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataProducts} />
+            style={{ maxWidth: 1100 }}
+            columns={columns}
+            pagination={{
+                placement: ['topEnd'],
+                current: filter_page,
+                pageSize: limit,
+                total: filter_total,
+                onChange: (page, pageSize) => {
+                    setFilterPage(filter_page)
+                    getFilteredData(page, pageSize)
+                    // setPage(lastPage)
+                },
+            }}
+            dataSource={filteredDataProducts || []} />
+            :
+            <Table
+                scroll={{ x: "max-content" }}
+                style={{ maxWidth: 1100 }}
+                columns={columns}
+                pagination={{
+                    placement: ['topEnd'],
+                    current: page,
+                    pageSize: limit,
+                    total: total,
+                    onChange: (page, pageSize) => {
+                        getProductsData(page, pageSize);
+                        setPage(page)
+                        //setPage(lastPage)
+                    },
+                }}
+                dataSource={dataProducts || []} />
+        }
     </div>
 }
