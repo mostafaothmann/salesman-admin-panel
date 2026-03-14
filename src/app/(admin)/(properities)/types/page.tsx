@@ -30,6 +30,7 @@ export default function TypesPage() {
 
     const [brand, setBrand] = useState("");
     const [quantity, setQuantity] = useState(0);
+    const [delivery_percentage, setDeliveryPercentage] = useState(0);
     const [percentage, setPercentage] = useState(0);
     const [online_percentage, setOnlinePercentage] = useState(0);
     const [price_for_sale, setPriceForSale] = useState(0)
@@ -92,7 +93,7 @@ export default function TypesPage() {
             name, admin_description, salesman_description, grouptype_id,
             brand, type, manufacturing_date, quantity,
             percentage, price_for_piece, price_for_sale,
-            online_percentage
+            online_percentage,delivery_percentage
         })
         getTypesData();
         emptyFields();

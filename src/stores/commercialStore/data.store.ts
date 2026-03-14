@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { AddingMall, AddingOffer, AddingOnlineCustomer, AddingOnlineOffer, AddingOnlineOrder, AddingOrder, Mall, Offer, OnlineCustomer, OnlineOffer, OnlineOrder, Order } from '../commercial-store-interfaces';
+import { AddingMall, AddingOffer, AddingOnlineCustomer, AddingOnlineOffer, AddingOnlineOrder, AddingOrder, EditingProduct, FilterProductProps, Mall, Offer, OnlineCustomer, OnlineOffer, OnlineOrder, Order } from '../commercial-store-interfaces';
 import { apiBaseOffer, apiMall, apiOffer, apiOnlineCustomer, apiOnlineOffer, apiOnlineOrder, apiOnlineProduct, apiOrder, apiProduct } from '../apis';
 import { AddingBaseOffer, AddingOnlineProduct, AddingProduct, BaseOffer, OnlineProduct, Product } from '../types-store-interfaces';
 
@@ -14,6 +14,7 @@ interface DataStore {
 
     dataProducts: Product[] | undefined;
     productD: Product,
+    filteredDataProducts: Product[];
 
     dataOnlineProducts: OnlineProduct[] | undefined;
     onlineProductD: OnlineProduct,
@@ -33,6 +34,9 @@ interface DataStore {
     dataMalls: Mall[] | undefined;
     mallD: Mall,
 
+    total: number,
+    filter_total: number,
+    lastPage: number,
     loading: boolean;
     error: string | null;
 
@@ -58,11 +62,12 @@ interface DataStore {
     editOnlineOrder: (id: number, onlineOrder: AddingOnlineOrder) => Promise<void>;
 
     // For Products
-    getProductsData: () => Promise<void>;
+    getProductsData: (page: number, limit: number) => Promise<void>;
     getProductData: (id: number) => Promise<void>;
     addProduct: (product: AddingProduct) => Promise<void>;
     deleteProduct: (id: number) => Promise<void>;
-    editProduct: (id: number, product: AddingProduct) => Promise<void>;
+    editProduct: (id: number, product: EditingProduct) => Promise<void>;
+    getFilteredDataProducts: (filters: FilterProductProps) => Promise<void>;
 
     // For OnlineProducts
     getOnlineProductsData: () => Promise<void>;
@@ -103,11 +108,16 @@ interface DataStore {
 export const useCommercialStore = create<DataStore>()(
     persist(
         (set, get) => ({
+
             //Malls
             dataMalls: undefined,
             mallD: null,
             loading: false,
             error: null,
+            total: 0,
+            filter_total: 0,
+            lastPage: 1,
+
             // Get Orders Data
             getMallsData: async () => {
                 set({ loading: true, error: null });
@@ -342,16 +352,22 @@ export const useCommercialStore = create<DataStore>()(
             //Products
             dataProducts: undefined,
             productD: null,
+            filteredDataProducts: undefined,
 
-            getProductsData: async () => {
+            getProductsData: async (page: number, limit: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiProduct.get(``);
-                    const dataProducts = res.data;
-                    set({ dataProducts, loading: false });
+                    const res = await apiProduct.get(``, { params: { page, limit } });
+                    const dataProducts = res.data.data;
+                    const total = res.data.total;
+                    const lastPage = res.data.lastPage;
+                    set({ dataProducts, loading: false, total, lastPage });
                     return dataProducts;
                 } catch (err: any) {
-                    set({ error: err.response?.data?.message || 'Error Loading Products', loading: false });
+                    set({
+                        error: err.response?.data?.message || "Error Loading Products",
+                        loading: false,
+                    });
                 }
             },
 
@@ -380,7 +396,7 @@ export const useCommercialStore = create<DataStore>()(
                 }
             },
 
-            editProduct: async (id: number, product: AddingProduct) => {
+            editProduct: async (id: number, product: EditingProduct) => {
                 set({ loading: true, error: null });
                 try {
                     const res = await apiProduct.patch(`/${id}`, product);
@@ -400,6 +416,37 @@ export const useCommercialStore = create<DataStore>()(
                     set({ error: err.response?.data?.message || 'Error Adding Product', loading: false });
                 }
             },
+            //Get Filtered Data
+            getFilteredDataProducts: async (
+                filters: FilterProductProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiProduct.post(
+                        `/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+
+                        const filteredDataProducts = res.data.data;
+                        const filter_total = res.data.total;
+
+                        set({ filteredDataProducts, loading: false, filter_total });
+                        return filteredDataProducts;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Filtering Doctors Visits",
+                        loading: false,
+                    });
+                }
+            },
+
+
+
+
 
             //OnlineProducts
             dataOnlineProducts: undefined,

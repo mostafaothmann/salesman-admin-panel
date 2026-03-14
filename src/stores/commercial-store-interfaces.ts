@@ -35,6 +35,10 @@ export interface Product {
     type_id: number;
     order_id: number;
     price_for_piece: number;
+    total_percentage: number;
+    base_percentage: number;
+    return_percentage: number;
+    delivery_percentage: number;
     base_total_price: number;
     return_total_price?: number;
     total_price: number;
@@ -44,6 +48,8 @@ export interface Product {
     has_return: boolean;
     return_discount?: number;
     return_date?: Date;
+    delivery_percentage_for_piece?: number;
+    percentage_for_piece?: number;
 }
 
 export interface OnlineProduct {
@@ -187,19 +193,33 @@ export interface AddingOnlineProduct {
 }
 
 export interface AddingProduct {
-    quantity: number;
-    type_id: number;
-    order_id: number;
     price_for_piece: number;
     base_total_price: number;
     return_total_price?: number;
-    total_price: number;
     base_quantity: number;
     return_quantity: number;
     total_quantity: number;
     has_return: boolean;
     return_discount?: number;
     return_date?: Date;
+    total_percentage: number;
+    base_percentage: number;
+    return_percentage: number;
+    delivery_percentage: number;
+    delivery_percentage_for_piece: number;
+    percentage_for_piece: number;
+}
+
+export interface EditingProduct {
+    price_for_piece: number;
+    base_quantity: number;
+    return_quantity: number;
+    total_quantity: number;
+    return_discount: number;
+    delivery_percentage: number;
+    delivery_percentage_for_piece?: number;
+    percentage_for_piece?: number;
+    //return_date?: Date;
 }
 
 export interface AddingOnlineOrder {
@@ -230,4 +250,25 @@ export interface AddingOrder {
     is_there_return: boolean;
     return_date?: Date;
 }
+
+
+export interface FilterProductProps {
+    filter_type_id: number;
+    filter_min_quantity: number;
+    filter_max_quantity: number;
+    filter_min_total_price: number;
+    filter_max_total_price: number;
+}
+
+
+export interface FilterOfferProps {
+    filter_base_offer_id: number;
+    filter_min_quantity: number;
+    filter_max_quantity: number;
+    filter_min_total_price: number;
+    filter_max_total_price: number;
+}
+
+
+
 
