@@ -79,7 +79,6 @@ const navItems: NavItem[] = [
     icon: <DoctorVisit />,
     name: "مقدمات",
     subItems: [
-      { name: "الهدايا الأساسية", path: "/base-gifts", pro: false },
       { name: "هدايا", path: "/gifts-visits", pro: false },
       { name: "عينات", path: "/samples", pro: false },
     ],
@@ -135,6 +134,8 @@ const navItems: NavItem[] = [
       { name: "المشرفين", path: "/assistants", pro: false },
       { name: "رسائل المندوبين", path: "/salesmans-messages", pro: false },
       { name: "فيديوهات الأطباء", path: "/videos-links", pro: false },
+      { name: "العروض الأساسية", path: "/base-offers", pro: false },
+      { name: "الهدايا الأساسية", path: "/base-gifts", pro: false },
     ],
   }
 ];

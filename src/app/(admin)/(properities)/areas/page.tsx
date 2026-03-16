@@ -178,11 +178,6 @@ export default function AreasPage() {
     ];
 
     return <div>
-        <Button variant="solid" color="purple"
-            onClick={() => downloadExcel()}>
-            تنزيل
-        </Button>
-
         {/*Adding Modal*/}
         <Modal
             title="إضافة مدينة جديدة"
@@ -205,18 +200,16 @@ export default function AreasPage() {
                             style={{ width: 200 }}
                             options={options}
                             placeholder="City"
-                            // what user sees & types
                             value={searchText}
-                            // typing updates text
+
                             onChange={(text) => {
                                 setSearchText(text);
                                 setCityId(undefined); // clear ID while typing
                             }}
 
-                            // when user selects from dropdown
                             onSelect={(value, option) => {
-                                setCityId(option.value);                 // ID
-                                setSearchText(option?.label as string);  // show name
+                                setCityId(option.value);
+                                setSearchText(option?.label as string);
                             }}
 
                             filterOption={(inputValue, option) =>
@@ -264,7 +257,7 @@ export default function AreasPage() {
                 // what user sees & types
                 value={searchText}
 
-                // typing updates text
+
                 onChange={(text) => {
                     setSearchText(text);
                     setCityId(undefined); // clear ID while typing
@@ -272,8 +265,8 @@ export default function AreasPage() {
 
                 // when user selects from dropdown
                 onSelect={(value, option) => {
-                    setCityId(option.value);                 // ID
-                    setSearchText(option?.label as string);  // show name
+                    setCityId(option.value);
+                    setSearchText(option?.label as string);
                 }}
 
                 filterOption={(inputValue, option) =>
@@ -327,16 +320,19 @@ export default function AreasPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
+        <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+            <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
+                إضافة
+            </Button>
+            <Button className="col-span-5" variant="solid" color="green"
+                onClick={() => downloadExcel()}>
+                تنزيل
+            </Button>
 
-        <Button
-            variant="solid" color="purple"
-            onClick={() => setOpen(true)}>
-            إضافة
-        </Button>
-
+        </div>
         <Table
             style={{ maxWidth: 1100 }}
             pagination={{

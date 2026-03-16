@@ -12,7 +12,7 @@ import { apiAssistant, apiDoctor, apiPharmacist, apiType, apiSalesman, apiSample
 import dayjs from 'dayjs';
 import jsPDF from "jspdf";
 import { useReactToPrint } from "react-to-print";
-import  html2canvas  from "html2canvas"
+import html2canvas from "html2canvas"
 
 export default function DoctorsVisitsPage() {
     const { getDoctorVisitData, doctorVisitD, getDoctorsVisitsData, total, filter_total, filteredDataDoctorsVisits,
@@ -265,7 +265,6 @@ export default function DoctorsVisitsPage() {
         };
         fetchData();
         getDoctorsVisitsData(page, limit);
-        console.log(dataDoctorsVisits)
     }, []);
 
     const columns: ColumnsType<any> = [
@@ -420,7 +419,7 @@ export default function DoctorsVisitsPage() {
             mask={false}
             width={1000}
             height={400}
-            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary", variant: "outlined" }}
         >
             <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-12 md:col-span-6 h-[400]">
@@ -449,7 +448,7 @@ export default function DoctorsVisitsPage() {
             confirmLoading={loading3}
             mask={false}
 
-            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary", variant: "outlined" }}
         >
             <div className="grid grid-cols-12 gap-4">
 
@@ -463,16 +462,14 @@ export default function DoctorsVisitsPage() {
                         style={{ width: '100%' }}
                         options={optionsStatus}
                         placeholder="حالة الزيارة"
-                        // what user sees & types
                         value={searchTextVisitStatus}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchVisitStatus(text);
                             setFilterVisitStatusId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterVisitStatusId(option.value);                 // ID
+                            setFilterVisitStatusId(option.value);
                             setSearchVisitStatus(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -495,16 +492,14 @@ export default function DoctorsVisitsPage() {
                             salesmansNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })
                         }
                         placeholder="مندوب الزيارة"
-                        // what user sees & types
                         value={searchTextSalesman}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextSalesman(text);
                             setFilterSalesmanId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterSalesmanId(option.value);                 // ID
+                            setFilterSalesmanId(option.value);
                             setSearchTextSalesman(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -526,16 +521,14 @@ export default function DoctorsVisitsPage() {
                         options={assistantsNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })
                         }
                         placeholder="مشرف الزيارة"
-                        // what user sees & types
                         value={searchTextAssistant}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextAssistant(text);
                             setFilterAssistantId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterAssistantId(option.value);                 // ID
+                            setFilterAssistantId(option.value);
                             setSearchTextAssistant(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -557,16 +550,14 @@ export default function DoctorsVisitsPage() {
                         options={doctorsNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })
                         }
                         placeholder="طبيب الزيارة"
-                        // what user sees & types
                         value={searchTextDoctor}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextDoctor(text);
                             setFilterDoctorId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterDoctorId(option.value);                 // ID
+                            setFilterDoctorId(option.value);
                             setSearchTextDoctor(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -588,16 +579,14 @@ export default function DoctorsVisitsPage() {
                         options={typesNames?.map(e => { return { value: e.id, label: `${e.name} ` } })
                         }
                         placeholder="صنف الزيارة"
-                        // what user sees & types
                         value={searchTextType}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextType(text);
                             setFilterTypeId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterTypeId(option.value);                 // ID
+                            setFilterTypeId(option.value);
                             setSearchTextType(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -621,16 +610,14 @@ export default function DoctorsVisitsPage() {
                             salesmansNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })
                         }
                         placeholder="اختصاص الطبيب"
-                        // what user sees & types
                         value={searchTextSalesman}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextSalesman(text);
                             setFilterSalesmanId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterSalesmanId(option.value);                 // ID
+                            setFilterSalesmanId(option.value);
                             setSearchTextSalesman(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -665,9 +652,8 @@ export default function DoctorsVisitsPage() {
                         style={{ width: '100%' }}
                         options={optionsGovernorates}
                         placeholder="المحافظة"
-                        // what user sees & types
                         value={searchTextGovernorate}
-                        // typing updates text
+
                         onChange={(text) => {
                             getCitiesData()
                             setSearchTextGovernorate(text);
@@ -682,10 +668,9 @@ export default function DoctorsVisitsPage() {
                                 item => item.id === filter_governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getCitiesData()
-                            setFilterGovernorateId(option.value);                 // ID
+                            setFilterGovernorateId(option.value);
                             setSearchTextGovernorate(option?.label as string);
                             const governorate = dataGovernorates?.find(
                                 item => item.id === filter_governorate_id)
@@ -709,9 +694,8 @@ export default function DoctorsVisitsPage() {
                         style={{ width: '100%' }}
                         options={optionsCities}
                         placeholder="المدينة"
-                        // what user sees & types
                         value={searchTextCity}
-                        // typing updates text
+
                         onChange={(text) => {
                             getAreasData()
                             setSearchTextCity(text);
@@ -724,10 +708,9 @@ export default function DoctorsVisitsPage() {
                                 item => item.id === filter_city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getAreasData()
-                            setFilterCityId(option.value);                 // ID
+                            setFilterCityId(option.value);
                             setSearchTextCity(option?.label as string);
                             const city = dataCities?.find(
                                 item => item.id === filter_city_id)
@@ -752,9 +735,8 @@ export default function DoctorsVisitsPage() {
                         style={{ width: '100%' }}
                         options={optionsAreas}
                         placeholder="المنطقة"
-                        // what user sees & types
                         value={searchTextArea}
-                        // typing updates text
+
                         onChange={(text) => {
                             getStreetsData()
                             setSearchTextArea(text);
@@ -766,10 +748,9 @@ export default function DoctorsVisitsPage() {
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
 
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getStreetsData()
-                            setFilterAreaId(option.value);                 // ID
+                            setFilterAreaId(option.value);
                             setSearchTextArea(option?.label as string);
                             const area = dataAreas?.find(
                                 item => item.id === filter_area_id)
@@ -794,16 +775,14 @@ export default function DoctorsVisitsPage() {
                         style={{ width: '100%' }}
                         options={optionsStreets}
                         placeholder="الشارع"
-                        // what user sees & types
                         value={searchTextStreet}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextStreet(text);
                             setFilterStreetId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterStreetId(option.value);                 // ID
+                            setFilterStreetId(option.value);
                             setSearchTextStreet(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -1055,12 +1034,12 @@ export default function DoctorsVisitsPage() {
         </Modal >
 
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
-                تنزيل
-            </Button>
             <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
                 فلترة
             </Button>
+            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
+        </Button>
         </div>
         <div className="max-w-full">
             {filtered ? <Table

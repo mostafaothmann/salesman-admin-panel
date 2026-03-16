@@ -333,7 +333,7 @@ export default function VideoLinksPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }} 
         >
         </Modal>
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">

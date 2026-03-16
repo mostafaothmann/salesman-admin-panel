@@ -318,10 +318,6 @@ export default function AssociationsPage() {
     ];
 
     return <div>
-        <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
-            تنزيل
-        </Button>
-
         {/*Adding Modal*/}
         <Modal
             title={
@@ -390,9 +386,8 @@ export default function AssociationsPage() {
                         style={{ width: '100%' }}
                         options={optionsGovernorates}
                         placeholder="المحافظة"
-                        // what user sees & types
                         value={searchTextGovernorate}
-                        // typing updates text
+
                         onChange={(text) => {
                             getCitiesData()
                             setSearchTextGovernorate(text);
@@ -407,11 +402,10 @@ export default function AssociationsPage() {
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getCitiesData()
-                            setGovernorateId(option.value);                 // ID
-                            setSearchTextGovernorate(option?.label as string);  // show name
+                            setGovernorateId(option.value);
+                            setSearchTextGovernorate(option?.label as string);
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -434,9 +428,8 @@ export default function AssociationsPage() {
                         style={{ width: '100%' }}
                         options={optionsCities}
                         placeholder="المدينة"
-                        // what user sees & types
                         value={searchTextCity}
-                        // typing updates text
+
                         onChange={(text) => {
                             getAreasData()
                             setSearchTextCity(text);
@@ -449,11 +442,10 @@ export default function AssociationsPage() {
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getAreasData()
-                            setCityId(option.value);                 // ID
-                            setSearchTextCity(option?.label as string);  // show name
+                            setCityId(option.value);
+                            setSearchTextCity(option?.label as string);
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -477,9 +469,8 @@ export default function AssociationsPage() {
                         style={{ width: '100%' }}
                         options={optionsAreas}
                         placeholder="المنطقة"
-                        // what user sees & types
                         value={searchTextArea}
-                        // typing updates text
+
                         onChange={(text) => {
                             getStreetsData()
                             setSearchTextArea(text);
@@ -491,11 +482,10 @@ export default function AssociationsPage() {
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
 
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getStreetsData()
-                            setAreaId(option.value);                 // ID
-                            setSearchTextArea(option?.label as string);  // show name
+                            setAreaId(option.value);
+                            setSearchTextArea(option?.label as string);
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -519,17 +509,15 @@ export default function AssociationsPage() {
                         style={{ width: '100%' }}
                         options={optionsStreets}
                         placeholder="الشارع"
-                        // what user sees & types
                         value={searchTextStreet}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextStreet(text);
                             setStreetId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setStreetId(option.value);                 // ID
-                            setSearchTextStreet(option?.label as string);  // show name
+                            setStreetId(option.value);
+                            setSearchTextStreet(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
                             (option?.label as string)
@@ -578,7 +566,7 @@ export default function AssociationsPage() {
             onCancel={() => setOpenLocationModal(false)}
             // confirmLoading={loading4}
             mask={false}
-            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary", variant: "outlined" }}
         >
             <div className="w-full h-[400]">
                 <Map lan={lan} lat={lat}></Map>
@@ -645,9 +633,8 @@ export default function AssociationsPage() {
                         style={{ width: '100%' }}
                         options={optionsGovernorates}
                         placeholder="المحافظة"
-                        // what user sees & types
                         value={searchTextGovernorate}
-                        // typing updates text
+
                         onChange={(text) => {
                             getCitiesData()
                             setSearchTextGovernorate(text);
@@ -662,11 +649,10 @@ export default function AssociationsPage() {
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getCitiesData()
-                            setGovernorateId(option.value);                 // ID
-                            setSearchTextGovernorate(option?.label as string);  // show name
+                            setGovernorateId(option.value);
+                            setSearchTextGovernorate(option?.label as string);
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -689,9 +675,8 @@ export default function AssociationsPage() {
                         style={{ width: '100%' }}
                         options={optionsCities}
                         placeholder="المدينة"
-                        // what user sees & types
                         value={searchTextCity}
-                        // typing updates text
+
                         onChange={(text) => {
                             getAreasData()
                             setSearchTextCity(text);
@@ -704,11 +689,10 @@ export default function AssociationsPage() {
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getAreasData()
-                            setCityId(option.value);                 // ID
-                            setSearchTextCity(option?.label as string);  // show name
+                            setCityId(option.value);
+                            setSearchTextCity(option?.label as string);
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -732,9 +716,8 @@ export default function AssociationsPage() {
                         style={{ width: '100%' }}
                         options={optionsAreas}
                         placeholder="المنطقة"
-                        // what user sees & types
                         value={searchTextArea}
-                        // typing updates text
+
                         onChange={(text) => {
                             getStreetsData()
                             setSearchTextArea(text);
@@ -746,11 +729,10 @@ export default function AssociationsPage() {
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
 
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getStreetsData()
-                            setAreaId(option.value);                 // ID
-                            setSearchTextArea(option?.label as string);  // show name
+                            setAreaId(option.value);
+                            setSearchTextArea(option?.label as string);
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -774,17 +756,15 @@ export default function AssociationsPage() {
                         style={{ width: '100%' }}
                         options={optionsStreets}
                         placeholder="الشارع"
-                        // what user sees & types
                         value={searchTextStreet}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextStreet(text);
                             setStreetId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setStreetId(option.value);                 // ID
-                            setSearchTextStreet(option?.label as string);  // show name
+                            setStreetId(option.value);
+                            setSearchTextStreet(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
                             (option?.label as string)
@@ -959,13 +939,18 @@ export default function AssociationsPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
 
-        <Button variant="solid" color="purple" onClick={() => changeOpenModalAdd()}>
-            إضافة
-        </Button>
+        <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+            <Button className="col-span-5" variant="solid" color="cyan" onClick={() => changeOpenModalAdd()}>
+                إضافة
+            </Button>
+            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
+            </Button>
+        </div>
 
         <Table
             scroll={{ x: "max-content" }}

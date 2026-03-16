@@ -387,7 +387,7 @@ export default function PharmacistsVisitsPage() {
             mask={false}
             width={1000}
             height={400}
-            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary", variant: "outlined" }}
         >
             <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-12 md:col-span-6 h-[400]">
@@ -416,7 +416,7 @@ export default function PharmacistsVisitsPage() {
             confirmLoading={loading3}
             mask={false}
 
-            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary", variant: "outlined" }}
         >
             <div className="grid grid-cols-12 gap-4">
 
@@ -430,16 +430,14 @@ export default function PharmacistsVisitsPage() {
                         style={{ width: '100%' }}
                         options={optionsStatus}
                         placeholder="حالة الزيارة"
-                        // what user sees & types
                         value={searchTextVisitStatus}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchVisitStatus(text);
                             setFilterVisitStatusId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterVisitStatusId(option.value);                 // ID
+                            setFilterVisitStatusId(option.value);
                             setSearchVisitStatus(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -462,16 +460,14 @@ export default function PharmacistsVisitsPage() {
                             salesmansNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })
                         }
                         placeholder="مندوب الزيارة"
-                        // what user sees & types
                         value={searchTextSalesman}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextSalesman(text);
                             setFilterSalesmanId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterSalesmanId(option.value);                 // ID
+                            setFilterSalesmanId(option.value);
                             setSearchTextSalesman(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -493,16 +489,14 @@ export default function PharmacistsVisitsPage() {
                         options={assistantsNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })
                         }
                         placeholder="مشرف الزيارة"
-                        // what user sees & types
                         value={searchTextAssistant}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextAssistant(text);
                             setFilterAssistantId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterAssistantId(option.value);                 // ID
+                            setFilterAssistantId(option.value);
                             setSearchTextAssistant(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -524,16 +518,14 @@ export default function PharmacistsVisitsPage() {
                         options={pharmacistsNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })
                         }
                         placeholder="صيدلي الزيارة"
-                        // what user sees & types
                         value={searchTextPharmacist}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextPharmacist(text);
                             setFilterPharmacistId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterPharmacistId(option.value);                 // ID
+                            setFilterPharmacistId(option.value);
                             setSearchTextPharmacist(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -555,16 +547,14 @@ export default function PharmacistsVisitsPage() {
                         options={typesNames?.map(e => { return { value: e.id, label: `${e.name} ` } })
                         }
                         placeholder="صنف الزيارة"
-                        // what user sees & types
                         value={searchTextType}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextType(text);
                             setFilterTypeId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterTypeId(option.value);                 // ID
+                            setFilterTypeId(option.value);
                             setSearchTextType(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -588,16 +578,14 @@ export default function PharmacistsVisitsPage() {
                             salesmansNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })
                         }
                         placeholder="اختصاص الصيدلي"
-                        // what user sees & types
                         value={searchTextSalesman}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextSalesman(text);
                             setFilterSalesmanId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterSalesmanId(option.value);                 // ID
+                            setFilterSalesmanId(option.value);
                             setSearchTextSalesman(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -632,9 +620,8 @@ export default function PharmacistsVisitsPage() {
                         style={{ width: '100%' }}
                         options={optionsGovernorates}
                         placeholder="المحافظة"
-                        // what user sees & types
                         value={searchTextGovernorate}
-                        // typing updates text
+
                         onChange={(text) => {
                             getCitiesData()
                             setSearchTextGovernorate(text);
@@ -649,10 +636,9 @@ export default function PharmacistsVisitsPage() {
                                 item => item.id === filter_governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getCitiesData()
-                            setFilterGovernorateId(option.value);                 // ID
+                            setFilterGovernorateId(option.value);
                             setSearchTextGovernorate(option?.label as string);
                             const governorate = dataGovernorates?.find(
                                 item => item.id === filter_governorate_id)
@@ -676,9 +662,8 @@ export default function PharmacistsVisitsPage() {
                         style={{ width: '100%' }}
                         options={optionsCities}
                         placeholder="المدينة"
-                        // what user sees & types
                         value={searchTextCity}
-                        // typing updates text
+
                         onChange={(text) => {
                             getAreasData()
                             setSearchTextCity(text);
@@ -691,10 +676,9 @@ export default function PharmacistsVisitsPage() {
                                 item => item.id === filter_city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getAreasData()
-                            setFilterCityId(option.value);                 // ID
+                            setFilterCityId(option.value);
                             setSearchTextCity(option?.label as string);
                             const city = dataCities?.find(
                                 item => item.id === filter_city_id)
@@ -719,9 +703,8 @@ export default function PharmacistsVisitsPage() {
                         style={{ width: '100%' }}
                         options={optionsAreas}
                         placeholder="المنطقة"
-                        // what user sees & types
                         value={searchTextArea}
-                        // typing updates text
+
                         onChange={(text) => {
                             getStreetsData()
                             setSearchTextArea(text);
@@ -733,10 +716,9 @@ export default function PharmacistsVisitsPage() {
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
 
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
                             getStreetsData()
-                            setFilterAreaId(option.value);                 // ID
+                            setFilterAreaId(option.value);
                             setSearchTextArea(option?.label as string);
                             const area = dataAreas?.find(
                                 item => item.id === filter_area_id)
@@ -761,16 +743,14 @@ export default function PharmacistsVisitsPage() {
                         style={{ width: '100%' }}
                         options={optionsStreets}
                         placeholder="الشارع"
-                        // what user sees & types
                         value={searchTextStreet}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextStreet(text);
                             setFilterStreetId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterStreetId(option.value);                 // ID
+                            setFilterStreetId(option.value);
                             setSearchTextStreet(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -1012,11 +992,11 @@ export default function PharmacistsVisitsPage() {
         </Modal >
 
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
-                تنزيل
-            </Button>
             <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
                 فلترة
+            </Button>
+            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
             </Button>
         </div>
         <div className="max-w-full">

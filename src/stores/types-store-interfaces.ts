@@ -49,6 +49,7 @@ export interface Type {
     price_for_sale: number;
     percentage: number;
     delivery_percentage: number;
+    return_discount: number;
     type: number,
     online_percentage: number;
 }
@@ -113,6 +114,7 @@ export interface AddingType {
     percentage: number;
     delivery_percentage: number;
     manufacturing_date: string;
+    return_discount: number;
     type: number,
     online_percentage: number;
 }
@@ -129,6 +131,7 @@ export interface AddingOnlineProduct {
 }
 
 export interface AddingBaseOffer {
+    type_id: number;
     number_of_gifts: number;
     number_of_pieces: number;
 }

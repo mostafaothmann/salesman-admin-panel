@@ -36,6 +36,7 @@ export default function TypesPage() {
     const [price_for_sale, setPriceForSale] = useState(0)
     const [price_for_piece, setPriceForPiece] = useState(0)
     const [manufacturing_date, setManufacturingDate] = useState("");
+    const [return_discount, setReturnDiscount] = useState(0);
     const [grouptype_id, setGroupTypeId] = useState(0)
     const [type, setType] = useState(0)
 
@@ -70,30 +71,13 @@ export default function TypesPage() {
     const [loading2, setLoading2] = useState(false);
 
 
-    /*     //handleEdit
-        async function handleEdit() {
-            setLoading(true);
-            await editType(editedId, { name: name });
-            setLoading(false);
-            setOpenEditModal(false);
-            getTypesData();
-        } */
-
     //addType function
     async function handleAdd() {
-        console.log(
-            {
-                name, admin_description, grouptype_id, salesman_description,
-                brand: searchTextBrand, type, manufacturing_date, quantity,
-                percentage, price_for_piece, price_for_sale,
-                online_percentage
-            }
-        )
         await addType({
             name, admin_description, salesman_description, grouptype_id,
             brand, type, manufacturing_date, quantity,
             percentage, price_for_piece, price_for_sale,
-            online_percentage,delivery_percentage
+            online_percentage, delivery_percentage, return_discount
         })
         getTypesData();
         emptyFields();
@@ -174,14 +158,24 @@ export default function TypesPage() {
             sorter: (a: any, b: any) => Number(a.quantity) - Number(b.quantity),
         },
         {
-            title: "ربح المندوب الميداني",
+            title: "عمولة المندوب الميداني",
             dataIndex: "percentage",
             sorter: (a: any, b: any) => Number(a.percentage) - Number(a.percentage),
         },
         {
-            title: "ربح المندوب الأونلاين",
+            title: "عمولة المندوب الأونلاين",
             dataIndex: "online_percentage",
             sorter: (a: any, b: any) => a.online_percentage.localeCompare(b.online_percentage),
+        },
+        {
+            title: "عمولة مندوب التوصيل",
+            dataIndex: "delivery_percentage",
+            sorter: (a: any, b: any) => a.delivery_percentage.localeCompare(b.delivery_percentage),
+        },
+        {
+            title: "حسم الإرجاع",
+            dataIndex: "return_discount",
+            sorter: (a: any, b: any) => a.return_discount.localeCompare(b.return_discount),
         },
         {
             title: "تاريخ الإضافة",
@@ -227,10 +221,6 @@ export default function TypesPage() {
     ];
 
     return <div>
-        <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
-            تنزيل
-        </Button>
-
         {/*Adding Modal*/}
         <Modal
             title="إضافة صنف جديد"
@@ -260,19 +250,15 @@ export default function TypesPage() {
                         style={{ width: '100%' }}
                         options={optionsGroupTypes}
                         placeholder="مجموعة الصنف"
-                        // what user sees & types
                         value={searchText}
-                        // typing updates text
                         onChange={(text) => {
                             setSearchText(text);
-                            setGroupTypeId(undefined); // clear ID while typing
+                            setGroupTypeId(undefined);
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setGroupTypeId(option.value);                 // ID
-                            setSearchText(option?.label as string);  // show name
+                            setGroupTypeId(option.value);
+                            setSearchText(option?.label as string);
                         }}
-
                         filterOption={(inputValue, option) =>
                             (option?.label as string)
                                 ?.toLowerCase()
@@ -289,22 +275,15 @@ export default function TypesPage() {
                         style={{ width: '100%' }}
                         options={optionsBrand}
                         placeholder="براند الصنف"
-
-                        // what user sees & types
                         value={searchTextBrand}
-
-                        // typing updates text
                         onChange={(text) => {
                             setSearchTextBrand(text);
                             setBrand(text);
                         }}
-
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setBrand(option.value);                 // ID
-                            setSearchTextBrand(option?.label as string);  // show name
+                            setBrand(option.value);
+                            setSearchTextBrand(option?.label as string);
                         }}
-
                         filterOption={(inputValue, option) =>
                             (option?.label as string)
                                 ?.toLowerCase()
@@ -329,7 +308,7 @@ export default function TypesPage() {
 
                 <div className="col-span-12 sm:col-span-6">
                     <h3>
-                        تكلفة الإنتاج  :
+                        السعر للمندوب   :
                     </h3>
                     <InputNumber
                         value={price_for_piece}
@@ -337,7 +316,7 @@ export default function TypesPage() {
                         style={{ width: '100%' }}
                         min={0}
                         onChange={(e) => setPriceForPiece(e)}
-                        placeholder="نسبة المندوب"
+                        placeholder="السعر للمندوب"
                     />
                 </div>
 
@@ -351,10 +330,9 @@ export default function TypesPage() {
                         style={{ width: '100%' }}
                         min={0}
                         onChange={(e) => setPriceForSale(e)}
-                        placeholder="نسبة المندوب"
+                        placeholder="سعر المبيع"
                     />
                 </div>
-
 
                 <div className="col-span-12 sm:col-span-6">
                     <h3>
@@ -386,6 +364,34 @@ export default function TypesPage() {
 
                 <div className="col-span-12 sm:col-span-6">
                     <h3>
+                        نسبة مندوب التوصيل  :
+                    </h3>
+                    <InputNumber
+                        value={delivery_percentage}
+                        type={"number"}
+                        style={{ width: '100%' }}
+                        min={0}
+                        onChange={(e) => setDeliveryPercentage(e)}
+                        placeholder="نسبة مندوب التوصيل"
+                    />
+                </div>
+
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        حسم الإرجاع :
+                    </h3>
+                    <InputNumber
+                        value={return_discount}
+                        type={"number"}
+                        style={{ width: '100%' }}
+                        min={0}
+                        onChange={(e) => setReturnDiscount(e)}
+                        placeholder="حسم الإرجاع"
+                    />
+                </div>
+
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
                         تاريخ بداية الصنع :
                     </h3>
                     <DatePicker className="w-full"
@@ -403,19 +409,15 @@ export default function TypesPage() {
                         style={{ width: '100%' }}
                         options={optionsType}
                         placeholder="مجموعة الصنف"
-                        // what user sees & types
                         value={searchTextType}
-                        // typing updates text
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setType(undefined); // clear ID while typing
+                            setType(undefined);
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setType(option.value);                 // ID
-                            setSearchTextType(option?.label as string);  // show name
+                            setType(option.value);
+                            setSearchTextType(option?.label as string);
                         }}
-
                         filterOption={(inputValue, option) =>
                             (option?.label as string)
                                 ?.toLowerCase()
@@ -449,34 +451,8 @@ export default function TypesPage() {
                         placeholder="وصف الإدارة"
                     />
                 </div>
-
             </div>
-
-
         </Modal>
-
-        {/*    <Modal
-            title="تعديل الصنف"
-            open={open1}
-            okButtonProps={{ variant: "outlined", color: "blue" }}
-            onOk={() => handleEdit()}
-            onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
-            mask={false}
-        >
-            <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الصنف"
-            />
-            <TextArea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الصنف"
-            />
-
-        </Modal> */}
 
         {/*Delete Modal*/}
         <Modal
@@ -487,14 +463,18 @@ export default function TypesPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
 
-        <Button variant="solid" color="purple" onClick={() => changeOpenModalAdd()}>
-            إضافة
-        </Button>
-
+        <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+            <Button className="col-span-5" variant="solid" color="cyan" onClick={() => changeOpenModalAdd()}>
+                إضافة
+            </Button>
+            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
+            </Button>
+        </div>
         <Table
             scroll={{ x: "max-content" }}
             style={{ maxWidth: 1100 }}

@@ -185,10 +185,6 @@ export default function CititesPage() {
     ];
 
     return <div>
-        <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
-            تنزيل
-        </Button>
-
         {/*Adding Modal*/}
         <Modal
             title="إضافة مدينة جديدة"
@@ -213,19 +209,17 @@ export default function CititesPage() {
                             options={options}
                             placeholder="Governorate"
 
-                            // what user sees & types
                             value={searchText}
 
-                            // typing updates text
+
                             onChange={(text) => {
                                 setSearchText(text);
                                 setGovernorateId(undefined); // clear ID while typing
                             }}
 
-                            // when user selects from dropdown
                             onSelect={(value, option) => {
-                                setGovernorateId(option.value);                 // ID
-                                setSearchText(option?.label as string);  // show name
+                                setGovernorateId(option.value);
+                                setSearchText(option?.label as string);
                             }}
 
                             filterOption={(inputValue, option) =>
@@ -274,7 +268,7 @@ export default function CititesPage() {
                 // what user sees & types
                 value={searchText}
 
-                // typing updates text
+
                 onChange={(text) => {
                     setSearchText(text);
                     setGovernorateId(undefined); // clear ID while typing
@@ -282,8 +276,8 @@ export default function CititesPage() {
 
                 // when user selects from dropdown
                 onSelect={(value, option) => {
-                    setGovernorateId(option.value);                 // ID
-                    setSearchText(option?.label as string);  // show name
+                    setGovernorateId(option.value);
+                    setSearchText(option?.label as string);
                 }}
 
                 filterOption={(inputValue, option) =>
@@ -339,14 +333,17 @@ export default function CititesPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
-
-        <Button variant="solid" color="purple" onClick={() => setOpen(true)}>
-            إضافة
-        </Button>
-
+        <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+            <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
+                إضافة
+            </Button>
+            <Button variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
+            </Button>
+        </div>
         <Table
             style={{ maxWidth: 1100 }}
             pagination={{

@@ -119,13 +119,14 @@ export default function SampleDoctorPage() {
     ];
 
     return <div>
-        <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
-            تنزيل
-        </Button>
-        <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
-            فلترة
-        </Button>
-
+        <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+            <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
+                فلترة
+            </Button>
+            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
+            </Button>
+        </div>
         {/*Filter Modal*/}
         <Modal
             title="فلترة النتائج"
@@ -135,7 +136,7 @@ export default function SampleDoctorPage() {
             confirmLoading={loading3}
             mask={false}
 
-            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary", variant: "outlined" }}
         >
             <div className="grid grid-cols-12 gap-4">
 
@@ -150,16 +151,14 @@ export default function SampleDoctorPage() {
                         options={typesNames?.map(e => { return { value: e.id, label: `${e.name} ` } })
                         }
                         placeholder="صنف الزيارة"
-                        // what user sees & types
                         value={searchTextType}
-                        // typing updates text
+
                         onChange={(text) => {
                             setSearchTextType(text);
                             setFilterTypeId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterTypeId(option.value);                 // ID
+                            setFilterTypeId(option.value);
                             setSearchTextType(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>

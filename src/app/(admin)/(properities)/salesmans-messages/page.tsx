@@ -255,7 +255,7 @@ export default function SalesmansMessagesPage() {
             confirmLoading={loading3}
             mask={false}
 
-            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary", variant: "outlined" }} 
         >
             <div className="grid grid-cols-12 gap-4">
 
@@ -269,16 +269,14 @@ export default function SalesmansMessagesPage() {
                         style={{ width: '100%' }}
                         options={options}
                         placeholder="المندوب"
-                        // what user sees & types
                         value={searchText}
-                        // typing updates text
+                        
                         onChange={(text) => {
                             setSearchText(text);
                             setFilterSalesmanId(undefined); // clear ID while typing
                         }}
-                        // when user selects from dropdown
                         onSelect={(value, option) => {
-                            setFilterSalesmanId(option.value);                 // ID
+                            setFilterSalesmanId(option.value);                 
                             setSearchText(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -315,18 +313,16 @@ export default function SalesmansMessagesPage() {
                             options={options}
                             placeholder="المندوب"
 
-                            // what user sees & types
-                            value={searchText}
+                                value={searchText}
 
-                            // typing updates text
+                            
                             onChange={(text) => {
                                 setSearchText(text);
                                 setSalesmanId(undefined); // clear ID while typing
                             }}
 
-                            // when user selects from dropdown
-                            onSelect={(value, option) => {
-                                setSalesmanId(option.value);                 // ID
+                                onSelect={(value, option) => {
+                                setSalesmanId(option.value);                 
                                 setSearchText(option?.label as string);  // show title
                             }}
 
@@ -376,7 +372,7 @@ export default function SalesmansMessagesPage() {
                 // what user sees & types
                 value={searchText}
 
-                // typing updates text
+                
                 onChange={(text) => {
                     setSearchText(text);
                     setSalesmanId(undefined); // clear ID while typing
@@ -384,7 +380,7 @@ export default function SalesmansMessagesPage() {
 
                 // when user selects from dropdown
                 onSelect={(value, option) => {
-                    setSalesmanId(option.value);                 // ID
+                    setSalesmanId(option.value);                 
                     setSearchText(option?.label as string);  // show title
                 }}
 
@@ -433,7 +429,7 @@ export default function SalesmansMessagesPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }} 
         >
         </Modal>
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">

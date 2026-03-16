@@ -152,12 +152,6 @@ export default function IngredientsPage() {
             dataIndex: "name",
             sorter: (a: any, b: any) => a.name.localeCompare(b.name),
         },
-
-        {
-            title: "الكمية",
-            dataIndex: "quantity",
-            sorter: (a: any, b: any) => Number(a.quantity) - Number(b.quantity),
-        },
         {
             title: "تاريخ الإضافة",
             dataIndex: "created_at",
@@ -207,9 +201,7 @@ export default function IngredientsPage() {
     ];
 
     return <div>
-        <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
-            تنزيل
-        </Button>
+
 
         {/*Adding Modal*/}
         <Modal
@@ -230,20 +222,6 @@ export default function IngredientsPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="اسم الصنف"
-                    />
-                </div>
-
-                <div className="col-span-12 sm:col-span-6">
-                    <h3>
-                        الكمية  :
-                    </h3>
-                    <InputNumber
-                        value={quantity}
-                        type={"number"}
-                        style={{ width: '100%' }}
-                        min={0}
-                        onChange={(e) => setQuantity(e)}
-                        placeholder="الكمية"
                     />
                 </div>
 
@@ -354,7 +332,7 @@ export default function IngredientsPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
 
@@ -447,9 +425,14 @@ export default function IngredientsPage() {
             </div>
         </Modal>
 
-        <Button variant="solid" color="purple" onClick={() => changeOpenModalAdd()}>
-            إضافة
-        </Button>
+        <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+            <Button className="col-span-5" variant="solid" color="cyan" onClick={() => changeOpenModalAdd()}>
+                إضافة
+            </Button>
+            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
+            </Button>
+        </div>
 
         <Table
             style={{ maxWidth: 1100 }}

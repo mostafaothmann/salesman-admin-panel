@@ -278,17 +278,17 @@ export default function GroupTypesPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
 
 
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
-            <Button className="col-span-5 bg-[#592C46]" variant="solid" color="purple" onClick={() => downloadExcel()}>
-                تنزيل
-            </Button>
             <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
                 إضافة
+            </Button>
+            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
             </Button>
         </div>
 

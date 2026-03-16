@@ -49,7 +49,7 @@ export default function BaseGiftsPage() {
 
     //addType function
     async function handleAdd() {
-        await addBaseGift({ name, description,quantity})
+        await addBaseGift({ name, description, quantity })
         getBaseGiftsData();
         setName("");
         setSearchText("");
@@ -102,8 +102,8 @@ export default function BaseGiftsPage() {
     const downloadExcel = () => {
         const worksheet = XLSX.utils.json_to_sheet(dataBaseGifts ?? []);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "الهدايا الأساسية");
+        XLSX.writeFile(workbook, "الهدايا الأساسية.xlsx");
     };
     useEffect(() => { getBaseGiftsData(); }, []);
     const columns: ColumnsType<any> = [
@@ -169,10 +169,6 @@ export default function BaseGiftsPage() {
     ];
 
     return <div>
-        <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
-            تنزيل
-        </Button>
-
         {/*Adding Modal*/}
         <Modal
             title="إضافة مجموعة جديدة"
@@ -262,13 +258,17 @@ export default function BaseGiftsPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
-
-        <Button variant="solid" color="purple" onClick={() => setOpen(true)}>
-            إضافة
-        </Button>
+        <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+            <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
+                إضافة
+            </Button>
+            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
+            </Button>
+        </div>
 
         <Table
             style={{ maxWidth: 1100 }}

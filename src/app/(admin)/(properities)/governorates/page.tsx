@@ -166,10 +166,6 @@ export default function GovernoratesPage() {
   ];
 
   return <div>
-    <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
-      تنزيل
-    </Button>
-
     {/*Adding Modal*/}
     <Modal
       title={
@@ -283,14 +279,14 @@ export default function GovernoratesPage() {
       confirmLoading={loading2}
       mask={false}
       okType="danger"
-      okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+      okButtonProps={{ type: "primary" }}
     >
     </Modal>
-
-    <Button variant="solid" color="purple" onClick={() => setOpen(true)}>
-      إضافة
-    </Button>
-
+    <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+      <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
+        إضافة
+      </Button>
+    </div>
     <Table
       style={{ maxWidth: 1100 }}
       pagination={{

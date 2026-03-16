@@ -32,7 +32,7 @@ export default function Map({ lat, lan }: MapProps) {
     return (
         <MapContainer
 
-            style={{ height: '100%', width: '100%' }}
+            style={{ height: '90%', width: '100%' }}
         >
             <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

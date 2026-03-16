@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { AddingMall, AddingOffer, AddingOnlineCustomer, AddingOnlineOffer, AddingOnlineOrder, AddingOrder, AddingProduct, EditingProduct, FilterProductProps, Mall, Offer, OnlineCustomer, OnlineOffer, OnlineOrder, Order, Product } from '../commercial-store-interfaces';
+import { AddingMall, AddingOffer, AddingOnlineCustomer, AddingOnlineOffer, AddingOnlineOrder, AddingOrder, AddingProduct, EditingOffer, EditingProduct, FilterOfferProps, FilterOrderProps, FilterProductProps, Mall, Offer, OnlineCustomer, OnlineOffer, OnlineOrder, Order, Product } from '../commercial-store-interfaces';
 import { apiBaseOffer, apiMall, apiOffer, apiOnlineCustomer, apiOnlineOffer, apiOnlineOrder, apiOnlineProduct, apiOrder, apiProduct } from '../apis';
 import { AddingBaseOffer, AddingOnlineProduct, BaseOffer, OnlineProduct } from '../types-store-interfaces';
 
@@ -8,6 +8,7 @@ import { AddingBaseOffer, AddingOnlineProduct, BaseOffer, OnlineProduct } from '
 interface DataStore {
     dataOrders: Order[] | undefined;
     orderD: Order,
+    filteredDataOrders: Order[],
 
     dataOnlineOrders: OnlineOrder[] | undefined;
     onlineOrderD: OnlineOrder,
@@ -21,6 +22,7 @@ interface DataStore {
 
     dataOffers: Offer[] | undefined;
     offerD: Offer,
+    filteredDataOffers: Offer[],
 
     dataOnlineOffers: OnlineOffer[] | undefined;
     onlineOfferD: OnlineOffer,
@@ -48,11 +50,12 @@ interface DataStore {
     editMall: (id: number, product: AddingMall) => Promise<void>;
 
     //for Orders
-    getOrdersData: () => Promise<void>;
+    getOrdersData: (page: number, limit: number) => Promise<void>;
     getOrderData: (id: number) => Promise<void>;
     addOrder: (order: AddingOrder) => Promise<void>;
     deleteOrder: (id: number) => Promise<void>;
     editOrder: (id: number, order: AddingOrder) => Promise<void>;
+    getFilteredDataOrders: (filters: FilterOrderProps) => Promise<void>;
 
     // For OnlineOrders
     getOnlineOrdersData: () => Promise<void>;
@@ -77,11 +80,12 @@ interface DataStore {
     editOnlineProduct: (id: number, onlineProduct: AddingOnlineProduct) => Promise<void>;
 
     // For Offers
-    getOffersData: () => Promise<void>;
+    getOffersData: (page: number, limit: number) => Promise<void>;
     getOfferData: (id: number) => Promise<void>;
     addOffer: (offer: AddingOffer) => Promise<void>;
     deleteOffer: (id: number) => Promise<void>;
-    editOffer: (id: number, offer: AddingOffer) => Promise<void>;
+    editOffer: (id: number, offer: EditingOffer) => Promise<void>;
+    getFilteredDataOffers: (filters: FilterOfferProps) => Promise<void>;
 
     // For OnlineOffers
     getOnlineOffersData: () => Promise<void>;
@@ -177,7 +181,7 @@ export const useCommercialStore = create<DataStore>()(
                     });
                 }
             },
-            //Adding New order
+            //Adding New Mall
             addMall: async (mall: AddingMall) => {
                 set({ loading: true, error: null });
                 try {
@@ -203,17 +207,20 @@ export const useCommercialStore = create<DataStore>()(
             //Orders
             dataOrders: undefined,
             orderD: null,
+            filteredDataOrders: undefined,
             // Get Orders Data
-            getOrdersData: async () => {
+            getOrdersData: async (page: number, limit: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiOrder.get(``);
-                    const dataOrders = res.data
-                    set({ dataOrders, loading: false });
-                    return dataOrders
+                    const res = await apiOrder.get(``, { params: { page, limit } });
+                    const dataOrders = res.data.data;
+                    const total = res.data.total;
+                    const lastPage = res.data.lastPage;
+                    set({ dataOrders, loading: false, total, lastPage });
+                    return dataOrders;
                 } catch (err: any) {
                     set({
-                        error: err.response?.data?.message || 'Error Loading Properties',
+                        error: err.response?.data?.message || "Error Loading Orders",
                         loading: false,
                     });
                 }
@@ -282,6 +289,35 @@ export const useCommercialStore = create<DataStore>()(
                     });
                 }
             },
+            //Get Filtered Data
+            getFilteredDataOrders: async (
+                filters: FilterOrderProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiOrder.post(
+                        `/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+
+                        const filteredDataOrders = res.data.data;
+                        const filter_total = res.data.total;
+
+                        set({ filteredDataOrders, loading: false, filter_total });
+                        return filteredDataOrders;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Filtering Orders",
+                        loading: false,
+                    });
+                }
+            },
+
+
 
 
 
@@ -438,7 +474,7 @@ export const useCommercialStore = create<DataStore>()(
                     set({
                         error:
                             err.response?.data?.message ||
-                            "Error Filtering Doctors Visits",
+                            "Error Filtering Products",
                         loading: false,
                     });
                 }
@@ -515,15 +551,23 @@ export const useCommercialStore = create<DataStore>()(
             // Offers
             dataOffers: undefined,
             offerD: null,
-            getOffersData: async () => {
+            filteredDataOffers: undefined,
+
+
+            getOffersData: async (page: number, limit: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiOffer.get(``);
-                    const dataOffers = res.data;
-                    set({ dataOffers, loading: false });
+                    const res = await apiOffer.get(``, { params: { page, limit } });
+                    const dataOffers = res.data.data;
+                    const total = res.data.total;
+                    const lastPage = res.data.lastPage;
+                    set({ dataOffers, loading: false, total, lastPage });
                     return dataOffers;
                 } catch (err: any) {
-                    set({ error: err.response?.data?.message || 'Error Loading Offers', loading: false });
+                    set({
+                        error: err.response?.data?.message || "Error Loading Products",
+                        loading: false,
+                    });
                 }
             },
 
@@ -552,7 +596,7 @@ export const useCommercialStore = create<DataStore>()(
                 }
             },
 
-            editOffer: async (id: number, offer: AddingOffer) => {
+            editOffer: async (id: number, offer: EditingOffer) => {
                 set({ loading: true, error: null });
                 try {
                     await apiOffer.patch(`/${id}`, offer);
@@ -572,6 +616,35 @@ export const useCommercialStore = create<DataStore>()(
                     set({ error: err.response?.data?.message || 'Error Adding Offer', loading: false });
                 }
             },
+            //Get Filtered Data
+            getFilteredDataOffers: async (
+                filters: FilterOfferProps
+            ) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiOffer.post(
+                        `/filter`,
+                        filters
+                    );
+                    if (res.status === 201) {
+
+                        const filteredDataOffers = res.data.data;
+                        const filter_total = res.data.total;
+
+                        set({ filteredDataOffers, loading: false, filter_total });
+                        return filteredDataOffers;
+                    }
+                } catch (err: any) {
+                    set({
+                        error:
+                            err.response?.data?.message ||
+                            "Error Filtering Offers",
+                        loading: false,
+                    });
+                }
+            },
+
+
 
             // OnlineOffers
             dataOnlineOffers: undefined,

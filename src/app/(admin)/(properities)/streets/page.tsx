@@ -187,10 +187,6 @@ export default function StreetsPage() {
     ];
 
     return <div>
-        <Button variant="solid" color="purple" onClick={() => downloadExcel()}>
-            تنزيل
-        </Button>
-
         {/*Adding Modal*/}
         <Modal
             title="إضافة شارع جديدة"
@@ -215,19 +211,17 @@ export default function StreetsPage() {
                             options={options}
                             placeholder="المنطقة"
 
-                            // what user sees & types
                             value={searchText}
 
-                            // typing updates text
+
                             onChange={(text) => {
                                 setSearchText(text);
                                 setAreaId(undefined); // clear ID while typing
                             }}
 
-                            // when user selects from dropdown
                             onSelect={(value, option) => {
-                                setAreaId(option.value);                 // ID
-                                setSearchText(option?.label as string);  // show name
+                                setAreaId(option.value);
+                                setSearchText(option?.label as string);
                             }}
 
                             filterOption={(inputValue, option) =>
@@ -276,7 +270,7 @@ export default function StreetsPage() {
                 // what user sees & types
                 value={searchText}
 
-                // typing updates text
+
                 onChange={(text) => {
                     setSearchText(text);
                     setAreaId(undefined); // clear ID while typing
@@ -284,8 +278,8 @@ export default function StreetsPage() {
 
                 // when user selects from dropdown
                 onSelect={(value, option) => {
-                    setAreaId(option.value);                 // ID
-                    setSearchText(option?.label as string);  // show name
+                    setAreaId(option.value);
+                    setSearchText(option?.label as string);
                 }}
 
                 filterOption={(inputValue, option) =>
@@ -332,13 +326,18 @@ export default function StreetsPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
 
-        <Button variant="solid" color="purple" onClick={() => setOpen(true)}>
-            إضافة
-        </Button>
+        <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
+            <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
+                إضافة
+            </Button>
+            <Button variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
+            </Button>
+        </div>
 
         <Table
             style={{ maxWidth: 1100 }}

@@ -691,7 +691,7 @@ export default function ProductsPage() {
                 </div>
             }
             open={openShowModal}
-            onOk={() => emptyFields()}
+            onOk={() => { setOpenShowModal(false); emptyFields(); }}
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
@@ -919,7 +919,7 @@ export default function ProductsPage() {
             confirmLoading={loading3}
             mask={false}
 
-            okButtonProps={{ type: "primary", variant: "outlined" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary", variant: "outlined" }}
         >
             <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-6 xl:col-span-6">
@@ -1014,15 +1014,15 @@ export default function ProductsPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} // 🔥 bold & strong
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
-                تنزيل
-            </Button>
             <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
                 فلترة
+            </Button>
+            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+                تنزيل
             </Button>
         </div>
         {filtered ? <Table
