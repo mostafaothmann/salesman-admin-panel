@@ -25,17 +25,17 @@ interface DataStore {
     //for Salesmans
     getSalesmansData: (page: number, limit: number) => Promise<void>;
     getSalesmanData: (id: number) => Promise<void>;
-    addSalesman: (salesman: AddingSalesman) => Promise<void>;
-    deleteSalesman: (id: number) => Promise<void>;
-    editSalesman: (id: number, salesman: AddingSalesman) => Promise<void>;
+    addSalesman: (salesman: AddingSalesman) => Promise<any>;
+    deleteSalesman: (id: number) => Promise<any>;
+    editSalesman: (id: number, salesman: AddingSalesman) => Promise<any>;
     getFilteredDataSalesmans: (filters: FilterSalesmanProps) => Promise<void>;
 
     // For Assistants
     getAssistantsData: () => Promise<void>;
     getAssistantData: (id: number) => Promise<void>;
-    addAssistant: (assistant: AddingAssistant) => Promise<void>;
-    deleteAssistant: (id: number) => Promise<void>;
-    editAssistant: (id: number, assistant: AddingAssistant) => Promise<void>;
+    addAssistant: (assistant: AddingAssistant) => Promise<any>;
+    deleteAssistant: (id: number) => Promise<any>;
+    editAssistant: (id: number, assistant: AddingAssistant) => Promise<any>;
 
 }
 //gettig the token from Auth Store 
@@ -98,11 +98,12 @@ export const useUsersStore = create<DataStore>()(
             deleteSalesman: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiSalesman.delete(`/${id}`);
+                    const res = await apiSalesman.delete(`/${id}`);
                     set((state) => ({
                         dataSalesmans: state.dataSalesmans?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting Area',
@@ -116,7 +117,7 @@ export const useUsersStore = create<DataStore>()(
                 try {
                     const res = await apiSalesman.patch(`/${id}`, salesman);
                     if (res.status != 201) { }
-
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading Materials',
@@ -129,13 +130,12 @@ export const useUsersStore = create<DataStore>()(
                 set({ loading: true, error: null });
                 try {
                     if (salesman !== null) {
-                        //   const { authData } = useAuthStore.getState(); // ✅ dynamically get latest auth data
-                        //    property.customerId = authData?.id || 0;
                         const res = await apiSalesman.post(``, salesman);
                         set({ loading: false });
                         if (res.status == 201) {
 
                         }
+                        return res;
                     }
                 } catch (err: any) {
                     set({
@@ -207,11 +207,12 @@ export const useUsersStore = create<DataStore>()(
             deleteAssistant: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiAssistant.delete(`/${id}`);
+                    const res = await apiAssistant.delete(`/${id}`);
                     set((state) => ({
                         dataAssistants: state.dataAssistants?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({ error: err.response?.data?.message || 'Error Deleting Assistant', loading: false });
                 }
@@ -221,6 +222,7 @@ export const useUsersStore = create<DataStore>()(
                 set({ loading: true, error: null });
                 try {
                     const res = await apiAssistant.patch(`/${id}`, assistant);
+                    return res;
                 } catch (err: any) {
                     set({ error: err.response?.data?.message || 'Error Editing Assistant', loading: false });
                 }
@@ -232,6 +234,7 @@ export const useUsersStore = create<DataStore>()(
                     if (assistant !== null) {
                         const res = await apiAssistant.post(``, assistant);
                         set({ loading: false });
+                        return res;
                     }
                 } catch (err: any) {
                     set({ error: err.response?.data?.message || 'Error Adding Assistant', loading: false });
@@ -246,6 +249,6 @@ export const useUsersStore = create<DataStore>()(
             name: 'users-data-storage',
             storage: createJSONStorage(() => localStorage),
             //partialize: (state) => ({ data: state.dataSalesmans })
-        } 
+        }
     )
 );

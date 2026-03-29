@@ -45,9 +45,9 @@ interface DataStore {
     // For Malls
     getMallsData: () => Promise<void>;
     getMallData: (id: number) => Promise<void>;
-    addMall: (product: AddingMall) => Promise<void>;
-    deleteMall: (id: number) => Promise<void>;
-    editMall: (id: number, product: AddingMall) => Promise<void>;
+    addMall: (product: AddingMall) => Promise<any>;
+    deleteMall: (id: number) => Promise<any>;
+    editMall: (id: number, product: AddingMall) => Promise<any>;
 
     //for Orders
     getOrdersData: (page: number, limit: number) => Promise<void>;
@@ -97,9 +97,9 @@ interface DataStore {
     // For BaseOffers
     getBaseOffersData: () => Promise<void>;
     getBaseOfferData: (id: number) => Promise<void>;
-    addBaseOffer: (baseOffer: AddingBaseOffer) => Promise<void>;
-    deleteBaseOffer: (id: number) => Promise<void>;
-    editBaseOffer: (id: number, baseOffer: AddingBaseOffer) => Promise<void>;
+    addBaseOffer: (baseOffer: AddingBaseOffer) => Promise<any>;
+    deleteBaseOffer: (id: number) => Promise<any>;
+    editBaseOffer: (id: number, baseOffer: AddingBaseOffer) => Promise<any>;
 
     // For OnlineCustomers
     getOnlineCustomersData: () => Promise<void>;
@@ -155,11 +155,12 @@ export const useCommercialStore = create<DataStore>()(
             deleteMall: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiMall.delete(`/${id}`);
+                    const res = await apiMall.delete(`/${id}`);
                     set((state) => ({
                         dataMalls: state.dataMalls?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting Mall',
@@ -173,7 +174,7 @@ export const useCommercialStore = create<DataStore>()(
                 try {
                     const res = await apiMall.patch(`/${id}`, mall);
                     if (res.status != 201) { }
-
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading Mall',
@@ -185,15 +186,14 @@ export const useCommercialStore = create<DataStore>()(
             addMall: async (mall: AddingMall) => {
                 set({ loading: true, error: null });
                 try {
-                    if (mall !== null) {
-                        //   const { authData } = useAuthStore.getState(); // ✅ dynamically get latest auth data
-                        //    property.customerId = authData?.id || 0;
-                        const res = await apiMall.post(``, mall);
-                        set({ loading: false });
-                        if (res.status == 201) {
+                    const res = await apiMall.post(``, mall);
+                    set({ loading: false });
+                    if (res.status == 201) {
 
-                        }
                     }
+
+                    return res;
+
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading Mall',
@@ -740,11 +740,13 @@ export const useCommercialStore = create<DataStore>()(
             deleteBaseOffer: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiBaseOffer.delete(`/${id}`);
+                    const res = await apiBaseOffer.delete(`/${id}`);
                     set((state) => ({
                         dataBaseOffers: state.dataBaseOffers?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
+
                 } catch (err: any) {
                     set({ error: err.response?.data?.message || 'Error Deleting BaseOffer', loading: false });
                 }
@@ -753,7 +755,8 @@ export const useCommercialStore = create<DataStore>()(
             editBaseOffer: async (id: number, baseOffer: AddingBaseOffer) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiBaseOffer.patch(`/${id}`, baseOffer);
+                    const res = await apiBaseOffer.patch(`/${id}`, baseOffer);
+                    return res;
                 } catch (err: any) {
                     set({ error: err.response?.data?.message || 'Error Editing BaseOffer', loading: false });
                 }
@@ -763,8 +766,9 @@ export const useCommercialStore = create<DataStore>()(
                 set({ loading: true, error: null });
                 try {
                     if (baseOffer !== null) {
-                        await apiBaseOffer.post(``, baseOffer);
-                        set({ loading: false });
+                        const res = await apiBaseOffer.post(``, baseOffer);
+                        set({ loading: false })
+                        return res;
                     }
                 } catch (err: any) {
                     set({ error: err.response?.data?.message || 'Error Adding BaseOffer', loading: false });

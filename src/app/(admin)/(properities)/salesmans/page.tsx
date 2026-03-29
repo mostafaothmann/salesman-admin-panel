@@ -1,6 +1,6 @@
 "use client";
 
-import { AutoComplete, Button, DatePicker, Divider, Input, InputNumber, Modal, Space, Table, Tag } from "antd";
+import { AutoComplete, Button, DatePicker, Divider, Input, InputNumber, Modal, notification, Skeleton, Space, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
@@ -47,7 +47,7 @@ export default function SalesmansPage() {
     const [street_id, setStreetId] = useState(1);
     const [level, setLevel] = useState(0);
     const [birth_date, setBirthDate] = useState("");
-    const [sex_id, setSexId] = useState(0);
+    const [gender_id, setSexId] = useState(0);
     const [phone_number, setPhoneNumber] = useState("");
     const [telephone_number, setTelephoneNumber] = useState("");
     const [searchTextSex, setSearchTextSex] = useState("");
@@ -130,26 +130,61 @@ export default function SalesmansPage() {
         setCityId(city_id + 1)
         setAreaId(area_id + 1)
         setStreetId(street_id + 1)
-        await addSalesman({
-            first_name: first_name,
-            level: level,
-            password: password,
-            email: email,
-            leader_id: leader_id,
-            last_name: last_name,
-            birth_date: birth_date,
-            admin_description: admin_description,
-            account_status_id: account_status_id,
-            account_type_id: account_type_id,
-            sex: sex_id,
-            phone_number: phone_number,
-            telephone_number: telephone_number,
-            role: ROLE.SALESMAN,
-            governorate_id: governorate_id,
-            city_id: city_id,
-            street_id: street_id,
-            area_id: area_id,
-        })
+
+        if (first_name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(first_name) &&
+            last_name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(last_name)
+        ) {
+            try {
+                const res = await addSalesman({
+                    first_name: first_name,
+                    level: level,
+                    password: password,
+                    email: email,
+                    leader_id: leader_id,
+                    last_name: last_name,
+                    birth_date: birth_date,
+                    admin_description: admin_description,
+                    account_status_id: account_status_id,
+                    account_type_id: account_type_id,
+                    gender: gender_id,
+                    phone_number: phone_number,
+                    telephone_number: telephone_number,
+                    role: ROLE.SALESMAN,
+                    governorate_id: governorate_id,
+                    city_id: city_id,
+                    street_id: street_id,
+                    area_id: area_id,
+                })
+
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
+
         getSalesmansData(page, limit);
         setBirthDate("");
         setFirstName("");
@@ -249,7 +284,35 @@ export default function SalesmansPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteSalesman(id);
+        try {
+            const res = await deleteSalesman(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getSalesmansData(page, limit);
         setLoading2(false);
         setOpenDeleteModal(false);
@@ -259,8 +322,6 @@ export default function SalesmansPage() {
     //location 
     async function OpenLocationModal(id: number) {
         const salesman = dataSalesmans?.find(e => e.id == id)
-        console.log(salesman)
-        console.log(id)
         setLan(Number(salesman?.lan));
         setLat(Number(salesman?.lat));
         // setLoading4(true);
@@ -275,7 +336,12 @@ export default function SalesmansPage() {
         XLSX.utils.book_append_sheet(workbook, worksheet, "المندوبين");
         XLSX.writeFile(workbook, "المندوبين.xlsx");
     };
-    useEffect(() => { getSalesmansData(page, limit); console.log("dataSalesmans  : ", dataSalesmans) }, []);
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        setPageLoading(true);
+        getSalesmansData(page, limit).finally(() => setPageLoading(false));
+    }, []);
 
     const columns: ColumnsType<any> = [
         {
@@ -354,7 +420,6 @@ export default function SalesmansPage() {
             render: (value: number) => {
                 let tagColor = "#01B9B0";
                 let mainLabel = "";
-                console.log(value)
                 switch (value) {
                     case 1:
                         tagColor = "#355872";
@@ -1151,49 +1216,52 @@ export default function SalesmansPage() {
             </div>
         </Modal>
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
-            <Button className="col-span-4" variant="solid" color="cyan" onClick={() => changeOpenModalAdd()}>
+            <Button className="col-span-5" variant="solid" color="cyan" onClick={() => changeOpenModalAdd()}>
                 إضافة
             </Button>
-            <Button className="col-span-4" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
+            <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
                 فلترة
             </Button>
-            <Button className="col-span-4" variant="solid" color="green" onClick={() => downloadExcel()}>
+            {/*      <Button className="col-span-4" variant="solid" color="green" onClick={() => downloadExcel()}>
                 تنزيل
-            </Button>
+            </Button> */}
         </div>
         <div className="max-w-full">
-            {filtered ? <Table
-                scroll={{ x: "max-content" }}
-                columns={columns}
-                pagination={{
-                    position: ["topRight"],
-                    current: filter_page,
-                    pageSize: limit,
-                    total: filter_total,
-                    onChange: (page, pageSize) => {
-                        setFilterPage(filter_page)
-                        getFilteredData(page, pageSize)
-                        // setPage(lastPage)
-                    },
-                }}
-                dataSource={filteredDataSalesmans || []} />
-                :
-                <Table
-                    scroll={{ x: "max-content" }}
-                    style={{ maxWidth: 1100 }}
-                    columns={columns}
-                    pagination={{
-                        position: ["topRight"],
-                        current: page,
-                        pageSize: limit,
-                        total: total,
-                        onChange: (page, pageSize) => {
-                            getSalesmansData(page, pageSize);
-                            setPage(page)
-                            //setPage(lastPage)
-                        },
-                    }}
-                    dataSource={dataSalesmans || []} />
+            {
+                (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                    :
+                    filtered ? <Table
+                        scroll={{ x: "max-content" }}
+                        columns={columns}
+                        pagination={{
+                            position: ["topRight"],
+                            current: filter_page,
+                            pageSize: limit,
+                            total: filter_total,
+                            onChange: (page, pageSize) => {
+                                setFilterPage(filter_page)
+                                getFilteredData(page, pageSize)
+                                // setPage(lastPage)
+                            },
+                        }}
+                        dataSource={filteredDataSalesmans || []} />
+                        :
+                        <Table
+                            scroll={{ x: "max-content" }}
+                            style={{ maxWidth: 1100 }}
+                            columns={columns}
+                            pagination={{
+                                position: ["topRight"],
+                                current: page,
+                                pageSize: limit,
+                                total: total,
+                                onChange: (page, pageSize) => {
+                                    getSalesmansData(page, pageSize);
+                                    setPage(page)
+                                    //setPage(lastPage)
+                                },
+                            }}
+                            dataSource={dataSalesmans || []} />
             }
 
         </div>

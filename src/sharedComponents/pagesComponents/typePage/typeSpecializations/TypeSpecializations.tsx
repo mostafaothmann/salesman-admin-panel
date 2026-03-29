@@ -108,7 +108,7 @@ export function TypeSpecializations({ id }: profileComponent) {
                         value={searchText}
                         onChange={(text) => {
                             setSearchText(text);
-                            setSpecializationId(undefined); // clear ID while typing
+                            setSpecializationId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setSpecializationId(option.value);           

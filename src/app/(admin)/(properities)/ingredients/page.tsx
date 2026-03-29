@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Button, Dropdown, Input, InputNumber, Modal, Space, Table } from "antd";
+import { Button, Dropdown, Input, InputNumber, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
@@ -81,7 +81,37 @@ export default function IngredientsPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editIngredient(editedId, { name, admin_description, salesman_description, quantity });
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await editIngredient(editedId, { name, admin_description, salesman_description, quantity });
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         setLoading(false);
         setOpenEditModal(false);
         getIngredientsData();
@@ -89,9 +119,41 @@ export default function IngredientsPage() {
 
     //addType function
     async function handleAdd() {
-        await addIngredient({
-            name, admin_description, salesman_description, quantity,
-        })
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)
+        ) {
+            try {
+                const res = await addIngredient({
+                    name, admin_description, salesman_description, quantity,
+                })
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
+
         getIngredientsData();
         emptyFields();
         setOpen(false)
@@ -99,7 +161,7 @@ export default function IngredientsPage() {
     //emptyFields function
     const emptyFields = () => {
         setName("");
-        setQuantity(0)
+        setQuantity(0);
         setAdminDescription("");
         setSalesmanDescription("");
         setOpen(false);
@@ -124,22 +186,67 @@ export default function IngredientsPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteIngredient(id);
+        try {
+            const res = await deleteIngredient(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getIngredientsData();
         setLoading2(false);
         setOpenDeleteModal(false);
     }
 
 
-
     //downloadExcele
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataIngredients ?? []);
+
+        const formattedData = (dataIngredients ?? []).map(item => ({
+            "تاريخ الإضافة": item.created_at.slice(0, 10),
+            "كمية المكون": item.quantity,
+            "اسم المكون": item.name,
+            "معرف المكون": item.id,
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        worksheet["!cols"] = [
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+        ];
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "المكونات");
         XLSX.writeFile(workbook, "المكونات.xlsx");
     };
-    useEffect(() => { getIngredientsData() }, []);
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        setPageLoading(true);
+        getIngredientsData().finally(() => setPageLoading(false));
+    }, []);
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -151,6 +258,11 @@ export default function IngredientsPage() {
             title: "المكون",
             dataIndex: "name",
             sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+        },
+        {
+            title: "الكمية",
+            dataIndex: "quantity",
+            sorter: (a: any, b: any) => Number(a.quantity) - Number(b.quantity),
         },
         {
             title: "تاريخ الإضافة",
@@ -205,7 +317,11 @@ export default function IngredientsPage() {
 
         {/*Adding Modal*/}
         <Modal
-            title="إضافة صنف جديد"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span> إضافة مكون</span>
+                </div>
+            }
             open={open}
             onOk={() => handleAdd()}
             okButtonProps={{ variant: "outlined", color: "purple" }}
@@ -224,7 +340,19 @@ export default function IngredientsPage() {
                         placeholder="اسم الصنف"
                     />
                 </div>
-
+                <div className="col-span-12 sm:col-span-6">
+                    <h3>
+                        الكمية  :
+                    </h3>
+                    <InputNumber
+                        value={quantity}
+                        type={"number"}
+                        style={{ width: '100%' }}
+                        min={0}
+                        onChange={(e) => setQuantity(e)}
+                        placeholder="الكمية"
+                    />
+                </div>
                 <div className="col-span-12">
                     <h3>
                         وصف المندوبين :
@@ -264,7 +392,7 @@ export default function IngredientsPage() {
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}   
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
@@ -348,7 +476,7 @@ export default function IngredientsPage() {
             onOk={() => { setOpenShowModal(false); emptyFields(); }}
             okButtonProps={{ variant: "outlined", color: "cyan" }}
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}   
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
@@ -433,13 +561,16 @@ export default function IngredientsPage() {
                 تنزيل
             </Button>
         </div>
-
-        <Table
-            style={{ maxWidth: 1100 }}
-            scroll={{ x: "max-content" }}
-            pagination={{
-                position: ["topRight"],
-            }}
-            columns={columns} dataSource={dataIngredients} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    style={{ maxWidth: 1100 }}
+                    scroll={{ x: "max-content" }}
+                    pagination={{
+                        position: ["topRight"],
+                    }}
+                    columns={columns} dataSource={dataIngredients} />
+        }
     </div>
 }

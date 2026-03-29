@@ -1,7 +1,7 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, InputNumber, Modal, Space, Table } from "antd";
+import { AutoComplete, Button, Dropdown, Input, InputNumber, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
@@ -50,7 +50,39 @@ export default function BaseOffersPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editBaseOffer(editedId, { type_id, number_of_gifts, number_of_pieces });
+        if (number_of_gifts && /^\d+$/.test(String(number_of_gifts)) &&
+            number_of_pieces && /^\d+$/.test(String(number_of_pieces))
+        ) {
+            try {
+                const res = await editBaseOffer(editedId, { type_id, number_of_gifts, number_of_pieces });
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         setLoading(false);
         setOpenEditModal(false);
         getBaseOffersData();
@@ -60,7 +92,40 @@ export default function BaseOffersPage() {
     //addType function
     async function handleAdd() {
         setBaseOfferId(baseOffer_id + 1);
-        await addBaseOffer({ type_id, number_of_gifts, number_of_pieces })
+        if (number_of_gifts && /^\d+$/.test(String(number_of_gifts)) &&
+            number_of_pieces && /^\d+$/.test(String(number_of_pieces))
+        ) {
+            try {
+                const res = await addBaseOffer({ type_id, number_of_gifts, number_of_pieces })
+
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         emptyFields();
         getBaseOffersData();
         setOpen(false)
@@ -107,20 +172,45 @@ export default function BaseOffersPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteBaseOffer(id);
+
+        try {
+            const res = await deleteBaseOffer(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getBaseOffersData();
         setLoading2(false);
         setOpenDeleteModal(false);
     }
 
-    //downloadExcele
-    const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataBaseOffers ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
-    };
+    const [pageLoading, setPageLoading] = useState(true);
+
     useEffect(() => {
+        setPageLoading(true);
         const fetchData = async () => {
             try {
                 const [
@@ -133,7 +223,7 @@ export default function BaseOffersPage() {
                 console.error("Error fetching data:", error);
             }
         };
-        fetchData();
+        fetchData().finally(() => setPageLoading(false));
         getBaseOffersData();
     }, []);
     const columns: ColumnsType<any> = [
@@ -223,7 +313,7 @@ export default function BaseOffersPage() {
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-6 sm:col-span-6">
+                <div className="col-span-6">
                     <h3>
                         عدد القطع الأساسية
                     </h3>
@@ -235,7 +325,7 @@ export default function BaseOffersPage() {
                     />
                 </div>
 
-                <div className="col-span-6 sm:col-span-6">
+                <div className="col-span-6">
                     <h3>
                         عدد القطع المجانية
                     </h3>
@@ -246,7 +336,7 @@ export default function BaseOffersPage() {
                         placeholder="عدد القطع المجانية"
                     />
                 </div>
-                <div className="col-span-6 sm:col-span-6">
+                <div className="col-span-6">
                     <div>
                         <h3>
                             صنف العرض :
@@ -261,7 +351,7 @@ export default function BaseOffersPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setTypeId(undefined); // clear ID while typing
+                            setTypeId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setTypeId(option.value);
@@ -281,7 +371,7 @@ export default function BaseOffersPage() {
         </Modal>
         <Modal
             title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
                     <span> تعديل عرض</span>
                 </div>
             }
@@ -289,7 +379,7 @@ export default function BaseOffersPage() {
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">
@@ -331,7 +421,7 @@ export default function BaseOffersPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setTypeId(undefined); // clear ID while typing
+                            setTypeId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setTypeId(option.value);
@@ -350,7 +440,7 @@ export default function BaseOffersPage() {
         {/* Show Modal */}
         <Modal
             title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
                     <span>تفاصيل العرض</span>
                 </div>
             }
@@ -359,7 +449,7 @@ export default function BaseOffersPage() {
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">
@@ -404,7 +494,7 @@ export default function BaseOffersPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setTypeId(undefined); // clear ID while typing
+                            setTypeId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setTypeId(option.value);
@@ -436,16 +526,17 @@ export default function BaseOffersPage() {
             <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
                 إضافة
             </Button>
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
-                تنزيل
-            </Button>
         </div>
-        <Table
-            style={{ maxWidth: 1100 }}
-            pagination={{
-                position: ["topRight"],
-            }}
-            scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataBaseOffers} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    style={{ maxWidth: 1100 }}
+                    pagination={{
+                        position: ["topRight"],
+                    }}
+                    scroll={{ x: "max-content" }}
+                    columns={columns} dataSource={dataBaseOffers} />
+        }
     </div>
 }

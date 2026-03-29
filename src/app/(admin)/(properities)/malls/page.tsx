@@ -1,7 +1,7 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, Modal, Space, Table } from "antd";
+import { AutoComplete, Button, Dropdown, Input, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
@@ -78,12 +78,44 @@ export default function MallsPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editMall(editedId, {
-            governorate_id, city_id, area_id, admin_description, salesman_description,
-            street_id, name, phone_number, telephone_number,
-        });
+
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await editMall(editedId, {
+                    governorate_id, city_id, area_id, admin_description, salesman_description,
+                    street_id, name, phone_number, telephone_number,
+                });
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         await getMallsData();
         setLoading(false);
+        emptyFields
         setOpenEditModal(false);
     }
 
@@ -94,17 +126,48 @@ export default function MallsPage() {
         setCityId(city_id + 1)
         setAreaId(area_id + 1)
         setStreetId(street_id + 1)
-        await addMall({
-            name: name,
-            admin_description: admin_description,
-            salesman_description: salesman_description,
-            phone_number: phone_number,
-            telephone_number: telephone_number,
-            governorate_id: governorate_id,
-            city_id: city_id,
-            street_id: street_id,
-            area_id: area_id,
-        })
+
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await addMall({
+                    name: name,
+                    admin_description: admin_description,
+                    salesman_description: salesman_description,
+                    phone_number: phone_number,
+                    telephone_number: telephone_number,
+                    governorate_id: governorate_id,
+                    city_id: city_id,
+                    street_id: street_id,
+                    area_id: area_id,
+                })
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
 
         getMallsData();
         setTelephoneNumber("");
@@ -214,12 +277,39 @@ export default function MallsPage() {
 
     //downloadExcele
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataMalls ?? []);
+
+        const formattedData = (dataMalls ?? []).map(item => ({
+            "تاريخ الإضافة": item.created_at.slice(0, 10),
+            "الهاتف": item.phone_number,
+            "الأرضي": item.telephone_number,
+            "الشارع": dataStreets?.find(e => e.id == Number(item.street_id))?.name,
+            "المنطقة": dataAreas?.find(e => e.id == Number(item.area_id))?.name,
+            "المدينة": dataCities?.find(e => e.id == Number(item.city_id))?.name,
+            "المحافظة": dataGovernorates?.find(e => e.id == Number(item.governorate_id))?.name,
+            "اسم المول": item.name,
+            "معرف المول": item.id,
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        worksheet["!cols"] = [
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+        ];
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "المولات");
+        XLSX.writeFile(workbook, "المولات.xlsx");
     };
-    useEffect(() => { getMallsData(); }, []);
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        setPageLoading(true);
+        getMallsData().finally(() => setPageLoading(false));
+    }, []);
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -389,10 +479,10 @@ export default function MallsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setGovernorateId(undefined); // clear ID while typing
-                            setCityId(undefined); // clear ID while typing
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setGovernorateId(undefined); 
+                            setCityId(undefined); 
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -430,9 +520,9 @@ export default function MallsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setCityId(undefined); // clear ID while typing
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setCityId(undefined); 
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -470,8 +560,8 @@ export default function MallsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -508,7 +598,7 @@ export default function MallsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setStreetId(undefined); // clear ID while typing
+                            setStreetId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setStreetId(option.value);
@@ -580,7 +670,7 @@ export default function MallsPage() {
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}   
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
@@ -636,10 +726,10 @@ export default function MallsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setGovernorateId(undefined); // clear ID while typing
-                            setCityId(undefined); // clear ID while typing
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setGovernorateId(undefined); 
+                            setCityId(undefined); 
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -677,9 +767,9 @@ export default function MallsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setCityId(undefined); // clear ID while typing
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setCityId(undefined); 
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -717,8 +807,8 @@ export default function MallsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -755,7 +845,7 @@ export default function MallsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setStreetId(undefined); // clear ID while typing
+                            setStreetId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setStreetId(option.value);
@@ -785,7 +875,7 @@ export default function MallsPage() {
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}   
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
@@ -919,8 +1009,12 @@ export default function MallsPage() {
                 تنزيل
             </Button>
         </div>
-        <Table
-            scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataMalls} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    scroll={{ x: "max-content" }}
+                    columns={columns} dataSource={dataMalls} />
+        }
     </div>
 }

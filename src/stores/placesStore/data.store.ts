@@ -24,30 +24,30 @@ interface DataStore {
     //for Governorates
     getGovernoratesData: () => Promise<void>;
     getGovernorateData: (id: number) => Promise<void>;
-    addGovernotate: (governorate: AddingGovernorate) => Promise<void>;
-    deleteGovernorate: (id: number) => Promise<void>;
-    editGovernorate: (id: number, governorate: AddingGovernorate) => Promise<void>;
+    addGovernotate: (governorate: AddingGovernorate) => Promise<any>;
+    deleteGovernorate: (id: number) => Promise<any>;
+    editGovernorate: (id: number, governorate: AddingGovernorate) => Promise<any>;
 
     // for City
     getCitiesData: () => Promise<void>;
     getCityData: (id: number) => Promise<void>;
-    addCity: (city: AddingCity) => Promise<void>;
-    deleteCity: (id: number) => Promise<void>;
-    editCity: (id: number, city: AddingCity) => Promise<void>;
+    addCity: (city: AddingCity) => Promise<any>;
+    deleteCity: (id: number) => Promise<any>;
+    editCity: (id: number, city: AddingCity) => Promise<any>;
 
     // for Area
     getAreasData: () => Promise<void>;
     getAreaData: (id: number) => Promise<void>;
-    addArea: (area: AddingArea) => Promise<void>;
-    deleteArea: (id: number) => Promise<void>;
-    editArea: (id: number, area: AddingArea) => Promise<void>;
+    addArea: (area: AddingArea) => Promise<any>;
+    deleteArea: (id: number) => Promise<any>;
+    editArea: (id: number, area: AddingArea) => Promise<any>;
 
     // for Street
     getStreetsData: () => Promise<void>;
     getStreetData: (id: number) => Promise<void>;
-    addStreet: (street: AddingStreet) => Promise<void>;
-    deleteStreet: (id: number) => Promise<void>;
-    editStreet: (id: number, street: AddingStreet) => Promise<void>;
+    addStreet: (street: AddingStreet) => Promise<any>;
+    deleteStreet: (id: number) => Promise<any>;
+    editStreet: (id: number, street: AddingStreet) => Promise<any>;
 
 
 }
@@ -94,11 +94,12 @@ export const usePlacesStore = create<DataStore>()(
             deleteGovernorate: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiGovernorate.delete(`/${id}`);
+                    const res = await apiGovernorate.delete(`/${id}`);
                     set((state) => ({
                         dataGovernorates: state.dataGovernorates?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting Area',
@@ -112,7 +113,7 @@ export const usePlacesStore = create<DataStore>()(
                 try {
                     const res = await apiGovernorate.patch(`/${id}`, governorate);
                     if (res.status != 201) { }
-
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading Materials',
@@ -124,15 +125,14 @@ export const usePlacesStore = create<DataStore>()(
             addGovernotate: async (governorate: AddingGovernorate) => {
                 set({ loading: true, error: null });
                 try {
-                    if (governorate !== null) {
-                        //   const { authData } = useAuthStore.getState(); // ✅ dynamically get latest auth data
-                        //    property.customerId = authData?.id || 0;
-                        const res = await apiGovernorate.post(``, governorate);
-                        set({ loading: false });
-                        if (res.status == 201) {
-
-                        }
+                    //   const { authData } = useAuthStore.getState(); // ✅ dynamically get latest auth data
+                    //    property.customerId = authData?.id || 0;
+                    const res = await apiGovernorate.post(``, governorate);
+                    set({ loading: false });
+                    if (res.status == 201) {
+                        return res;
                     }
+
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading Properties',
@@ -140,6 +140,8 @@ export const usePlacesStore = create<DataStore>()(
                     });
                 }
             },
+
+
 
             //Cities
             dataCities: undefined,
@@ -177,11 +179,12 @@ export const usePlacesStore = create<DataStore>()(
             deleteCity: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiCity.delete(`/${id}`);
+                    const res = await apiCity.delete(`/${id}`);
                     set((state) => ({
                         dataCities: state.dataCities?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting Area',
@@ -195,7 +198,7 @@ export const usePlacesStore = create<DataStore>()(
                 try {
                     const res = await apiCity.patch(`/${id}`, city);
                     if (res.status != 201) { }
-
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading Materials',
@@ -208,13 +211,12 @@ export const usePlacesStore = create<DataStore>()(
                 set({ loading: true, error: null });
                 try {
                     if (city !== null) {
-                        //   const { authData } = useAuthStore.getState(); // ✅ dynamically get latest auth data
-                        //    property.customerId = authData?.id || 0;
                         const res = await apiCity.post(``, city);
                         set({ loading: false });
                         if (res.status == 201) {
 
                         }
+                        return res;
                     }
                 } catch (err: any) {
                     set({
@@ -223,6 +225,8 @@ export const usePlacesStore = create<DataStore>()(
                     });
                 }
             },
+
+
 
             // Areas
             dataAreas: undefined,
@@ -260,11 +264,12 @@ export const usePlacesStore = create<DataStore>()(
             deleteArea: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiArea.delete(`/${id}`);
+                    const res = await apiArea.delete(`/${id}`);
                     set((state) => ({
                         dataAreas: state.dataAreas?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting Area',
@@ -276,8 +281,9 @@ export const usePlacesStore = create<DataStore>()(
             editArea: async (id: number, area: AddingArea) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiArea.patch(`/${id}`, area);
+                    const res = await apiArea.patch(`/${id}`, area);
                     set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Editing Area',
@@ -289,8 +295,9 @@ export const usePlacesStore = create<DataStore>()(
             addArea: async (area: AddingArea) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiArea.post('', area);
+                    const res = await apiArea.post('', area);
                     set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Adding Area',
@@ -334,11 +341,12 @@ export const usePlacesStore = create<DataStore>()(
             deleteStreet: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiStreet.delete(`/${id}`);
+                    const res = await apiStreet.delete(`/${id}`);
                     set((state) => ({
                         dataStreets: state.dataStreets?.filter((s) => s.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting Street',
@@ -350,8 +358,9 @@ export const usePlacesStore = create<DataStore>()(
             editStreet: async (id: number, street: AddingStreet) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiStreet.patch(`/${id}`, street);
+                    const res = await apiStreet.patch(`/${id}`, street);
                     set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Editing Street',
@@ -363,8 +372,9 @@ export const usePlacesStore = create<DataStore>()(
             addStreet: async (street: AddingStreet) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiStreet.post('', street);
+                    const res = await apiStreet.post('', street);
                     set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Adding Street',
@@ -380,6 +390,6 @@ export const usePlacesStore = create<DataStore>()(
             name: 'places-data-storage',
             storage: createJSONStorage(() => localStorage),
             //partialize: (state) => ({ data: state.dataGovernorates })
-        } 
+        }
     )
 );

@@ -23,9 +23,9 @@ export interface Salesman {
 
     birth_date: string;
 
-    sex: number;
+    gender: number;
 
-    governorate_Id: number;
+    governorate_id: number;
     level: number;
     team_profit: number;
     total_profit: number;
@@ -52,7 +52,7 @@ export interface Assistant {
 
     admin_description: string;
 
-    sex: number;
+    gender: number;
 
     email: string;
     password: string;
@@ -83,7 +83,7 @@ export interface AddingSalesman {
 
     admin_description?: string;
 
-    sex: number;
+    gender: number;
 
     email: string;
     password: string;
@@ -115,7 +115,7 @@ export interface AddingAssistant {
 
     admin_description: string;
 
-    sex: number;
+    gender: number;
 
     email: string;
     password: string;

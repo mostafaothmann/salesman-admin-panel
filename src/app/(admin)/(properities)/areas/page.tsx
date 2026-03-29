@@ -1,7 +1,7 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, Menu, Modal, Space, Table, Tag, Upload } from "antd";
+import { AutoComplete, Button, Dropdown, Input, Menu, Modal, notification, Skeleton, Space, Table, Tag, Upload } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
@@ -42,7 +42,37 @@ export default function AreasPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editArea(editedId, { name: name, description: description, city_id: city_id });
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await editArea(editedId, { name: name, description: description, city_id: city_id });
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         setLoading(false);
         setOpenEditModal(false);
         getAreasData();
@@ -51,8 +81,37 @@ export default function AreasPage() {
     //addType function
     async function handleAdd() {
         setCityId(city_id + 1);
-        console.log({ name, description, city_id })
-        await addArea({ name, description, city_id })
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await addArea({ name, description, city_id })
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         getAreasData();
         setName("");
         setSearchText("");
@@ -100,20 +159,45 @@ export default function AreasPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteArea(id);
+        try {
+            const res = await deleteArea(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getAreasData();
         setLoading2(false);
         setOpenDeleteModal(false);
     }
+    const [pageLoading, setPageLoading] = useState(true);
 
-    //downloadExcele
-    const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataAreas ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
-    };
-    useEffect(() => { getAreasData(); }, []);
+    useEffect(() => {
+        setPageLoading(true);
+        getAreasData().finally(() => setPageLoading(false));
+    }, []);
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -160,7 +244,8 @@ export default function AreasPage() {
                     </Button>
 
                     <Button
-                        type="default"
+                        variant="outlined"
+                        color="cyan"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
                         Edit
@@ -180,135 +265,176 @@ export default function AreasPage() {
     return <div>
         {/*Adding Modal*/}
         <Modal
-            title="إضافة مدينة جديدة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>إضافة منطقة</span>
+                </div>
+            }
             open={open}
             onOk={() => handleAdd()}
             onCancel={() => emptyFields()}
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
-                <div className="grid grid-cols-12 sm:col-span-12  col-span-12 gap-2">
-                    <div className="md:col-span-6 col-span-12">
-                        <Input
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="اسم المدينة"
-                        />
-                    </div>
-                    <div className="md:col-span-6 col-span-12">
-                        <AutoComplete
-                            style={{ width: 200 }}
-                            options={options}
-                            placeholder="City"
-                            value={searchText}
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        اسم المنطقة
+                    </h3>
+                    <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم المدينة"
+                    />
+                </div>
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        المدينة
+                    </h3>
+                    <AutoComplete
+                        style={{ width: 200 }}
+                        options={options}
+                        placeholder="المدينة"
+                        value={searchText}
+                        onChange={(text) => {
+                            setSearchText(text);
+                            setCityId(undefined);
+                        }}
+                        onSelect={(value, option) => {
+                            setCityId(option.value);
+                            setSearchText(option?.label as string);
+                        }}
 
-                            onChange={(text) => {
-                                setSearchText(text);
-                                setCityId(undefined); // clear ID while typing
-                            }}
-
-                            onSelect={(value, option) => {
-                                setCityId(option.value);
-                                setSearchText(option?.label as string);
-                            }}
-
-                            filterOption={(inputValue, option) =>
-                                (option?.label as string)
-                                    ?.toLowerCase()
-                                    .includes(inputValue.toLowerCase())
-                            }
-                        />
-                    </div>
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        value={description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
                 </div>
             </div>
-
-            <TextArea
-                value={description}
-                style={{ maxWidth: '100%' }}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
         </Modal>
         <Modal
-            title="تعديل مدينة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>تعديل منطقة</span>
+                </div>
+            }
             open={open1}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم المدينة"
-            />
-            <TextArea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
-            <AutoComplete
-                style={{ width: 200 }}
-                options={options}
-                placeholder="المحافظة"
+            <div className="grid grid-cols-12 gap-2">
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        اسم المنطقة
+                    </h3>
+                    <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم المنطقة"
+                    />
+                </div>
 
-                // what user sees & types
-                value={searchText}
-
-
-                onChange={(text) => {
-                    setSearchText(text);
-                    setCityId(undefined); // clear ID while typing
-                }}
-
-                // when user selects from dropdown
-                onSelect={(value, option) => {
-                    setCityId(option.value);
-                    setSearchText(option?.label as string);
-                }}
-
-                filterOption={(inputValue, option) =>
-                    (option?.label as string)
-                        ?.toLowerCase()
-                        .includes(inputValue.toLowerCase())
-                }
-            />
-
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        المدينة
+                    </h3>
+                    <AutoComplete
+                        style={{ width: 200 }}
+                        options={options}
+                        placeholder="المدينة"
+                        value={searchText}
+                        onChange={(text) => {
+                            setSearchText(text);
+                            setCityId(undefined);
+                        }}
+                        onSelect={(value, option) => {
+                            setCityId(option.value);
+                            setSearchText(option?.label as string);
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
+            </div>
         </Modal>
 
         {/* Show Modal */}
         <Modal
-            title="تفاصيل مدينة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>تفاصيل منطقة</span>
+                </div>
+            }
             open={open3}
             onOk={() => emptyFields()}
             onCancel={() => { setOpen3(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                disabled
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم المدينة"
-            />
-            <TextArea
-                disabled
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
-
-            <Dropdown
-                menu={{ items: items }}
-                trigger={['click']}
-            >
-                <Button className="px-4 py-2 border rounded">
-                    الشوراع
-                </Button>
-            </Dropdown>
+            <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-12">
+                    <h3>
+                        اسم المنطقة
+                    </h3>
+                    <Input
+                        disabled
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم المدينة"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        disabled
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <Dropdown
+                        menu={{ items: items }}
+                        trigger={['click']}
+                    >
+                        <Button className="px-4 py-2 border rounded w-full" color="cyan" variant="outlined">
+                            الشوراع
+                        </Button>
+                    </Dropdown>
+                </div>
+            </div>
         </Modal>
 
         {/*Delete Modal*/}
@@ -327,18 +453,19 @@ export default function AreasPage() {
             <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
                 إضافة
             </Button>
-            <Button className="col-span-5" variant="solid" color="green"
-                onClick={() => downloadExcel()}>
-                تنزيل
-            </Button>
+
 
         </div>
-        <Table
-            style={{ maxWidth: 1100 }}
-            pagination={{
-                position: ["topRight"],
-            }}
-            scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataAreas} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    style={{ maxWidth: 1100 }}
+                    pagination={{
+                        position: ["topRight"],
+                    }}
+                    scroll={{ x: "max-content" }}
+                    columns={columns} dataSource={dataAreas} />
+        }
     </div>
 }

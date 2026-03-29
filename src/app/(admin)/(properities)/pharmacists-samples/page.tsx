@@ -159,7 +159,7 @@ export default function SamplePharmacistPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setFilterTypeId(undefined); // clear ID while typing
+                            setFilterTypeId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterTypeId(option.value);

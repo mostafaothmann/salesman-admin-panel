@@ -1,7 +1,7 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, Modal, Space, Table } from "antd";
+import { AutoComplete, Button, Dropdown, Input, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
@@ -81,11 +81,40 @@ export default function HospitalsPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        console.log(editedId)
-        await editHospital(editedId, {
-            governorate_id, city_id, area_id, street_id, admin_description, salesman_description,
-            name, phone_number, telephone_number, email, type
-        });
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await editHospital(editedId, {
+                    governorate_id, city_id, area_id, street_id, admin_description, salesman_description,
+                    name, phone_number, telephone_number, email, type
+                });
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         await getHospitalsData();
         setLoading(false);
         setOpenEditModal(false);
@@ -134,6 +163,7 @@ export default function HospitalsPage() {
         setSearchTextStreet("");
         setAdminDescription("");
         setSalesmanDescription("")
+        setEmail("")
         setOpen(false);
     }
 
@@ -210,7 +240,35 @@ export default function HospitalsPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteHospital(id);
+        try {
+            const res = await deleteHospital(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getHospitalsData();
         setLoading2(false);
         setOpenDeleteModal(false);
@@ -218,12 +276,41 @@ export default function HospitalsPage() {
 
     //downloadExcele
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataHospitals ?? []);
+        const formattedData = (dataHospitals ?? []).map(item => ({
+            "تاريخ الإضافة": item.created_at.slice(0, 10),
+            "البريد": item.email,
+            "الهاتف": item.phone_number,
+            "الأرضي": item.telephone_number,
+            "الشارع": dataStreets?.find(e => e.id == Number(item.street_id))?.name,
+            "المنطقة": dataAreas?.find(e => e.id == Number(item.area_id))?.name,
+            "المدينة": dataCities?.find(e => e.id == Number(item.city_id))?.name,
+            "المحافظة": dataGovernorates?.find(e => e.id == Number(item.governorate_id))?.name,
+            "اسم المشفى": item.name,
+            "معرف المشفى": item.id,
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        worksheet["!cols"] = [
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+        ];
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "الجمعيات");
-        XLSX.writeFile(workbook, "الجمعيات.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "المشافي");
+        XLSX.writeFile(workbook, "المشافي.xlsx");
     };
-    useEffect(() => { getHospitalsData(); }, []);
+
+    const [pageLoading, setPageLoading] = useState(true);
+    useEffect(() => {
+        setPageLoading(true)
+        getHospitalsData().finally(() => setPageLoading(false));
+
+    }, []);
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -372,8 +459,16 @@ export default function HospitalsPage() {
                 </div>
 
                 <div className="col-span-6 xl:col-span-6">
+                    <h3>
+                        البريد :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={email}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="البريد"
+                    />
                 </div>
-
 
                 <div className="col-span-6 xl:col-span-3">
                     <div>
@@ -393,10 +488,10 @@ export default function HospitalsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setGovernorateId(undefined); // clear ID while typing
-                            setCityId(undefined); // clear ID while typing
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setGovernorateId(undefined); 
+                            setCityId(undefined); 
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -434,9 +529,9 @@ export default function HospitalsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setCityId(undefined); // clear ID while typing
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setCityId(undefined); 
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -474,8 +569,8 @@ export default function HospitalsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -512,7 +607,7 @@ export default function HospitalsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setStreetId(undefined); // clear ID while typing
+                            setStreetId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setStreetId(option.value);
@@ -584,7 +679,7 @@ export default function HospitalsPage() {
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}   
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
@@ -621,6 +716,17 @@ export default function HospitalsPage() {
                     />
                 </div>
 
+                <div className="col-span-6 xl:col-span-6">
+                    <h3>
+                        البريد :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={email}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="البريد"
+                    />
+                </div>
 
                 <div className="col-span-6 xl:col-span-3">
                     <div>
@@ -640,10 +746,10 @@ export default function HospitalsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setGovernorateId(undefined); // clear ID while typing
-                            setCityId(undefined); // clear ID while typing
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setGovernorateId(undefined); 
+                            setCityId(undefined); 
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -681,9 +787,9 @@ export default function HospitalsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setCityId(undefined); // clear ID while typing
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setCityId(undefined); 
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -721,8 +827,8 @@ export default function HospitalsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -759,7 +865,7 @@ export default function HospitalsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setStreetId(undefined); // clear ID while typing
+                            setStreetId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setStreetId(option.value);
@@ -815,7 +921,7 @@ export default function HospitalsPage() {
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}   
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
@@ -950,12 +1056,15 @@ export default function HospitalsPage() {
                 تنزيل
             </Button>
         </div>
-
-        <Table
-            scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataHospitals}
-            pagination={{
-                position: ["topRight"],
-            }} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    scroll={{ x: "max-content" }}
+                    columns={columns} dataSource={dataHospitals}
+                    pagination={{
+                        position: ["topRight"],
+                    }} />
+        }
     </div>
 }

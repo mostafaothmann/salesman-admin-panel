@@ -1,121 +1,124 @@
 
 // 🧩 Interfaces
 export interface GroupType {
-    id: number,
-    name: string,
-    description: string,
+    id: number
+    name: string
+    description: string
+    created_at: string
     types: Type[]
 }
 
 export interface Ingredient {
-    id: number,
-    name: string,
-    salesman_description: string,
-    admin_description: string,
-    quantity: number,
+    id: number
+    name: string
+    salesman_description: string
+    admin_description: string
+    created_at: string
+    quantity: number
 }
 
 export interface TypeIngredient {
-    id: number,
-    ingredient_id: number,
-    type_id: number,
-    quantity_percentage: number,
+    id: number
+    ingredient_id: number
+    type_id: number
+    quantity_percentage: number
 }
 
 export interface RecoveryCase {
-    id: number,
-    description: string,
-    type_id: number,
-    end_treatment: string,
-    start_treatment: string,
+    id: number
+    description: string
+    type_id: number
+    end_treatment: string
+    start_treatment: string
 }
 
 export interface RecoveryCaseImage {
-    id: number,
-    recovercase_id: number,
+    id: number
+    recovercase_id: number
     description: string;
 }
 
 export interface Type {
-    id: number,
+    id: number
     grouptype_id: number;
     salesman_description: string;
-    admin_description: string,
-    name: string,
-    quantity: number,
-    brand: string,
+    admin_description: string
+    name: string
+    quantity: number
+    brand: string
     price_for_piece: number;
     manufacturing_date: string;
     price_for_sale: number;
     percentage: number;
     delivery_percentage: number;
     return_discount: number;
-    type: number,
+    type: number
+    created_at: string
     online_percentage: number;
 }
 
 export interface OnlineProduct {
-    id: number,
+    id: number
     order_id: number;
-    type_id: number,
-    quantity: number,
+    type_id: number
+    quantity: number
     price_for_piece: number;
     total_price: number;
     total_percentage: number;
 }
 
 export interface BaseOffer {
-    id: number,
-    type_id: number,
+    id: number
+    type_id: number
     number_of_gifts: number;
     number_of_pieces: number;
 }
 
 //for Adding/Edititng
 export interface AddingGroupType {
-    name: string,
-    description: string,
+    name: string
+    description: string
 }
 
 export interface AddingIngredient {
-    name: string,
-    admin_description: string,
-    salesman_description: string,
-    quantity: number,
+    name: string
+    admin_description: string
+    salesman_description: string
+    quantity: number
 }
 
 export interface AddingTypeIngredient {
-    ingredient_id: number,
-    type_id: number,
-    quantity_percentage: number,
+    ingredient_id: number
+    type_id: number
+    quantity_percentage: number
 }
 
 export interface AddingRecoveryCase {
-    description: string,
-    type_id: number,
-    end_treatment: string,
-    start_treatment: string,
+    description: string
+    type_id: number
+    end_treatment: string
+    start_treatment: string
 }
 
 export interface AddingRecoveryCaseImage {
-    recovercase_id: number,
+    recovercase_id: number
     description: string;
 }
 
 export interface AddingType {
     grouptype_id: number;
-    name: string,
-    quantity: number,
-    brand: string,
+    name: string
+    quantity: number
+    brand: string
     salesman_description: string;
-    admin_description: string,
+    admin_description: string
     price_for_piece: number;
     price_for_sale: number;
     percentage: number;
     delivery_percentage: number;
     manufacturing_date: string;
     return_discount: number;
-    type: number,
+    type: number
     online_percentage: number;
 }
 
@@ -123,8 +126,8 @@ export interface AddingType {
 
 export interface AddingOnlineProduct {
     order_id: number;
-    type_id: number,
-    quantity: number,
+    type_id: number
+    quantity: number
     price_for_piece: number;
     total_price: number;
     total_percentage: number;

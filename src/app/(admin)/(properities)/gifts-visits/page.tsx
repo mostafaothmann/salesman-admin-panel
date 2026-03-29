@@ -1,7 +1,7 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, InputNumber, Modal, Space, Table } from "antd";
+import { AutoComplete, Button, Dropdown, Input, InputNumber, Modal, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
@@ -77,6 +77,9 @@ export default function GiftVisitsPage() {
         XLSX.utils.book_append_sheet(workbook, worksheet, "المكونات");
         XLSX.writeFile(workbook, "المكونات.xlsx");
     };
+
+    const [pageLoading, setPageLoading] = useState(true);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -90,7 +93,8 @@ export default function GiftVisitsPage() {
                 console.error("Error fetching data:", error);
             }
         };
-        fetchData();
+        setPageLoading(true);
+        fetchData().finally(() => setPageLoading(false));;
         getGiftVisitsData(page, limit);
     }, []);
 
@@ -154,7 +158,7 @@ export default function GiftVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setFilterTypeId(undefined); // clear ID while typing
+                            setFilterTypeId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterTypeId(option.value);
@@ -178,42 +182,42 @@ export default function GiftVisitsPage() {
                 تنزيل
             </Button>
         </div>
-        
-        <div className="max-w-full">
-            {filtered ? <Table
-                scroll={{ x: "max-content" }}
-                columns={columns}
-                pagination={{
-                    placement: ['topEnd'],
-                    current: filter_page,
-                    pageSize: limit,
-                    total: filter_total,
-                    onChange: (page, pageSize) => {
-                        setFilterPage(filter_page)
-                        getFilteredData(page, pageSize)
-                        // setPage(lastPage)
-                    },
-                }}
-                dataSource={filteredDataGiftsVisits || []} />
+
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
                 :
-                <Table
+                filtered ? <Table
                     scroll={{ x: "max-content" }}
-                    style={{ maxWidth: 1100 }}
                     columns={columns}
                     pagination={{
                         placement: ['topEnd'],
-                        current: page,
+                        current: filter_page,
                         pageSize: limit,
-                        total: total,
+                        total: filter_total,
                         onChange: (page, pageSize) => {
-                            getGiftVisitsData(page, pageSize);
-                            setPage(page)
-                            //setPage(lastPage)
+                            setFilterPage(filter_page)
+                            getFilteredData(page, pageSize)
+                            // setPage(lastPage)
                         },
                     }}
-                    dataSource={dataGiftsVisits || []} />
-            }
-
-        </div >
-    </div>
+                    dataSource={filteredDataGiftsVisits || []} />
+                    :
+                    <Table
+                        scroll={{ x: "max-content" }}
+                        style={{ maxWidth: 1100 }}
+                        columns={columns}
+                        pagination={{
+                            placement: ['topEnd'],
+                            current: page,
+                            pageSize: limit,
+                            total: total,
+                            onChange: (page, pageSize) => {
+                                getGiftVisitsData(page, pageSize);
+                                setPage(page)
+                                //setPage(lastPage)
+                            },
+                        }}
+                        dataSource={dataGiftsVisits || []} />
+        }
+    </div >
 }

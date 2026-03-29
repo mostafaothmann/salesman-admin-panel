@@ -1,6 +1,6 @@
 "use client";
 
-import { AutoComplete, Button, DatePicker, Input, Modal, SliderSingleProps, Space, Table, TimePickerProps, Upload } from "antd";
+import { AutoComplete, Button, DatePicker, Input, Modal, notification, Skeleton, SliderSingleProps, Space, Table, TimePickerProps, Upload } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import dayjs from 'dayjs';
@@ -31,7 +31,7 @@ export default function AssistantsPage() {
     const [account_status_id, setAccountStatusId] = useState(1);
     const [birth_date, setBirthDate] = useState("");
     const [email, setEmail] = useState("");
-    const [sex_id, setSexId] = useState(0);
+    const [gender_id, setSexId] = useState(0);
     const [phone_number, setPhoneNumber] = useState("");
     const [telephone_number, setTelephoneNumber] = useState("");
     const [password, setPassword] = useState("");
@@ -99,23 +99,58 @@ export default function AssistantsPage() {
         setCityId(city_id + 1)
         setAreaId(area_id + 1)
         setStreetId(street_id + 1)
-        await addAssistant({
-            first_name: first_name,
-            last_name: last_name,
-            governorate_id: governorate_id,
-            city_id: city_id,
-            street_id: street_id,
-            area_id: area_id,
-            account_status_id: account_status_id,
-            birth_date: birth_date,
-            admin_description: admin_description,
-            sex: sex_id,
-            phone_number: phone_number,
-            telephone_number: telephone_number,
-            email: email,
-            role: ROLE.ASSISTANT,
-            password: password
-        })
+
+
+        if (first_name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(first_name) &&
+            last_name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(last_name)
+        ) {
+            try {
+                const res = await addAssistant({
+                    first_name: first_name,
+                    last_name: last_name,
+                    governorate_id: governorate_id,
+                    city_id: city_id,
+                    street_id: street_id,
+                    area_id: area_id,
+                    account_status_id: account_status_id,
+                    birth_date: birth_date,
+                    admin_description: admin_description,
+                    gender: gender_id,
+                    phone_number: phone_number,
+                    telephone_number: telephone_number,
+                    email: email,
+                    role: ROLE.ASSISTANT,
+                    password: password
+                })
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
+
         getAssistantsData();
         setBirthDate("");
         setFirstName("");
@@ -172,7 +207,38 @@ export default function AssistantsPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteAssistant(id);
+
+
+        try {
+            const res = await deleteAssistant(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
+
         getAssistantsData();
         setLoading2(false);
         setOpenDeleteModal(false);
@@ -198,7 +264,12 @@ export default function AssistantsPage() {
         XLSX.utils.book_append_sheet(workbook, worksheet, "المشرفين");
         XLSX.writeFile(workbook, "المشرفين.xlsx");
     };
-    useEffect(() => { getAssistantsData(); }, []);
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        setPageLoading(true);
+        getAssistantsData().finally(() => setPageLoading(false));
+    }, []);
 
     const columns: ColumnsType<any> = [
         {
@@ -634,21 +705,24 @@ export default function AssistantsPage() {
 
 
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
-            <Button className="col-span-5" variant="solid" color="purple" onClick={() => changeOpenModalAdd()}>
+            <Button className="col-span-5" variant="solid" color="cyan" onClick={() => changeOpenModalAdd()}>
                 إضافة
             </Button>
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+            {/*   <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
                 تنزيل
-            </Button>
+            </Button> */}
         </div>
-
-        <Table
-            style={{ maxWidth: 1100 }}
-            pagination={{
-                position: ["topRight"],
-            }}
-            scroll={{ x: "max-content" }}
-            columns={columns}
-            dataSource={dataAssistants || []} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    style={{ maxWidth: 1100 }}
+                    pagination={{
+                        position: ["topRight"],
+                    }}
+                    scroll={{ x: "max-content" }}
+                    columns={columns}
+                    dataSource={dataAssistants || []} />
+        }
     </div>
 }

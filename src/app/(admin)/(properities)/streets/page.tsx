@@ -1,7 +1,7 @@
 "use client";
 
 
-import { AutoComplete, Button, Modal, Table, Space, Input } from "antd";
+import { AutoComplete, Button, Modal, Table, Space, Input, notification, Skeleton } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
@@ -43,7 +43,38 @@ export default function StreetsPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editStreet(editedId, { name: name, description: description, area_id: area_id });
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await editStreet(editedId, { name: name, description: description, area_id: area_id });
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
+
         setLoading(false);
         setOpenEditModal(false);
         getStreetsData();
@@ -52,7 +83,38 @@ export default function StreetsPage() {
     //addType function
     async function handleAdd() {
         setAreaId(area_id + 1);
-        await addStreet({ name, description, area_id })
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await addStreet({ name, description, area_id })
+
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         getStreetsData();
         setName("");
         setSearchText("");
@@ -101,20 +163,42 @@ export default function StreetsPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteStreet(id);
+        try {
+            const res = await deleteStreet(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getStreetsData();
         setLoading2(false);
         setOpenDeleteModal(false);
     }
+    const [pageLoading, setPageLoading] = useState(true);
 
-    //downloadExcele
-    const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataStreets ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
-    };
-    useEffect(() => { getStreetsData(); }, []);
+    useEffect(() => { getStreetsData().finally(() => setPageLoading(false)); }, []);
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -161,7 +245,8 @@ export default function StreetsPage() {
                         Delete
                     </Button>
                     <Button
-                        type="default"
+                        variant="outlined"
+                        color="cyan"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
                         Edit
@@ -189,7 +274,13 @@ export default function StreetsPage() {
     return <div>
         {/*Adding Modal*/}
         <Modal
-            title="إضافة شارع جديدة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>
+                        إضافة شارع
+                    </span>
+                </div>
+            }
             open={open}
             onOk={() => handleAdd()}
             okButtonProps={{ variant: "outlined", color: "purple" }}
@@ -197,124 +288,162 @@ export default function StreetsPage() {
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
-                <div className="grid grid-cols-12 sm:col-span-12  col-span-12 gap-2">
-                    <div className="md:col-span-6 col-span-12">
-                        <Input
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="اسم الشارع"
-                        />
-                    </div>
-                    <div className="md:col-span-6 col-span-12">
-                        <AutoComplete
-                            style={{ width: 200 }}
-                            options={options}
-                            placeholder="المنطقة"
-
-                            value={searchText}
-
-
-                            onChange={(text) => {
-                                setSearchText(text);
-                                setAreaId(undefined); // clear ID while typing
-                            }}
-
-                            onSelect={(value, option) => {
-                                setAreaId(option.value);
-                                setSearchText(option?.label as string);
-                            }}
-
-                            filterOption={(inputValue, option) =>
-                                (option?.label as string)
-                                    ?.toLowerCase()
-                                    .includes(inputValue.toLowerCase())
-                            }
-                        />
-                    </div>
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        اسم الشارع
+                    </h3>
+                    <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم الشارع"
+                    />
+                </div>
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        المنطقة
+                    </h3>
+                    <AutoComplete
+                        style={{ width: 200 }}
+                        options={options}
+                        placeholder="المنطقة"
+                        value={searchText}
+                        onChange={(text) => {
+                            setSearchText(text);
+                            setAreaId(undefined);
+                        }}
+                        onSelect={(value, option) => {
+                            setAreaId(option.value);
+                            setSearchText(option?.label as string);
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        value={description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
                 </div>
             </div>
-
-            <TextArea
-                value={description}
-                style={{ maxWidth: '100%' }}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
-        </Modal>
+        </Modal >
         <Modal
-            title="تعديل شارع"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>
+                        تعديل شارع
+                    </span>
+                </div>
+            }
             open={open1}
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الشارع"
-            />
-            <TextArea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
-            <AutoComplete
-                style={{ width: 200 }}
-                options={options}
-                placeholder="المحافظة"
+            <div className="grid grid-cols-12 gap-2">
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        اسم الشارع
+                    </h3>
+                    <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم الشارع"
+                    />
+                </div>
 
-                // what user sees & types
-                value={searchText}
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        المدينة
+                    </h3>
+                    <AutoComplete
+                        style={{ width: 200 }}
+                        options={options}
+                        placeholder="المدينة"
+                        value={searchText}
+                        onChange={(text) => {
+                            setSearchText(text);
+                            setAreaId(undefined);
+                        }}
+                        onSelect={(value, option) => {
+                            setAreaId(option.value);
+                            setSearchText(option?.label as string);
+                        }}
 
-
-                onChange={(text) => {
-                    setSearchText(text);
-                    setAreaId(undefined); // clear ID while typing
-                }}
-
-                // when user selects from dropdown
-                onSelect={(value, option) => {
-                    setAreaId(option.value);
-                    setSearchText(option?.label as string);
-                }}
-
-                filterOption={(inputValue, option) =>
-                    (option?.label as string)
-                        ?.toLowerCase()
-                        .includes(inputValue.toLowerCase())
-                }
-            />
-
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+                <div className=" col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
+            </div>
         </Modal>
 
         {/* Show Modal */}
         <Modal
-            title="تفاصيل شارع"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>
+                        تفاصيل شارع
+                    </span>
+                </div>
+            }
             open={openShowModal}
             onOk={() => emptyFields()}
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                disabled
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الشارع"
-            />
-            <TextArea
-                disabled
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
+            <div className="grid grid-cols-12 sm:col-span-12  col-span-12 gap-2">
+                <div className="col-span-12">
+                    <h3>
+                        اسم الشارع
+                    </h3>
+                    <Input
+                        disabled
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم الشارع"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        disabled
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
+            </div>
         </Modal>
 
         {/*Delete Modal*/}
@@ -334,17 +463,17 @@ export default function StreetsPage() {
             <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
                 إضافة
             </Button>
-            <Button variant="solid" color="green" onClick={() => downloadExcel()}>
-                تنزيل
-            </Button>
         </div>
-
-        <Table
-            style={{ maxWidth: 1100 }}
-            pagination={{
-                position: ["topRight"],
-            }}
-            scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataStreets} />
-    </div>
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    style={{ maxWidth: 1100 }}
+                    pagination={{
+                        position: ["topRight"],
+                    }}
+                    scroll={{ x: "max-content" }}
+                    columns={columns} dataSource={dataStreets} />
+        }
+    </div >
 }

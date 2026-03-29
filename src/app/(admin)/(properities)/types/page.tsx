@@ -1,7 +1,7 @@
 "use client";
 
 
-import { AutoComplete, Button, DatePicker, Input, InputNumber, Modal, Space, Table } from "antd";
+import { AutoComplete, Button, DatePicker, Input, InputNumber, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
@@ -10,7 +10,9 @@ import { ColumnsType } from "antd/es/table";
 
 
 export default function TypesPage() {
+    //store data
     const { dataTypes, dataGroupTypes, getGroupTypesData, deleteType, getTypesData, editType, addType } = useTypeStore();
+
     const router = useRouter();
     //showModal
     const openShowModal = (id: number) => {
@@ -73,12 +75,44 @@ export default function TypesPage() {
 
     //addType function
     async function handleAdd() {
-        await addType({
-            name, admin_description, salesman_description, grouptype_id,
-            brand, type, manufacturing_date, quantity,
-            percentage, price_for_piece, price_for_sale,
-            online_percentage, delivery_percentage, return_discount
-        })
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)
+        ) {
+            try {
+                const res = await await addType({
+                    name, admin_description, salesman_description, grouptype_id,
+                    brand, type, manufacturing_date, quantity,
+                    percentage, price_for_piece, price_for_sale,
+                    online_percentage, delivery_percentage, return_discount
+                })
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
+
         getTypesData();
         emptyFields();
         setOpen(false)
@@ -88,9 +122,18 @@ export default function TypesPage() {
         setName("");
         setSearchText("");
         setSearchTextBrand("");
+        setQuantity(0);
+        setDeliveryPercentage(0);
+        setPercentage(0);
+        setPriceForPiece(0);
+        setPriceForSale(0);
+        setOnlinePercentage(0);
         setAdminDescription("");
         setSalesmanDescription("");
         setBrand("");
+        setManufacturingDate("");
+        setSearchTextType("");
+        setGroupTypeId(null);
         setOpen(false);
     }
     //editModal
@@ -112,7 +155,37 @@ export default function TypesPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteType(id);
+
+        try {
+            const res = await deleteType(id);
+
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "حدث خطأ في الاتصال بالسيرفر",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getTypesData();
         setLoading2(false);
         setOpenDeleteModal(false);
@@ -120,12 +193,46 @@ export default function TypesPage() {
 
     //downloadExcele
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataTypes ?? []);
+        const formattedData = (dataTypes ?? []).map(item => ({
+            "تاريخ الإضافة": item.created_at.slice(0, 10),
+            "تاريخ بداية التصنيع": item.manufacturing_date.slice(0, 10),
+            "كمية الصنف": item.quantity,
+            "عمولة المندوب": item.percentage,
+            "عمولة أونلاين": item.online_percentage,
+            "عمولة توصيل": item.delivery_percentage,
+            "براند الصنف": item.brand,
+            "حسم الإرجاع": item.return_discount,
+            "سعر القطعة": item.price_for_piece,
+            "السعر للمبيع": item.price_for_sale,
+            "اسم الصنف": item.name,
+            "معرف الصنف": item.id,
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        worksheet["!cols"] = [
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+            { wch: 15 },
+        ];
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "الأصناف");
         XLSX.writeFile(workbook, "الأصناف.xlsx");
     };
-    useEffect(() => { getTypesData() }, []);
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        setPageLoading(true)
+        getTypesData().finally(() => setPageLoading(false))
+    }, []
+    );
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -223,7 +330,11 @@ export default function TypesPage() {
     return <div>
         {/*Adding Modal*/}
         <Modal
-            title="إضافة صنف جديد"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span> إضافة صنف</span>
+                </div>
+            }
             open={open}
             onOk={() => handleAdd()}
             okButtonProps={{ variant: "outlined", color: "purple" }}
@@ -403,12 +514,12 @@ export default function TypesPage() {
 
                 <div className="col-span-12 sm:col-span-6">
                     <h3>
-                        مجموعة الصنف :
+                        نوع الصنف  :
                     </h3>
                     <AutoComplete
                         style={{ width: '100%' }}
                         options={optionsType}
-                        placeholder="مجموعة الصنف"
+                        placeholder="نوع الصنف"
                         value={searchTextType}
                         onChange={(text) => {
                             setSearchTextType(text);
@@ -475,12 +586,15 @@ export default function TypesPage() {
                 تنزيل
             </Button>
         </div>
-        <Table
-            scroll={{ x: "max-content" }}
-            style={{ maxWidth: 1100 }}
-            pagination={{
-                position: ["topRight"],
-            }}
-            columns={columns} dataSource={dataTypes} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                : <Table
+                    scroll={{ x: "max-content" }}
+                    style={{ maxWidth: 1100 }}
+                    pagination={{
+                        position: ["topRight"],
+                    }}
+                    columns={columns} dataSource={dataTypes} />
+        }
     </div>
 }

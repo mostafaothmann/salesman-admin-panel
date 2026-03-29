@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Button, Dropdown, Input, Modal, Space, Table } from "antd";
+import { Button, Dropdown, Input, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
@@ -43,7 +43,37 @@ export default function VideoLinksPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editVideoLink(editedId, { link: link, name: name, description: description });
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await editVideoLink(editedId, { link: link, name: name, description: description });
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         setLoading(false);
         setOpenEditModal(false);
         getVideosLinksData();
@@ -52,7 +82,37 @@ export default function VideoLinksPage() {
     //addType function
     async function handleAdd() {
         setVideoLinkId(videoLink_id + 1);
-        await addVideoLink({ name, link, description })
+        if (link && /^[A-Za-z\u0600-\u06FF\s]+$/.test(link)) {
+            try {
+                const res = await addVideoLink({ name, link, description })
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         getVideosLinksData();
         setName("");
         setSearchText("");
@@ -97,20 +157,50 @@ export default function VideoLinksPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteVideoLink(id);
+
+
+        try {
+            const res = await deleteVideoLink(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
+
         getVideosLinksData();
         setLoading2(false);
         setOpenDeleteModal(false);
     }
 
-    //downloadExcele
-    const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataVideosLinks ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
-    };
-    useEffect(() => { getVideosLinksData(); }, []);
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        setPageLoading(true);
+        getVideosLinksData().finally(() => setPageLoading(false));
+    }, []);
+
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -188,45 +278,51 @@ export default function VideoLinksPage() {
             onCancel={() => emptyFields()}
             mask={false}
         >
-            <div >
-                <h3>
-                    اسم الطبيب
-                </h3>
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12">
+                    <h3>
+                        اسم الطبيب
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم الطبيب"
+                    />
+
+                </div>
+
+                <div className="col-span-12">
+                    <h3>
+                        الرابط
+                    </h3>
+                    <TextArea
+                        className="w-full"
+                        value={link}
+                        style={{ maxWidth: '100%', maxHeight: 60 }}
+                        onChange={(e) => setLink(e.target.value)}
+                        placeholder="الرابط"
+                    />
+                </div>
+
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        value={description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
             </div>
-            <Input
-                className="w-full"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الطبيب"
-            />
-            <div >
-                <h3>
-                    الرابط
-                </h3>
-            </div>
-            <TextArea
-                className="w-full"
-                value={link}
-                style={{ maxWidth: '100%', maxHeight: 60 }}
-                onChange={(e) => setLink(e.target.value)}
-                placeholder="الرابط"
-            />
-            <div>
-                <h3>
-                    الوصف
-                </h3>
-            </div>
-            <TextArea
-                value={description}
-                style={{ maxWidth: '100%' }}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
+
         </Modal>
         <Modal
             title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
                     <span> تعديل رابط</span>
                 </div>
             }
@@ -234,50 +330,52 @@ export default function VideoLinksPage() {
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <div >
-                <h3>
-                    اسم الطبيب
-                </h3>
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12">
+                    <h3>
+                        اسم الطبيب
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم الطبيب"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الرابط
+                    </h3>
+                    <TextArea
+                        className="w-full"
+                        value={link}
+                        style={{ maxWidth: '100%', maxHeight: 60 }}
+                        onChange={(e) => setLink(e.target.value)}
+                        placeholder="الرابط"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        value={description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
             </div>
-            <Input
-                className="w-full"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الطبيب"
-            />
-            <div >
-                <h3>
-                    الرابط
-                </h3>
-            </div>
-            <TextArea
-                className="w-full"
-                value={link}
-                style={{ maxWidth: '100%', maxHeight: 60 }}
-                onChange={(e) => setLink(e.target.value)}
-                placeholder="الرابط"
-            />
-            <div>
-                <h3>
-                    الوصف
-                </h3>
-            </div>
-            <TextArea
-                value={description}
-                style={{ maxWidth: '100%' }}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
         </Modal>
 
         {/* Show Modal */}
         <Modal
             title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
                     <span>تفاصيل الرابط</span>
                 </div>
             }
@@ -286,42 +384,49 @@ export default function VideoLinksPage() {
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                className="w-full"
-                disabled
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الطبيب"
-            />
-            <div >
-                <h3>
-                    الرابط
-                </h3>
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12">
+                    <h3>
+                        اسم الطبيب
+                    </h3>
+                    <Input
+                        className="w-full"
+                        disabled
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم الطبيب"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الرابط
+                    </h3>
+                    <TextArea
+                        disabled
+                        className="w-full"
+                        value={link}
+                        style={{ maxWidth: '100%', maxHeight: 60 }}
+                        onChange={(e) => setLink(e.target.value)}
+                        placeholder="الرابط"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        disabled
+                        value={description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
             </div>
-            <TextArea
-                disabled
-                className="w-full"
-                value={link}
-                style={{ maxWidth: '100%', maxHeight: 60 }}
-                onChange={(e) => setLink(e.target.value)}
-                placeholder="الرابط"
-            />
-            <div>
-                <h3>
-                    الوصف
-                </h3>
-            </div>
-            <TextArea
-                disabled
-                value={description}
-                style={{ maxWidth: '100%' }}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
         </Modal>
 
         {/*Delete Modal*/}
@@ -333,7 +438,7 @@ export default function VideoLinksPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} 
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
@@ -341,12 +446,16 @@ export default function VideoLinksPage() {
                 إضافة
             </Button>
         </div>
-        <Table
-            style={{ maxWidth: 1100 }}
-            pagination={{
-                position: ["topRight"],
-            }}
-            scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataVideosLinks} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    style={{ maxWidth: 1100 }}
+                    pagination={{
+                        position: ["topRight"],
+                    }}
+                    scroll={{ x: "max-content" }}
+                    columns={columns} dataSource={dataVideosLinks} />
+        }
     </div>
 }

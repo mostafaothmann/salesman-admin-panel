@@ -104,7 +104,7 @@ export interface Doctor {
     is_added_by_admin: boolean,
     phone_number: string,
     telephone_number: string,
-    sex: number,
+    gender: number,
     wife_husband_first_name: string;
     wife_husband_last_name: string;
 }
@@ -225,7 +225,7 @@ export interface Pharmacist {
     graduation_country: string,
     graduation_university: string,
     is_added_by_admin: boolean,
-    sex: number,
+    gender: number,
     wife_husband_first_name: string;
     wife_husband_last_name: string;
     pharmacistVisits: PharmacistVisit[]
@@ -239,8 +239,9 @@ export interface SpecializationType {
 }
 
 export interface Specialization {
-    id: number,
-    name: string,
+    id: number
+    name: string
+    created_at: string
     doctors: Doctor[]
     specializationTypes: SpecializationType[]
 }
@@ -252,24 +253,24 @@ export interface DoctorPharmacist {
 }
 
 export interface Hospital {
-    id: number;
-    type: number;
-    name: string;
+    id: number
+    type: number
+    name: string
+    created_at: string
+    lan?: string
+    lat?: string
 
-    lan?: string;
-    lat?: string;
+    phone_number?: string
+    telephone_number?: string
+    email?: string
 
-    phone_number?: string;
-    telephone_number?: string;
-    email?: string;
+    governorate_id: number
+    city_id?: number
+    area_id?: number
+    street_id?: number
 
-    governorate_id: number;
-    city_id?: number;
-    area_id?: number;
-    street_id?: number;
-
-    salesman_description?: string;
-    admin_description?: string;
+    salesman_description?: string
+    admin_description?: string
 }
 
 
@@ -334,24 +335,24 @@ export interface AssociationPharmacist {
 }
 
 export interface Association {
-    id: number,
-    name: string,
-    admin_description: string,
-    salesman_description: string,
-    lat?: string;
-    lan?: string;
-    email: string,
-    phone_number: string,
-    country: string,
-    telephone_number: string,
-    governorate_id: number,
-    city_id: number,
-    area_id: number,
-    street_id: number,
+    id: number
+    name: string
+    created_at: string
+    admin_description: string
+    salesman_description: string
+    lat?: string
+    lan?: string
+    email: string
+    phone_number: string
+    country: string
+    telephone_number: string
+    governorate_id: number
+    city_id: number
+    area_id: number
+    street_id: number
 }
 
 //for Adding/Edititng
-
 export interface AddingDoctorSample {
     doctor_visit_id: number,
     quantity: number,
@@ -394,15 +395,11 @@ export interface AddingDoctor {
     area_id: number,
     street_id: number,
     specialization_id: number,
-    //   building_id:number,
     first_name: string,
     last_name: string,
     classification: number,
     loyalty: number,
-    //last_visit_note: string,
-    // last_visit_date: Date,
     birth_date: string,
-    //average_patients_per_day: number,
     admin_description: string,
     salesman_description: string,
     favourite_time_opening: string,
@@ -411,13 +408,11 @@ export interface AddingDoctor {
     first_work_time_closing: string
     second_work_time_opening: string,
     second_work_time_closing: string,
-    //photo: string,
     graduation_country: string,
     phone_number: string,
     telephone_number: string,
     graduation_university: string,
-    //  is_added_by_admin: boolean,
-    sex: number,
+    gender: number,
     wife_husband_first_name: string;
     wife_husband_last_name: string;
 }
@@ -446,7 +441,7 @@ export interface AddingPharmacist {
     second_work_time_closing: string,
     graduation_country: string,
     graduation_university: string,
-    sex: number,
+    gender: number,
     wife_husband_first_name: string;
     wife_husband_last_name: string;
 }

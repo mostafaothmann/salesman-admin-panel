@@ -1,7 +1,8 @@
 import axios from "axios";
-const url = `http://192.168.1.111:4000`
+const url = `http://10.205.253.158:4000`
 
 //for RohAlarad
+
 
 //Places Store
 export const apiSalesman = axios.create({

@@ -434,7 +434,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchVisitStatus(text);
-                            setFilterVisitStatusId(undefined); // clear ID while typing
+                            setFilterVisitStatusId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterVisitStatusId(option.value);
@@ -464,7 +464,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextSalesman(text);
-                            setFilterSalesmanId(undefined); // clear ID while typing
+                            setFilterSalesmanId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterSalesmanId(option.value);
@@ -493,7 +493,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextAssistant(text);
-                            setFilterAssistantId(undefined); // clear ID while typing
+                            setFilterAssistantId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterAssistantId(option.value);
@@ -522,7 +522,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextPharmacist(text);
-                            setFilterPharmacistId(undefined); // clear ID while typing
+                            setFilterPharmacistId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterPharmacistId(option.value);
@@ -551,7 +551,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setFilterTypeId(undefined); // clear ID while typing
+                            setFilterTypeId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterTypeId(option.value);
@@ -582,7 +582,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextSalesman(text);
-                            setFilterSalesmanId(undefined); // clear ID while typing
+                            setFilterSalesmanId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterSalesmanId(option.value);
@@ -628,10 +628,10 @@ export default function PharmacistsVisitsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setFilterGovernorateId(undefined); // clear ID while typing
-                            setFilterCityId(undefined); // clear ID while typing
-                            setFilterAreaId(undefined); // clear ID while typing
-                            setFilterStreetId(undefined); // clear ID while typing
+                            setFilterGovernorateId(undefined); 
+                            setFilterCityId(undefined); 
+                            setFilterAreaId(undefined); 
+                            setFilterStreetId(undefined); 
                             const governorate = dataGovernorates?.find(
                                 item => item.id === filter_governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -669,9 +669,9 @@ export default function PharmacistsVisitsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setFilterCityId(undefined); // clear ID while typing
-                            setFilterAreaId(undefined); // clear ID while typing
-                            setFilterStreetId(undefined); // clear ID while typing
+                            setFilterCityId(undefined); 
+                            setFilterAreaId(undefined); 
+                            setFilterStreetId(undefined); 
                             const city = dataCities?.find(
                                 item => item.id === filter_city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -709,8 +709,8 @@ export default function PharmacistsVisitsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setFilterAreaId(undefined); // clear ID while typing
-                            setFilterStreetId(undefined); // clear ID while typing
+                            setFilterAreaId(undefined); 
+                            setFilterStreetId(undefined); 
                             const area = dataAreas?.find(
                                 item => item.id === filter_area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -747,7 +747,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setFilterStreetId(undefined); // clear ID while typing
+                            setFilterStreetId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterStreetId(option.value);
@@ -786,7 +786,7 @@ export default function PharmacistsVisitsPage() {
                 </Button>
             ]
             }
-            confirmLoading={loading4}   // ✅ spinner on OK button
+            confirmLoading={loading4}   
             mask={false}
         >
 

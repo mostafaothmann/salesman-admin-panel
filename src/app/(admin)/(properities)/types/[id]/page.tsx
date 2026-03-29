@@ -13,14 +13,15 @@ export default function TypePage() {
     const params = useParams()
     const router = useRouter()
     const [activeKey, setActiveKey] = useState("1");
-    const {typeD,getTypeData}=useTypeStore()
-    useEffect(()=>{getTypeData(Number(params?.id))},[])
+    const { typeD, getTypeData } = useTypeStore()
+    useEffect(() => {
+         getTypeData(Number(params?.id)) }, [])
 
     const renderContent = () => {
         switch (activeKey) {
             case "1":
                 return <div>
-                      <TypesSpecifications {...typeD}></TypesSpecifications>
+                    <TypesSpecifications {...typeD}></TypesSpecifications>
                 </div>;
             case "2":
                 return <div>
@@ -46,7 +47,7 @@ export default function TypePage() {
 
         },
         {
-            label: <div>طلبات الأونلاين للصنف</div>, key: "4",
+            label: <div>عروض الصنف</div>, key: "4",
 
         },
         {
@@ -59,24 +60,12 @@ export default function TypePage() {
         },
         {
             label: <div>مكونات الصنف</div>, key: "7",
-
         },
         {
             label: <div> عينات الصيادلة</div>, key: "8",
-
         },
         {
             label: <div> عينات الأطباء</div>, key: "9",
-
-        },
-
-        {
-            label: <div>الأطباء</div>, key: "11",
-
-        },
-        {
-            label: <div>الصيادلة</div>, key: "12",
-
         }
     ]
     return <div className="col-span-12">
@@ -90,7 +79,7 @@ export default function TypePage() {
                 onChange={setActiveKey}
                 style={{
                     borderColor: "#592C46",
-                //    color:
+                    //    color:
                 }}
                 items={tabsItems}
                 tabBarStyle={{ height: 50, maxWidth: "100%", marginRight: 0 }}

@@ -72,7 +72,10 @@ export default function ProductsPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editProduct(editedId, { total_delivery_percentage, return_discount, return_quantity, base_quantity, total_quantity, price_for_piece });
+        const product = dataProducts?.find(
+            item => item.id === id
+        );
+        await editProduct(editedId, { ...product, return_discount, return_quantity, base_quantity, total_quantity, price_for_piece });
         setLoading(false);
         setOpenEditModal(false);
         getProductsData(page, limit);
@@ -466,14 +469,14 @@ export default function ProductsPage() {
         <Modal
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span>p:{order_id}:{id}</span>
+                    <span>o:{order_id}:p:{id}</span>
                 </div>
             }
             open={open1}
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}   
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">
@@ -687,7 +690,7 @@ export default function ProductsPage() {
         <Modal
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span>p:{order_id}:{id}</span>
+                    <span>o:{order_id}:p:{id}</span>
                 </div>
             }
             open={openShowModal}
@@ -695,7 +698,7 @@ export default function ProductsPage() {
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}   
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">

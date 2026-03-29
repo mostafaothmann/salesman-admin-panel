@@ -110,7 +110,6 @@ const navItems: NavItem[] = [
     name: "فواتير",
     subItems: [
       { name: "فواتير", path: "/orders", pro: false },
-      { name: "مرتجعات", path: "/returns", pro: false },
       { name: "عروض مباعة", path: "/offers", pro: false },
       { name: "منتجات مباعة", path: "/products", pro: false },
     ],

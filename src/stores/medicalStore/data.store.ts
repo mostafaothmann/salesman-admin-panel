@@ -101,9 +101,9 @@ interface DataStore {
     getSpecializationsData: () => Promise<void>;
     getSpecializationData: (id: number) => Promise<void>;
     getTypesForSpecializationData: (id: number) => Promise<void>;
-    addSpecialization: (specialization: AddingSpecialization) => Promise<void>;
-    deleteSpecialization: (id: number) => Promise<void>;
-    editSpecialization: (id: number, specialization: AddingSpecialization) => Promise<void>;
+    addSpecialization: (specialization: AddingSpecialization) => Promise<any>;
+    deleteSpecialization: (id: number) => Promise<any>;
+    editSpecialization: (id: number, specialization: AddingSpecialization) => Promise<any>;
 
     // for SpecializationTypes
     getSpecializationTypesData: () => Promise<void>;
@@ -117,9 +117,9 @@ interface DataStore {
     getDoctorData: (id: number) => Promise<void>;
 
     // getVisitsForDoctor: (id: number) => Promise<void>;
-    addDoctor: (doctor: AddingDoctor) => Promise<void>;
-    deleteDoctor: (id: number) => Promise<void>;
-    editDoctor: (id: number, doctor: AddingDoctor) => Promise<void>;
+    addDoctor: (doctor: AddingDoctor) => Promise<any>;
+    deleteDoctor: (id: number) => Promise<any>;
+    editDoctor: (id: number, doctor: AddingDoctor) => Promise<any>;
     getFilteredDataDoctors: (filters: FilterDoctorProps) => Promise<void>;
 
     //for Pharmacists
@@ -127,9 +127,9 @@ interface DataStore {
     getPharmacistData: (id: number) => Promise<void>;
 
     // getVisitsForDoctor: (id: number) => Promise<void>;
-    addPharmacist: (doctor: AddingPharmacist) => Promise<void>;
-    deletePharmacist: (id: number) => Promise<void>;
-    editPharmacist: (id: number, doctor: AddingPharmacist) => Promise<void>;
+    addPharmacist: (doctor: AddingPharmacist) => Promise<any>;
+    deletePharmacist: (id: number) => Promise<any>;
+    editPharmacist: (id: number, doctor: AddingPharmacist) => Promise<any>;
     getFilteredDataPharmacists: (filters: FilterPharmacistProps) => Promise<void>;
 
 
@@ -166,9 +166,9 @@ interface DataStore {
     // Association
     getAssociationsData: () => Promise<void>;
     getAssociationData: (id: number) => Promise<void>;
-    addAssociation: (association: AddingAssociation) => Promise<void>;
-    deleteAssociation: (id: number) => Promise<void>;
-    editAssociation: (id: number, association: AddingAssociation) => Promise<void>;
+    addAssociation: (association: AddingAssociation) => Promise<any>;
+    deleteAssociation: (id: number) => Promise<any>;
+    editAssociation: (id: number, association: AddingAssociation) => Promise<any>;
 
     // Sample
     getSamplesData: (page: number, limit: number) => Promise<void>;
@@ -198,9 +198,9 @@ interface DataStore {
     // Hospital
     getHospitalsData: () => Promise<void>;
     getHospitalData: (id: number) => Promise<void>;
-    addHospital: (hospitalDoctor: AddingHospital) => Promise<void>;
-    deleteHospital: (id: number) => Promise<void>;
-    editHospital: (id: number, hospitalDoctor: AddingHospital) => Promise<void>;
+    addHospital: (hospitalDoctor: AddingHospital) => Promise<any>;
+    deleteHospital: (id: number) => Promise<any>;
+    editHospital: (id: number, hospitalDoctor: AddingHospital) => Promise<any>;
 
 
     // HospitalDoctor
@@ -289,11 +289,12 @@ export const useMedicalStore = create<DataStore>()(
             deleteSpecialization: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiSpecialization.delete(`/${id}`);
+                    const res = await apiSpecialization.delete(`/${id}`);
                     set((state) => ({
                         dataSpecializations: state.dataSpecializations?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting Specialization',
@@ -307,7 +308,7 @@ export const useMedicalStore = create<DataStore>()(
                 try {
                     const res = await apiSpecialization.patch(`/${id}`, specialization);
                     if (res.status != 201) { }
-
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading Specialization',
@@ -327,6 +328,7 @@ export const useMedicalStore = create<DataStore>()(
                         if (res.status == 201) {
 
                         }
+                        return res;
                     }
                 } catch (err: any) {
                     set({
@@ -522,13 +524,13 @@ export const useMedicalStore = create<DataStore>()(
             deleteDoctor: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiDoctor.delete(`/${id}`);
-
+                    const res = await apiDoctor.delete(`/${id}`);
                     set((state) => ({
                         dataDoctors: state.dataDoctors?.filter((a) => a.id !== id
                         ),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error:
@@ -554,6 +556,7 @@ export const useMedicalStore = create<DataStore>()(
                     if (res.status === 200 || res.status === 201) {
                         set({ loading: false });
                     }
+                    return res;
                 } catch (err: any) {
                     set({
                         error:
@@ -578,6 +581,7 @@ export const useMedicalStore = create<DataStore>()(
                     if (res.status === 201) {
                         set({ loading: false });
                     }
+                    return res;
                 } catch (err: any) {
                     set({
                         error:
@@ -677,13 +681,14 @@ export const useMedicalStore = create<DataStore>()(
             deletePharmacist: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiPharmacist.delete(`/${id}`);
+                    const res = await apiPharmacist.delete(`/${id}`);
 
                     set((state) => ({
                         dataPharmacists: state.dataPharmacists?.filter((a) => a.id !== id
                         ),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error:
@@ -709,6 +714,7 @@ export const useMedicalStore = create<DataStore>()(
                     if (res.status === 200 || res.status === 201) {
                         set({ loading: false });
                     }
+                    return res;
                 } catch (err: any) {
                     set({
                         error:
@@ -733,6 +739,7 @@ export const useMedicalStore = create<DataStore>()(
                     if (res.status === 201) {
                         set({ loading: false });
                     }
+                    return res;
                 } catch (err: any) {
                     set({
                         error:
@@ -1039,11 +1046,12 @@ export const useMedicalStore = create<DataStore>()(
             deleteAssociation: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiAssociation.delete(`/${id}`);
+                    const res = await apiAssociation.delete(`/${id}`);
                     set((state) => ({
                         dataAssociations: state.dataAssociations?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting Association',
@@ -1058,7 +1066,7 @@ export const useMedicalStore = create<DataStore>()(
                 try {
                     const res = await apiAssociation.patch(`/${id}`, association);
                     if (res.status != 201) { }
-
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Editing Association',
@@ -1077,6 +1085,7 @@ export const useMedicalStore = create<DataStore>()(
                         if (res.status == 201) {
 
                         }
+                        return res;
                     }
                 } catch (err: any) {
                     set({
@@ -1805,11 +1814,12 @@ export const useMedicalStore = create<DataStore>()(
             deleteHospital: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiHospital.delete(`/${id}`);
+                    const res = await apiHospital.delete(`/${id}`);
                     set((state) => ({
                         dataHospitals: state.dataHospitals?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Deleting Hospital",
@@ -1821,7 +1831,8 @@ export const useMedicalStore = create<DataStore>()(
             editHospital: async (id: number, hospitalPharmacist: AddingHospital) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiHospital.patch(`/${id}`, hospitalPharmacist);
+                    const res = await apiHospital.patch(`/${id}`, hospitalPharmacist);
+                    return res;
                     set({ loading: false });
                 } catch (err: any) {
                     set({
@@ -1836,6 +1847,7 @@ export const useMedicalStore = create<DataStore>()(
                 try {
                     const res = await apiHospital.post(``, hospitalPharmacist);
                     if (res.status === 201) set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Adding HospitalPharmacist",
@@ -1934,6 +1946,6 @@ export const useMedicalStore = create<DataStore>()(
             name: 'medical-data-storage',
             storage: createJSONStorage(() => localStorage),
             //partialize: (state) => ({ data: state.dataSpecializations })
-        } 
+        }
     )
 );

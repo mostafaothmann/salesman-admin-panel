@@ -74,7 +74,11 @@ export default function OffersPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editOffer(editedId, { order_id, type_id, delivery_percentage_for_piece, base_offer_id, return_discount, return_quantity, base_quantity, price_for_piece });
+        setLoading(true);
+        const offer = dataOffers?.find(
+            item => item.id === id
+        );
+        await editOffer(editedId, { ...offer, order_id, type_id, delivery_percentage_for_piece, return_discount, return_quantity, base_quantity, price_for_piece });
         setLoading(false);
         setOpenEditModal(false);
         getOffersData(page, limit);
@@ -492,14 +496,14 @@ export default function OffersPage() {
         <Modal
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span>p:{order_id}:{id}</span>
+                    <span>o:{order_id}:{id}</span>
                 </div>
             }
             open={open1}
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}   
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">
@@ -713,7 +717,7 @@ export default function OffersPage() {
         <Modal
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
-                    <span>p:{order_id}:{id}</span>
+                    <span>o:{order_id}:o:{id}</span>
                 </div>
             }
             open={openShowModal}
@@ -721,7 +725,7 @@ export default function OffersPage() {
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}   
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">

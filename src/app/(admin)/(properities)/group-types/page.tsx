@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Button, Dropdown, Input, Modal, Space, Table } from "antd";
+import { Button, Dropdown, Input, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
@@ -10,7 +10,10 @@ import { ColumnsType } from "antd/es/table";
 
 
 export default function GroupTypesPage() {
+    //store data
     const { dataGroupTypes, addGroupType, editGroupType, getGroupTypesData, deleteGroupType } = useTypeStore();
+
+
 
 
     //Add Modal
@@ -41,7 +44,37 @@ export default function GroupTypesPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editGroupType(editedId, { name: name, description: description });
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await editGroupType(editedId, { name: name, description: description });;
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         setLoading(false);
         setOpenEditModal(false);
         getGroupTypesData();
@@ -49,7 +82,37 @@ export default function GroupTypesPage() {
 
     //addType function
     async function handleAdd() {
-        await addGroupType({ name, description })
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await addGroupType({ name, description });
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         getGroupTypesData();
         setName("");
         setSearchText("");
@@ -93,7 +156,35 @@ export default function GroupTypesPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteGroupType(id);
+        try {
+            const res = await deleteGroupType(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getGroupTypesData();
         setLoading2(false);
         setOpenDeleteModal(false);
@@ -101,12 +192,33 @@ export default function GroupTypesPage() {
 
     //downloadExcele
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataGroupTypes ?? []);
+
+        const formattedData = (dataGroupTypes ?? []).map(item => ({
+            "تاريخ الإضافة": item.created_at.slice(0, 10),
+            "الأصناف": item.types?.map(e => e.name).join(", "),
+            "الوصف": item.description,
+            "اسم المجموعة": item.name,
+            "معرف المجموعة": item.id,
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        worksheet["!cols"] = [
+            { wch: 20 },
+            { wch: 50 },
+            { wch: 40 },
+            { wch: 25 },
+            { wch: 25 },
+        ];
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "مجموعات الأصناف");
+        XLSX.writeFile(workbook, "مجموعات الأصناف.xlsx");
     };
-    useEffect(() => { getGroupTypesData(); }, []);
+
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        setPageLoading(true)
+        getGroupTypesData().finally(() => setPageLoading(false));
+    }, []);
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -175,22 +287,34 @@ export default function GroupTypesPage() {
         }
     ];
 
+
     return <div>
 
 
         {/*Adding Modal*/}
         <Modal
-            title="إضافة مجموعة جديدة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span> إضافة مجموعة</span>
+                </div>
+            }
             open={open}
-            onOk={() => handleAdd()}
+            onOk={() => { handleAdd() }}
             okButtonProps={{ variant: "outlined", color: "purple" }}
             onCancel={() => emptyFields()}
+            keyboard
             mask={false}
         >
+
             <div className="grid grid-cols-12 gap-2">
-                <div className="grid grid-cols-12 sm:col-span-12  col-span-12 gap-2">
+                <div className="col-span-12 xl:col-span-12">
+                    <h3>
+                        اسم المجموعة :
+                    </h3>
                     <div className="md:col-span-6 col-span-12">
                         <Input
+                            required
+                            minLength={3}
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="اسم المجموعة"
@@ -198,75 +322,114 @@ export default function GroupTypesPage() {
                     </div>
 
                 </div>
-            </div>
 
-            <TextArea
-                value={description}
-                style={{ maxWidth: '100%' }}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
+                <div className="col-span-12 xl:col-span-12">
+                    <h3>
+                        وصف المجموعة :
+                    </h3>
+                    <TextArea
+                        value={description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
+            </div>
         </Modal>
         <Modal
-            title="تعديل مجموعة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span> تعديل مجموعة</span>
+                </div>
+            }
             open={open1}
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم المجموعة"
-            />
-            <TextArea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
-
+            <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-12 xl:col-span-12">
+                    <h3>
+                        اسم المجموعة :
+                    </h3>
+                    <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم المجموعة"
+                    />
+                </div>
+                <div className="col-span-12 xl:col-span-12">
+                    <h3>
+                        وصف المجموعة :
+                    </h3>
+                    <TextArea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
+            </div>
         </Modal>
 
         {/* Show Modal */}
         <Modal
-            title="تفاصيل مجموعة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>  مجموعة تفاصيل</span>
+                </div>
+            }
             open={open3}
-            onOk={() => emptyFields()}
+            onOk={() => { setOpen3(false); emptyFields(); }}
             okButtonProps={{ variant: "outlined", color: "cyan" }}
-
             onCancel={() => { setOpen3(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                disabled
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم المجموعة"
-            />
-            <TextArea
-                disabled
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
-
-            <Dropdown
-                menu={{ items: items }}
-                trigger={['click']}
-            >
-                <Button
-                    variant="outlined"
-                    color="cyan"
-                    className="px-4 py-2 border rounded w-full">
-                    الأصناف
-                </Button>
-            </Dropdown>
+            <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-12 xl:col-span-12">
+                    <h3>
+                        اسم المجموعة :
+                    </h3>
+                    <Input
+                        disabled
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم المجموعة"
+                    />
+                </div>
+                <div className="col-span-12 xl:col-span-12">
+                    <h3>
+                        وصف المجموعة :
+                    </h3>
+                    <TextArea
+                        disabled
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
+                <div className="col-span-12 xl:col-span-12">
+                    <h3>
+                        أصناف المجموعة :
+                    </h3>
+                    <Dropdown
+                        menu={{ items: items }}
+                        trigger={['click']}
+                    >
+                        <Button
+                            variant="outlined"
+                            color="cyan"
+                            className="px-4 py-2 border rounded w-full">
+                            الأصناف
+                        </Button>
+                    </Dropdown>
+                </div>
+            </div>
         </Modal>
 
         {/*Delete Modal*/}
@@ -291,13 +454,17 @@ export default function GroupTypesPage() {
                 تنزيل
             </Button>
         </div>
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    style={{ maxWidth: 1100 }}
+                    scroll={{ x: "max-content" }}
+                    pagination={{
+                        position: ["topRight"],
+                    }}
+                    columns={columns} dataSource={dataGroupTypes} />
+        }
 
-        <Table
-            style={{ maxWidth: 1100 }}
-            scroll={{ x: "max-content" }}
-            pagination={{
-                position: ["topRight"],
-            }}
-            columns={columns} dataSource={dataGroupTypes} />
-    </div>
+    </div >
 }

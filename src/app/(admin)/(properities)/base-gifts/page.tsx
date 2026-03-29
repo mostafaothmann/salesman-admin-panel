@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Button, Dropdown, Input, Modal, Space, Table } from "antd";
+import { Button, Dropdown, Input, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { Type } from "../../../../stores/types-store-interfaces";
@@ -41,7 +41,37 @@ export default function BaseGiftsPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editBaseGift(editedId, { name: name, description: description, quantity: quantity });
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await editBaseGift(editedId, { name: name, description: description, quantity: quantity });
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         setLoading(false);
         setOpenEditModal(false);
         getBaseGiftsData();
@@ -49,7 +79,37 @@ export default function BaseGiftsPage() {
 
     //addType function
     async function handleAdd() {
-        await addBaseGift({ name, description, quantity })
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await addBaseGift({ name, description, quantity })
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         getBaseGiftsData();
         setName("");
         setSearchText("");
@@ -92,20 +152,47 @@ export default function BaseGiftsPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteBaseGift(id);
+        try {
+            const res = await deleteBaseGift(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getBaseGiftsData();
         setLoading2(false);
         setOpenDeleteModal(false);
     }
 
-    //downloadExcele
-    const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataBaseGifts ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "الهدايا الأساسية");
-        XLSX.writeFile(workbook, "الهدايا الأساسية.xlsx");
-    };
-    useEffect(() => { getBaseGiftsData(); }, []);
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        setPageLoading(true);
+        getBaseGiftsData().finally(() => setPageLoading(false));
+    }, []);
+
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -142,7 +229,8 @@ export default function BaseGiftsPage() {
                         Delete
                     </Button>
                     <Button
-                        type="default"
+                        variant="outlined"
+                        color="cyan"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
                         Edit
@@ -171,82 +259,121 @@ export default function BaseGiftsPage() {
     return <div>
         {/*Adding Modal*/}
         <Modal
-            title="إضافة مجموعة جديدة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span> إضافة هدية</span>
+                </div>
+            }
             open={open}
             onOk={() => handleAdd()}
             okButtonProps={{ variant: "outlined", color: "purple" }}
             onCancel={() => emptyFields()}
             mask={false}
         >
-            <div className="grid grid-cols-12 gap-2">
-                <div className="grid grid-cols-12 sm:col-span-12  col-span-12 gap-2">
-                    <div className="md:col-span-6 col-span-12">
-                        <Input
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="اسم الهدية"
-                        />
-                    </div>
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12">
+                    <h3>
+                        الهدية
+                    </h3>
+                    <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="الهدية"
+                    />
+                </div>
 
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        value={description}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
                 </div>
             </div>
-
-            <TextArea
-                value={description}
-                style={{ maxWidth: '100%' }}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
-        </Modal>
+        </Modal >
         <Modal
-            title="تعديل مجموعة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>تعديل هدية</span>
+                </div>
+            }
             open={open1}
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الهدية"
-            />
-            <TextArea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
-
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12">
+                    <h3>
+                        الهدية
+                    </h3>
+                    <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم الهدية"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
+            </div>
         </Modal>
 
         {/* Show Modal */}
         <Modal
-            title="تفاصيل مجموعة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span> تفاصيل هدية</span>
+                </div>
+            }
             open={open3}
             onOk={() => emptyFields()}
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpen3(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                disabled
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="اسم الهدية"
-            />
-            <TextArea
-                disabled
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="الوصف"
-            />
-
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12">
+                    <h3>
+                        الهدية
+                    </h3>
+                    <Input
+                        disabled
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اسم الهدية"
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        الوصف
+                    </h3>
+                    <TextArea
+                        disabled
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        placeholder="الوصف"
+                    />
+                </div>
+            </div>
         </Modal>
 
         {/*Delete Modal*/}
@@ -265,17 +392,18 @@ export default function BaseGiftsPage() {
             <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>
                 إضافة
             </Button>
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
-                تنزيل
-            </Button>
-        </div>
 
-        <Table
-            style={{ maxWidth: 1100 }}
-            scroll={{ x: "max-content" }}
-            pagination={{
-                position: ["topRight"],
-            }}
-            columns={columns} dataSource={dataBaseGifts} />
-    </div>
+        </div>
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    style={{ maxWidth: 1100 }}
+                    scroll={{ x: "max-content" }}
+                    pagination={{
+                        position: ["topRight"],
+                    }}
+                    columns={columns} dataSource={dataBaseGifts} />
+        }
+    </div >
 }

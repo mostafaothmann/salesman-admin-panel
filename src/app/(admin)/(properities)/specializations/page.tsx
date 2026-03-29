@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Button, Dropdown, Input, Modal, Space, Table } from "antd";
+import { Button, Dropdown, Input, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
@@ -43,7 +43,37 @@ export default function SpecializationsPage() {
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editSpecialization(editedId, { name: name });
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await editSpecialization(editedId, { name: name });
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         setLoading(false);
         setOpenEditModal(false);
         getSpecializationsData();
@@ -52,11 +82,40 @@ export default function SpecializationsPage() {
     //addType function
     async function handleAdd() {
         setGovernorateId(governorate_id + 1);
-        await addSpecialization({ name })
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)) {
+            try {
+                const res = await await addSpecialization({ name });
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
+
         getSpecializationsData();
-        setName("");
-        setSearchText("");
-        setDescription("")
+        emptyFields();
         setOpen(false)
     }
     //emptyFields function
@@ -97,7 +156,36 @@ export default function SpecializationsPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteSpecialization(id);
+        try {
+            const res = await deleteSpecialization(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "حدث خطأ في الاتصال بالسيرفر",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
+
         getSpecializationsData();
         setLoading2(false);
         setOpenDeleteModal(false);
@@ -105,12 +193,31 @@ export default function SpecializationsPage() {
 
     //downloadExcele
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataSpecializations ?? []);
+
+        const formattedData = (dataSpecializations ?? []).map(item => ({
+            "تاريخ الإضافة": item.created_at.slice(0, 10), // modified
+            "عدد الأطباء": item.doctors.length,
+            "اسم الإختصاص": item.name,
+            "معرف الإختصاص": item.id,
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        worksheet["!cols"] = [
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+            { wch: 20 },
+        ];
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Cities");
-        XLSX.writeFile(workbook, "Cities.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "الإختصاصات");
+        XLSX.writeFile(workbook, "الإختصاصات.xlsx");
     };
-    useEffect(() => { getSpecializationsData(); }, []);
+
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        setPageLoading(true);
+        getSpecializationsData().finally(() => setPageLoading(false));
+    }, []);
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -126,7 +233,7 @@ export default function SpecializationsPage() {
         {
             title: "عدد الأطباء",
             dataIndex: "doctors",
-            sorter: (a: any, b: any) => Number(a.types.length) - Number(a.types.length),
+            sorter: (a: any, b: any) => Number(a.doctors.length) - Number(a.doctors.length),
             render: (value: Doctor[]) => { return value.length }
         },
         {
@@ -315,13 +422,16 @@ export default function SpecializationsPage() {
                 تنزيل
             </Button>
         </div>
-
-        <Table
-            style={{ maxWidth: 1100 }}
-            pagination={{
-                position: ["topRight"],
-            }}
-            scroll={{ x: "max-content" }}
-            columns={columns} dataSource={dataSpecializations} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                <Table
+                    style={{ maxWidth: 1100 }}
+                    pagination={{
+                        position: ["topRight"],
+                    }}
+                    scroll={{ x: "max-content" }}
+                    columns={columns} dataSource={dataSpecializations} />
+        }
     </div>
 }

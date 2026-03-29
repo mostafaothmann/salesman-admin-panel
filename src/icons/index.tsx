@@ -74,9 +74,11 @@ import TimeLine from "./timeline.svg"
 import Online from "./online.svg"
 import Refresh from "./refresh.svg"
 import Mall from "./mall.svg"
+import Edit from "./edit-circle.svg"
 
 
 export {
+  Edit,
   Online,
   TimeLine,
   FirstAidKitIcon,

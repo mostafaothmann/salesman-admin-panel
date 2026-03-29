@@ -1,7 +1,7 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, Modal, Space, Table } from "antd";
+import { AutoComplete, Button, Dropdown, Input, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { ColumnsType } from "antd/es/table";
@@ -53,13 +53,42 @@ export default function SalesmansMessagesPage() {
     const [filter_title, SetFilterTitle] = useState("")
     const [filter_salesman_id, setFilterSalesmanId] = useState(0)
 
-    //options for Salesman auto complete
-    const options = salesmansNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })
 
     //handleEdit
     async function handleEdit() {
         setLoading(true);
-        await editSalesmanMessage(editedId, { title: title, content: content, salesman_id: salesman_id });
+        if (salesman_id && /^\d+$/.test(String(salesman_id))) {
+            try {
+                const res = await editSalesmanMessage(editedId, { title: title, content: content, salesman_id: salesman_id });
+                if (res?.status == 200 || res?.status == 204) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
+        emptyFields();
         setLoading(false);
         setOpenEditModal(false);
         getSalesmanMessagesData(page, limit);
@@ -77,7 +106,39 @@ export default function SalesmansMessagesPage() {
     //addType function
     async function handleAdd() {
         setSalesmanId(salesman_id + 1);
-        await addSalesmanMessage({ title, content, salesman_id })
+
+        if (salesman_id && /^\d+$/.test(String(salesman_id))) {
+            try {
+                const res = await addSalesmanMessage({ title, content, salesman_id })
+
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         getSalesmanMessagesData(page, limit);
         setTitle("");
         setSearchText("");
@@ -95,11 +156,12 @@ export default function SalesmansMessagesPage() {
         setOpen(false);
     }
     //editModal
-    const OpenEditModal = (id: number) => {
+    async function OpenEditModal(id: number) {
         setEditedId(id);
         const salesmanMessage = dataSalesmansMessages?.find(
             item => item.id === id
         );
+        await setSearchText(String(salesmansNames.filter(e => e.id == salesmanMessage?.salesman_id).map(e => { return `${e.first_name} ${e.last_name}` })))
         setTitle(salesmanMessage?.title || "");
         setContent(salesmanMessage?.content || "");
         dataSalesmansMessages?.find(e => e.id == Number(salesmanMessage?.id))?.salesman_id
@@ -112,10 +174,11 @@ export default function SalesmansMessagesPage() {
         setOpenDeleteModal(true);
     }
     //showModal
-    const openShowModal = (id: number) => {
+    async function openShowModal(id: number) {
         const salesmanMessage = dataSalesmansMessages?.find(
             item => item.id === id
         );
+        await setSearchText(String(salesmansNames.filter(e => e.id == salesmanMessage?.salesman_id).map(e => { return `${e.first_name} ${e.last_name}` })))
         setTitle(salesmanMessage?.title || "");
         setContent(salesmanMessage?.content || "");
         setOpen3(true);
@@ -142,20 +205,44 @@ export default function SalesmansMessagesPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deleteSalesmanMessage(id);
+        try {
+            const res = await deleteSalesmanMessage(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getSalesmanMessagesData(page, limit);
         setLoading2(false);
         setOpenDeleteModal(false);
     }
 
-    //downloadExcele
-    const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataSalesmansMessages ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "SalesmanMessages");
-        XLSX.writeFile(workbook, "SalesmanMessages.xlsx");
-    };
+    const [pageLoading, setPageLoading] = useState(true);
+
     useEffect(() => {
+        setPageLoading(true);
         getSalesmanMessagesData(page, limit);
         const fetchData = async () => {
             try {
@@ -169,8 +256,9 @@ export default function SalesmansMessagesPage() {
                 console.error("Error fetching data:", error);
             }
         };
-        fetchData();
+        fetchData().finally(() => setPageLoading(false));
     }, []);
+
     const columns: ColumnsType<any> = [
         {
             title: "الرقم",
@@ -248,18 +336,21 @@ export default function SalesmansMessagesPage() {
 
         {/*Filter Modal*/}
         <Modal
-            title="فلترة النتائج"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>فلترة النتائج</span>
+                </div>
+            }
             open={openFilterModal}
             onOk={() => handleFilter()}
             onCancel={() => { setOpenFilterModal(false); emptyFields() }}
             confirmLoading={loading3}
             mask={false}
 
-            okButtonProps={{ type: "primary", variant: "outlined" }} 
+            okButtonProps={{ type: "primary", variant: "outlined" }}
         >
             <div className="grid grid-cols-12 gap-4">
-
-                <div className="col-span-6 xl:col-span-6">
+                <div className="col-span-12">
                     <div>
                         <h3>
                             المندوب :
@@ -267,16 +358,16 @@ export default function SalesmansMessagesPage() {
                     </div>
                     <AutoComplete
                         style={{ width: '100%' }}
-                        options={options}
+                        options={salesmansNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })}
                         placeholder="المندوب"
                         value={searchText}
-                        
+
                         onChange={(text) => {
                             setSearchText(text);
-                            setFilterSalesmanId(undefined); // clear ID while typing
+                            setFilterSalesmanId(undefined);
                         }}
                         onSelect={(value, option) => {
-                            setFilterSalesmanId(option.value);                 
+                            setFilterSalesmanId(option.value);
                             setSearchText(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
@@ -291,133 +382,194 @@ export default function SalesmansMessagesPage() {
 
         {/*Adding Modal*/}
         <Modal
-            title="إضافة رسالة جديدة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>إضافة رسالة</span>
+                </div>
+            }
             open={open}
             onOk={() => handleAdd()}
             okButtonProps={{ variant: "outlined", color: "purple" }}
             onCancel={() => emptyFields()}
             mask={false}
         >
-            <div className="grid grid-cols-12 gap-2">
-                <div className="grid grid-cols-12 sm:col-span-12  col-span-12 gap-2">
-                    <div className="md:col-span-6 col-span-12">
-                        <Input
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="عنوان الرسالة"
-                        />
-                    </div>
-                    <div className="md:col-span-6 col-span-12">
-                        <AutoComplete
-                            style={{ width: 200 }}
-                            options={options}
-                            placeholder="المندوب"
-
-                                value={searchText}
-
-                            
-                            onChange={(text) => {
-                                setSearchText(text);
-                                setSalesmanId(undefined); // clear ID while typing
-                            }}
-
-                                onSelect={(value, option) => {
-                                setSalesmanId(option.value);                 
-                                setSearchText(option?.label as string);  // show title
-                            }}
-
-                            filterOption={(inputValue, option) =>
-                                (option?.label as string)
-                                    ?.toLowerCase()
-                                    .includes(inputValue.toLowerCase())
-                            }
-                        />
-                    </div>
+            <div className="grid grid-cols-12 gap-4">
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        عنوان الرسالة
+                    </h3>
+                    <Input
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="عنوان الرسالة"
+                    />
+                </div>
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        المندوب
+                    </h3>
+                    <AutoComplete
+                        style={{ width: 200 }}
+                        options={salesmansNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })}
+                        placeholder="المندوب"
+                        value={searchText}
+                        onChange={(text) => {
+                            setSearchText(text);
+                            setSalesmanId(undefined);
+                        }}
+                        onSelect={(value, option) => {
+                            setSalesmanId(option.value);
+                            setSearchText(option?.label as string);  // show title
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        المحتوى
+                    </h3>
+                    <TextArea
+                        value={content}
+                        style={{ maxWidth: '100%' }}
+                        onChange={(e) => setContent(e.target.value)}
+                        rows={4}
+                        placeholder="المحتوى"
+                    />
                 </div>
             </div>
-
-            <TextArea
-                value={content}
-                style={{ maxWidth: '100%' }}
-                onChange={(e) => setContent(e.target.value)}
-                rows={4}
-                placeholder="المحتوى"
-            />
-        </Modal>
+        </Modal >
         <Modal
-            title="تعديل رسالة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>تعديل رسالة</span>
+                </div>
+            }
             open={open1}
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="عنوان الرسالة"
-            />
-            <TextArea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={4}
-                placeholder="المحتوى"
-            />
-            <AutoComplete
-                style={{ width: 200 }}
-                options={options}
-                placeholder="المندوب"
+            <div className="grid grid-cols-12 gap-4">
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        عنوان الرسالة
+                    </h3>
+                    <Input
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="عنوان الرسالة"
+                    />
+                </div>
 
-                // what user sees & types
-                value={searchText}
-
-                
-                onChange={(text) => {
-                    setSearchText(text);
-                    setSalesmanId(undefined); // clear ID while typing
-                }}
-
-                // when user selects from dropdown
-                onSelect={(value, option) => {
-                    setSalesmanId(option.value);                 
-                    setSearchText(option?.label as string);  // show title
-                }}
-
-                filterOption={(inputValue, option) =>
-                    (option?.label as string)
-                        ?.toLowerCase()
-                        .includes(inputValue.toLowerCase())
-                }
-            />
-
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        المندوب
+                    </h3>
+                    <AutoComplete
+                        style={{ width: 200 }}
+                        options={salesmansNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })}
+                        placeholder="المندوب"
+                        value={searchText}
+                        onChange={(text) => {
+                            setSearchText(text);
+                            setSalesmanId(undefined);
+                        }}
+                        onSelect={(value, option) => {
+                            setSalesmanId(option.value);
+                            setSearchText(option?.label as string);  // show title
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        المحتوى
+                    </h3>
+                    <TextArea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        rows={4}
+                        placeholder="المحتوى"
+                    />
+                </div>
+            </div>
         </Modal>
 
         {/* Show Modal */}
         <Modal
-            title="تفاصيل رسالة"
+            title={
+                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
+                    <span>تفاصيل الرسالة</span>
+                </div>
+            }
             open={open3}
             onOk={() => emptyFields()}
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpen3(false); emptyFields() }}
-            confirmLoading={loading}   // ✅ spinner on OK button
+            confirmLoading={loading}
             mask={false}
         >
-            <Input
-                disabled
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="عنوان الرسالة"
-            />
-            <TextArea
-                disabled
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={4}
-                placeholder="المحتوى"
-            />
-
+            <div className="grid grid-cols-12 gap-4">
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        عنوان الرسالة
+                    </h3>
+                    <Input
+                        disabled
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="عنوان الرسالة"
+                    />
+                </div>
+                <div className="md:col-span-6 col-span-12">
+                    <h3>
+                        المندوب
+                    </h3>
+                    <AutoComplete
+                        disabled
+                        style={{ width: 200 }}
+                        options={salesmansNames?.map(e => { return { value: e.id, label: `${e.first_name} ${e.last_name}` } })}
+                        placeholder="المندوب"
+                        value={searchText}
+                        onChange={(text) => {
+                            setSearchText(text);
+                            setSalesmanId(undefined);
+                        }}
+                        onSelect={(value, option) => {
+                            setSalesmanId(option.value);
+                            setSearchText(option?.label as string);  // show title
+                        }}
+                        filterOption={(inputValue, option) =>
+                            (option?.label as string)
+                                ?.toLowerCase()
+                                .includes(inputValue.toLowerCase())
+                        }
+                    />
+                </div>
+                <div className="col-span-12">
+                    <h3>
+                        المحتوى
+                    </h3>
+                    <TextArea
+                        disabled
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        rows={4}
+                        placeholder="المحتوى"
+                    />
+                </div>
+            </div>
         </Modal>
 
         {/*Delete Modal*/}
@@ -429,7 +581,7 @@ export default function SalesmansMessagesPage() {
             confirmLoading={loading2}
             mask={false}
             okType="danger"
-            okButtonProps={{ type: "primary" }} 
+            okButtonProps={{ type: "primary" }}
         >
         </Modal>
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
@@ -441,40 +593,43 @@ export default function SalesmansMessagesPage() {
             </Button>
         </div>
         <div className="max-w-full">
-            {filtered ? <Table
-                scroll={{ x: "max-content" }}
-                columns={columns}
-                pagination={{
-                    position: ["topRight"],
-                    current: filter_page,
-                    pageSize: limit,
-                    total: filter_total,
-                    onChange: (page, pageSize) => {
-                        setFilterPage(filter_page)
-                        getFilteredData(page, pageSize)
-                        // setPage(lastPage)
-                    },
-                }}
-                dataSource={filteredDataSalesmansMessages || []} />
-                :
-                <Table
-                    scroll={{ x: "max-content" }}
-                    style={{ maxWidth: 1100 }}
-                    columns={columns}
-                    pagination={{
-                        position: ["topRight"],
-                        current: page,
-                        pageSize: limit,
-                        total: total,
-                        onChange: (page, pageSize) => {
-                            getSalesmansData(page, pageSize);
-                            setPage(page)
-                            //setPage(lastPage)
-                        },
-                    }}
-                    dataSource={dataSalesmansMessages || []} />
+            {
+                (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                    :
+                    filtered ? <Table
+                        scroll={{ x: "max-content" }}
+                        columns={columns}
+                        pagination={{
+                            position: ["topRight"],
+                            current: filter_page,
+                            pageSize: limit,
+                            total: filter_total,
+                            onChange: (page, pageSize) => {
+                                setFilterPage(filter_page)
+                                getFilteredData(page, pageSize)
+                                // setPage(lastPage)
+                            },
+                        }}
+                        dataSource={filteredDataSalesmansMessages || []} />
+                        :
+                        <Table
+                            scroll={{ x: "max-content" }}
+                            style={{ maxWidth: 1100 }}
+                            columns={columns}
+                            pagination={{
+                                position: ["topRight"],
+                                current: page,
+                                pageSize: limit,
+                                total: total,
+                                onChange: (page, pageSize) => {
+                                    getSalesmansData(page, pageSize);
+                                    setPage(page)
+                                    //setPage(lastPage)
+                                },
+                            }}
+                            dataSource={dataSalesmansMessages || []} />
             }
 
         </div>
-    </div>
+    </div >
 }

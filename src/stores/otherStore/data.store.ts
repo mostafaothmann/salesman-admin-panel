@@ -46,35 +46,35 @@ interface DataStore {
     // BaseGift
     getBaseGiftsData: () => Promise<void>;
     getBaseGiftData: (id: number) => Promise<void>;
-    addBaseGift: (baseGift: AddingBaseGift) => Promise<void>;
-    deleteBaseGift: (id: number) => Promise<void>;
-    editBaseGift: (id: number, baseGift: AddingBaseGift) => Promise<void>;
+    addBaseGift: (baseGift: AddingBaseGift) => Promise<any>;
+    deleteBaseGift: (id: number) => Promise<any>;
+    editBaseGift: (id: number, baseGift: AddingBaseGift) => Promise<any>;
 
 
     // GiftVisit
     getGiftVisitsData: (page: number, limit: number) => Promise<void>;
     getGiftVisitData: (id: number) => Promise<void>;
-    addGiftVisit: (giftVisit: AddingGiftVisit) => Promise<void>;
-    deleteGiftVisit: (id: number) => Promise<void>;
-    editGiftVisit: (id: number, giftVisit: AddingGiftVisit) => Promise<void>;
+    addGiftVisit: (giftVisit: AddingGiftVisit) => Promise<any>;
+    deleteGiftVisit: (id: number) => Promise<any>;
+    editGiftVisit: (id: number, giftVisit: AddingGiftVisit) => Promise<any>;
     getFilteredDataGiftVisits: (filters: FilterGiftVisitProps) => Promise<void>;
 
 
     // SalesmanMessage
     getSalesmanMessagesData: (page: number, limit: number) => Promise<void>;
     getSalesmanMessageData: (id: number) => Promise<void>;
-    addSalesmanMessage: (salesmanMessage: AddingSalesmanMessage) => Promise<void>;
-    deleteSalesmanMessage: (id: number) => Promise<void>;
-    editSalesmanMessage: (id: number, salesmanMessage: AddingSalesmanMessage) => Promise<void>;
+    addSalesmanMessage: (salesmanMessage: AddingSalesmanMessage) => Promise<any>;
+    deleteSalesmanMessage: (id: number) => Promise<any>;
+    editSalesmanMessage: (id: number, salesmanMessage: AddingSalesmanMessage) => Promise<any>;
     getFilteredDataSalesmanMessages: (filters: FitlerSalesmanMessageProps) => Promise<void>;
 
 
     // VideoLink
     getVideosLinksData: () => Promise<void>;
     getVideoLinkData: (id: number) => Promise<void>;
-    addVideoLink: (videoLink: AddingVideoLink) => Promise<void>;
-    deleteVideoLink: (id: number) => Promise<void>;
-    editVideoLink: (id: number, videoLink: AddingVideoLink) => Promise<void>;
+    addVideoLink: (videoLink: AddingVideoLink) => Promise<any>;
+    deleteVideoLink: (id: number) => Promise<any>;
+    editVideoLink: (id: number, videoLink: AddingVideoLink) => Promise<any>;
 
 }
 //gettig the token from Auth Store 
@@ -127,11 +127,12 @@ export const useOtherStore = create<DataStore>()(
             deleteBaseGift: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiBaseGift.delete(`/${id}`);
+                    const res = await apiBaseGift.delete(`/${id}`);
                     set((state) => ({
                         dataBaseGifts: state.dataBaseGifts?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Deleting BaseGift",
@@ -143,8 +144,9 @@ export const useOtherStore = create<DataStore>()(
             editBaseGift: async (id: number, baseGift: AddingBaseGift) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiBaseGift.patch(`/${id}`, baseGift);
+                    const res = await apiBaseGift.patch(`/${id}`, baseGift);
                     set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Editing BaseGift",
@@ -158,6 +160,7 @@ export const useOtherStore = create<DataStore>()(
                 try {
                     const res = await apiBaseGift.post(``, baseGift);
                     if (res.status === 201) set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Adding BaseGift",
@@ -211,11 +214,13 @@ export const useOtherStore = create<DataStore>()(
             deleteGiftVisit: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiGiftVisit.delete(`/${id}`);
+                    const res = await apiGiftVisit.delete(`/${id}`);
                     set((state) => ({
                         dataGiftsVisits: state.dataGiftsVisits?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
+
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Deleting GiftVisit",
@@ -227,8 +232,10 @@ export const useOtherStore = create<DataStore>()(
             editGiftVisit: async (id: number, giftVisit: AddingGiftVisit) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiGiftVisit.patch(`/${id}`, giftVisit);
+                    const res = await apiGiftVisit.patch(`/${id}`, giftVisit);
                     set({ loading: false });
+                    return res;
+
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Editing GiftVisit",
@@ -242,6 +249,7 @@ export const useOtherStore = create<DataStore>()(
                 try {
                     const res = await apiGiftVisit.post(``, giftVisit);
                     if (res.status === 201) set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Adding GiftVisit",
@@ -314,11 +322,12 @@ export const useOtherStore = create<DataStore>()(
             deleteSalesmanMessage: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiSalesmanMessage.delete(`/${id}`);
+                    const res = await apiSalesmanMessage.delete(`/${id}`);
                     set((state) => ({
                         dataSalesmansMessages: state.dataSalesmansMessages?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Deleting SalesmanMessage",
@@ -330,8 +339,9 @@ export const useOtherStore = create<DataStore>()(
             editSalesmanMessage: async (id: number, salesmanMessage: AddingSalesmanMessage) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiSalesmanMessage.patch(`/${id}`, salesmanMessage);
+                    const res = await apiSalesmanMessage.patch(`/${id}`, salesmanMessage);
                     set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Editing SalesmanMessage",
@@ -345,6 +355,7 @@ export const useOtherStore = create<DataStore>()(
                 try {
                     const res = await apiSalesmanMessage.post(``, salesmanMessage);
                     if (res.status === 201) set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Adding SalesmanMessage",
@@ -352,6 +363,7 @@ export const useOtherStore = create<DataStore>()(
                     });
                 }
             },
+
 
             getFilteredDataSalesmanMessages: async (filters: FitlerSalesmanMessageProps) => {
                 set({ loading: true, error: null });
@@ -412,11 +424,13 @@ export const useOtherStore = create<DataStore>()(
             deleteVideoLink: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiVideoLink.delete(`/${id}`);
+                    const res = await apiVideoLink.delete(`/${id}`);
                     set((state) => ({
                         dataVideosLinks: state.dataVideosLinks?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
+
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Deleting VideoLink",
@@ -428,8 +442,9 @@ export const useOtherStore = create<DataStore>()(
             editVideoLink: async (id: number, videoLink: AddingVideoLink) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiVideoLink.patch(`/${id}`, videoLink);
+                    const res = await apiVideoLink.patch(`/${id}`, videoLink);
                     set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Editing VideoLink",
@@ -443,6 +458,7 @@ export const useOtherStore = create<DataStore>()(
                 try {
                     const res = await apiVideoLink.post(``, videoLink);
                     if (res.status === 201) set({ loading: false });
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || "Error Adding VideoLink",

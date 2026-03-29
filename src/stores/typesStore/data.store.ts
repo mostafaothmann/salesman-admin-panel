@@ -36,23 +36,23 @@ interface DataStore {
     // for GroupTypes
     getGroupTypesData: () => Promise<void>;
     getGroupTypeData: (id: number) => Promise<void>;
-    addGroupType: (groupType: AddingGroupType) => Promise<void>;
-    deleteGroupType: (id: number) => Promise<void>;
-    editGroupType: (id: number, groupType: AddingGroupType) => Promise<void>;
+    addGroupType: (groupType: AddingGroupType) => Promise<any>;
+    deleteGroupType: (id: number) => Promise<any>;
+    editGroupType: (id: number, groupType: AddingGroupType) => Promise<any>;
 
     // for Types
     getTypesData: () => Promise<void>;
     getTypeData: (id: number) => Promise<void>;
-    addType: (type: AddingType) => Promise<void>;
-    deleteType: (id: number) => Promise<void>;
-    editType: (id: number, type: AddingType) => Promise<void>;
+    addType: (type: AddingType) => Promise<any>;
+    deleteType: (id: number) => Promise<any>;
+    editType: (id: number, type: AddingType) => Promise<any>;
 
     // for Ingredients
     getIngredientsData: () => Promise<void>;
     getIngredientData: (id: number) => Promise<void>;
-    addIngredient: (type: AddingIngredient) => Promise<void>;
-    deleteIngredient: (id: number) => Promise<void>;
-    editIngredient: (id: number, groupType: AddingIngredient) => Promise<void>;
+    addIngredient: (type: AddingIngredient) => Promise<any>;
+    deleteIngredient: (id: number) => Promise<any>;
+    editIngredient: (id: number, groupType: AddingIngredient) => Promise<any>;
     getTypesForIngredient: (id: number) => Promise<void>;
 
     //for other relations 
@@ -113,11 +113,12 @@ export const useTypeStore = create<DataStore>()(
             deleteGroupType: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiGroupType.delete(`/${id}`);
+                    const res = await apiGroupType.delete(`/${id}`);
                     set((state) => ({
                         dataGroupTypes: state.dataGroupTypes?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting GroupType',
@@ -130,7 +131,7 @@ export const useTypeStore = create<DataStore>()(
                 set({ loading: true, error: null });
                 try {
                     const res = await apiGroupType.patch(`/${id}`, groupType);
-                    if (res.status != 201) { }
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading GroupType',
@@ -145,7 +146,7 @@ export const useTypeStore = create<DataStore>()(
                     if (groupType !== null) {
                         const res = await apiGroupType.post(``, groupType);
                         set({ loading: false });
-                        if (res.status == 201) { }
+                        return res
                     }
                 } catch (err: any) {
                     set({
@@ -207,11 +208,13 @@ export const useTypeStore = create<DataStore>()(
             deleteType: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiType.delete(`/${id}`);
+                    const res = await apiType.delete(`/${id}`);
                     set((state) => ({
                         dataTypes: state.dataTypes?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
+
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting Type',
@@ -224,7 +227,7 @@ export const useTypeStore = create<DataStore>()(
                 set({ loading: true, error: null });
                 try {
                     const res = await apiType.patch(`/${id}`, type);
-                    if (res.status != 201) { }
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading Type',
@@ -240,6 +243,7 @@ export const useTypeStore = create<DataStore>()(
                         const res = await apiType.post(``, type);
                         set({ loading: false });
                         if (res.status == 201) { }
+                        return res;
                     }
                 } catch (err: any) {
                     set({
@@ -392,6 +396,7 @@ export const useTypeStore = create<DataStore>()(
             getIngredientsForType: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
+                    console.log(id)
                     const res = await apiType.get(`/ingredients/${id}`);
                     const dataIngredientsForType = res.data;
                     set({ dataIngredientsForType, loading: false });
@@ -449,11 +454,12 @@ export const useTypeStore = create<DataStore>()(
             deleteIngredient: async (id: number) => {
                 set({ loading: true, error: null });
                 try {
-                    await apiIngredient.delete(`/${id}`);
+                    const res = await apiIngredient.delete(`/${id}`);
                     set((state) => ({
                         dataIngredients: state.dataIngredients?.filter((a) => a.id !== id),
                         loading: false,
                     }));
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Deleting GroupType',
@@ -467,6 +473,7 @@ export const useTypeStore = create<DataStore>()(
                 try {
                     const res = await apiIngredient.patch(`/${id}`, ingredient);
                     if (res.status != 201) { }
+                    return res;
                 } catch (err: any) {
                     set({
                         error: err.response?.data?.message || 'Error Loading GroupType',
@@ -481,7 +488,7 @@ export const useTypeStore = create<DataStore>()(
                     if (ingredient !== null) {
                         const res = await apiIngredient.post(``, ingredient);
                         set({ loading: false });
-                        if (res.status == 201) { }
+                        return res;
                     }
                 } catch (err: any) {
                     set({

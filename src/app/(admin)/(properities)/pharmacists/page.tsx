@@ -1,6 +1,6 @@
 "use client";
 
-import { AutoComplete, Button, DatePicker, Divider, Dropdown, Input, Menu, Modal, Slider, SliderSingleProps, Space, Table, Tag, TimePicker, TimePickerProps, Upload } from "antd";
+import { AutoComplete, Button, DatePicker, Divider, Dropdown, Input, Menu, Modal, notification, Skeleton, Slider, SliderSingleProps, Space, Table, Tag, TimePicker, TimePickerProps, Upload } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 import dynamic from "next/dynamic";
 import { ColumnsType } from "antd/es/table";
+import { apiPharmacist } from "../../../../stores/apis";
 
 
 export default function PharmacistsPage() {
@@ -42,7 +43,7 @@ export default function PharmacistsPage() {
     const [classificationId, setClassificationId] = useState(1);
     const [loyaltyId, setLoyaltyId] = useState(0);
     const [birth_date, setBirthDate] = useState("");
-    const [sex_id, setSexId] = useState(0);
+    const [gender_id, setSexId] = useState(0);
     const [phone_number, setPhoneNumber] = useState("");
     const [telephone_number, setTelephoneNumber] = useState("");
     const [wife_husband_first_name, setWifeHusbandFirstName] = useState("");
@@ -137,7 +138,7 @@ export default function PharmacistsPage() {
 
     //showModal
     const openShowModal = (id: number) => {
-        router.push(`/pharmacis/${id}`);
+        router.push(`/pharmacists/${id}`);
     }
 
     async function changeOpenModalAdd() {
@@ -153,32 +154,65 @@ export default function PharmacistsPage() {
         setCityId(city_id + 1)
         setAreaId(area_id + 1)
         setStreetId(street_id + 1)
-        await addPharmacist({
-            first_name: first_name,
-            last_name: last_name,
-            favourite_time_opening: favourite_time_opening,
-            favourite_time_closing: favourite_time_closing,
-            first_work_time_opening: first_time_opening,
-            first_work_time_closing: first_time_closing,
-            second_work_time_opening: second_time_opening,
-            second_work_time_closing: second_time_closing,
-            governorate_id: governorate_id,
-            city_id: city_id,
-            street_id: street_id,
-            area_id: area_id,
-            graduation_country: graduation_country,
-            graduation_university: graduation_university,
-            birth_date: birth_date,
-            classification: classificationId,
-            loyalty: loyaltyId,
-            admin_description: admin_description,
-            salesman_description: salesman_description,
-            sex: sex_id,
-            wife_husband_first_name: wife_husband_first_name,
-            wife_husband_last_name: wife_husband_first_name,
-            phone_number: phone_number,
-            telephone_number: telephone_number
-        })
+
+        if (first_name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(first_name) &&
+            last_name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(last_name)
+        ) {
+            try {
+                const res = await addPharmacist({
+                    first_name: first_name,
+                    last_name: last_name,
+                    favourite_time_opening: favourite_time_opening,
+                    favourite_time_closing: favourite_time_closing,
+                    first_work_time_opening: first_time_opening,
+                    first_work_time_closing: first_time_closing,
+                    second_work_time_opening: second_time_opening,
+                    second_work_time_closing: second_time_closing,
+                    governorate_id: governorate_id,
+                    city_id: city_id,
+                    street_id: street_id,
+                    area_id: area_id,
+                    graduation_country: graduation_country,
+                    graduation_university: graduation_university,
+                    birth_date: birth_date,
+                    classification: classificationId,
+                    loyalty: loyaltyId,
+                    admin_description: admin_description,
+                    salesman_description: salesman_description,
+                    gender: gender_id,
+                    wife_husband_first_name: wife_husband_first_name,
+                    wife_husband_last_name: wife_husband_first_name,
+                    phone_number: phone_number,
+                    telephone_number: telephone_number
+                })
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        message: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        message: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         getPharmacistsData(page, limit);
         setBirthDate("");
         setFirstName("");
@@ -297,7 +331,36 @@ export default function PharmacistsPage() {
     //delete 
     async function handleDelete(id: number) {
         setLoading2(true);
-        await deletePharmacist(id);
+
+        try {
+            const res = await deletePharmacist(id);
+            if (res?.status == 200) {
+                notification.success({
+                    message: "نجاح",
+                    description: "تمت العملية بنجاح",
+                    placement: 'bottomLeft'
+                });
+            } else if (res?.status == 500) {
+                notification.error({
+                    message: "خطأ",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+            else {
+                notification.error({
+                    message: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "فشل",
+                description: "فشل العملية",
+                placement: 'bottomLeft'
+            });
+        }
         getPharmacistsData(page, limit);
         setLoading2(false);
         setOpenDeleteModal(false);
@@ -317,13 +380,60 @@ export default function PharmacistsPage() {
 
 
     //downloadExcele
+    const [allData, setAllData] = useState([])
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataPharmacists ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "الأطباء");
-        XLSX.writeFile(workbook, "الأطباء.xlsx");
+        apiPharmacist.get('/show')
+            .then(res => {
+                setAllData(res.data);
+                const formattedData = (allData ?? []).map(item => ({
+                    "تاريخ الإضافة": item.created_at.slice(0, 10),
+                    "مجموع المبيع": item.total_requested_products,
+                    "البريد": item.email,
+                    "الهاتف": item.phone_number,
+                    "الأرضي": item.telephone_number,
+                    "الولاء": optionsLoyalty?.find(e => e.value == Number(item.loyalty))?.label,
+                    "التصنيف": optionsClassification?.find(e => e.value == Number(item.classification))?.label,
+                    "الشارع": dataStreets?.find(e => e.id == Number(item.street_id))?.name,
+                    "المنطقة": dataAreas?.find(e => e.id == Number(item.area_id))?.name,
+                    "المدينة": dataCities?.find(e => e.id == Number(item.city_id))?.name,
+                    "المحافظة": dataGovernorates?.find(e => e.id == Number(item.governorate_id))?.name,
+                    "اسم العائلة": item.last_name,
+                    "الاسم": item.first_name,
+                    "معرف الصيدلي": item.id,
+                }));
+                const worksheet = XLSX.utils.json_to_sheet(formattedData);
+                worksheet["!cols"] = [
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 10 },
+                    { wch: 10 },
+                    { wch: 10 },
+                    { wch: 10 },
+                    { wch: 10 },
+                    { wch: 10 },
+                    { wch: 10 },
+                    { wch: 15 },
+                ];
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "الصيادلة");
+                XLSX.writeFile(workbook, "الصيادلة.xlsx");
+            })
+            .catch(err => {
+                notification.error({
+                    message: "خطأ",
+                    description: "حدث خطأ في جلب البيانات",
+                    placement: 'bottomLeft'
+                });
+            });
     };
-    useEffect(() => { getPharmacistsData(page, limit); }, []);
+
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        setPageLoading(true)
+        getPharmacistsData(page, limit).finally(() => setPageLoading(false));
+    }, []);
 
     const columns: ColumnsType<any> = [
         {
@@ -480,7 +590,7 @@ export default function PharmacistsPage() {
 
                         onChange={(text) => {
                             setSearchTextClassification(text);
-                            setClassificationId(undefined); // clear ID while typing
+                            setClassificationId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setClassificationId(option.value);
@@ -545,7 +655,7 @@ export default function PharmacistsPage() {
 
                         onChange={(text) => {
                             setSearchTextSex(text);
-                            setSexId(undefined); // clear ID while typing
+                            setSexId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setSexId(option.value);
@@ -574,7 +684,7 @@ export default function PharmacistsPage() {
 
                         onChange={(text) => {
                             setSearchTextLoyalty(text);
-                            setLoyaltyId(undefined); // clear ID while typing
+                            setLoyaltyId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setLoyaltyId(option.value);
@@ -655,10 +765,10 @@ export default function PharmacistsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setGovernorateId(undefined); // clear ID while typing
-                            setCityId(undefined); // clear ID while typing
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setGovernorateId(undefined); 
+                            setCityId(undefined); 
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -696,9 +806,9 @@ export default function PharmacistsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setCityId(undefined); // clear ID while typing
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setCityId(undefined); 
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -736,8 +846,8 @@ export default function PharmacistsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setAreaId(undefined); // clear ID while typing
-                            setStreetId(undefined); // clear ID while typing
+                            setAreaId(undefined); 
+                            setStreetId(undefined); 
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -774,7 +884,7 @@ export default function PharmacistsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setStreetId(undefined); // clear ID while typing
+                            setStreetId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setStreetId(option.value);
@@ -953,40 +1063,42 @@ export default function PharmacistsPage() {
                 تنزيل
             </Button>
         </div>
-
-        {filtered ? <Table
-            scroll={{ x: "max-content" }}
-            columns={columns}
-            style={{ maxWidth: 1100 }}
-            pagination={{
-                position: ["topRight"],
-                current: filter_page,
-                pageSize: limit,
-                total: filter_total,
-                onChange: (page, pageSize) => {
-                    setFilterPage(filter_page)
-                    getFilteredData(filter_page, pageSize)
-                    // setPage(lastPage)
-                },
-            }}
-            dataSource={filteredDataPharmacisits || []} />
-            :
-            <Table
-                scroll={{ x: "max-content" }}
-                style={{ maxWidth: 1100 }}
-                columns={columns}
-                pagination={{
-                    position: ["topRight"],
-                    current: page,
-                    pageSize: limit,
-                    total: total,
-                    onChange: (page, pageSize) => {
-                        getPharmacistsData(page, pageSize);
-                        setPage(page)
-                        // setPage(lastPage)
-                    },
-                }}
-                dataSource={dataPharmacists || []} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                :
+                filtered ? <Table
+                    scroll={{ x: "max-content" }}
+                    columns={columns}
+                    style={{ maxWidth: 1100 }}
+                    pagination={{
+                        position: ["topRight"],
+                        current: filter_page,
+                        pageSize: limit,
+                        total: filter_total,
+                        onChange: (page, pageSize) => {
+                            setFilterPage(filter_page)
+                            getFilteredData(filter_page, pageSize)
+                            // setPage(lastPage)
+                        },
+                    }}
+                    dataSource={filteredDataPharmacisits || []} />
+                    :
+                    <Table
+                        scroll={{ x: "max-content" }}
+                        style={{ maxWidth: 1100 }}
+                        columns={columns}
+                        pagination={{
+                            position: ["topRight"],
+                            current: page,
+                            pageSize: limit,
+                            total: total,
+                            onChange: (page, pageSize) => {
+                                getPharmacistsData(page, pageSize);
+                                setPage(page)
+                                // setPage(lastPage)
+                            },
+                        }}
+                        dataSource={dataPharmacists || []} />
         }
 
     </div>

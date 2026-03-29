@@ -1,7 +1,7 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, InputNumber, Modal, Space, Table } from "antd";
+import { AutoComplete, Button, Dropdown, Input, InputNumber, Modal, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
@@ -72,6 +72,8 @@ export default function SampleDoctorPage() {
         XLSX.utils.book_append_sheet(workbook, worksheet, "المكونات");
         XLSX.writeFile(workbook, "المكونات.xlsx");
     };
+    const [pageLoading, setPageLoading] = useState(true);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -85,7 +87,7 @@ export default function SampleDoctorPage() {
                 console.error("Error fetching data:", error);
             }
         };
-        fetchData();
+        fetchData().finally(() => setPageLoading(false));
         getDoctorSamplesData(page, limit);
     }, []);
 
@@ -123,9 +125,9 @@ export default function SampleDoctorPage() {
             <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
                 فلترة
             </Button>
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+            {/*   <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
                 تنزيل
-            </Button>
+            </Button> */}
         </div>
         {/*Filter Modal*/}
         <Modal
@@ -155,7 +157,7 @@ export default function SampleDoctorPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setFilterTypeId(undefined); // clear ID while typing
+                            setFilterTypeId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterTypeId(option.value);
@@ -170,41 +172,42 @@ export default function SampleDoctorPage() {
                 </div>
             </div>
         </Modal>
-        <div className="max-w-full">
-            {filtered ? <Table
-                scroll={{ x: "max-content" }}
-                columns={columns}
-                pagination={{
-                    placement: ['topEnd'],
-                    current: filter_page,
-                    pageSize: limit,
-                    total: filter_total,
-                    onChange: (page, pageSize) => {
-                        setFilterPage(filter_page)
-                        getFilteredData(page, pageSize)
-                        // setPage(lastPage)
-                    },
-                }}
-                dataSource={filteredDataDoctorsSamples || []} />
+        {
+            (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
                 :
-                <Table
+                filtered ? <Table
                     scroll={{ x: "max-content" }}
-                    style={{ maxWidth: 1100 }}
                     columns={columns}
                     pagination={{
                         placement: ['topEnd'],
-                        current: page,
+                        current: filter_page,
                         pageSize: limit,
-                        total: total,
+                        total: filter_total,
                         onChange: (page, pageSize) => {
-                            getDoctorSamplesData(page, pageSize);
-                            setPage(page)
-                            //setPage(lastPage)
+                            setFilterPage(filter_page)
+                            getFilteredData(page, pageSize)
+                            // setPage(lastPage)
                         },
                     }}
-                    dataSource={dataDoctorSamples || []} />
-            }
+                    dataSource={filteredDataDoctorsSamples || []} />
+                    :
+                    <Table
+                        scroll={{ x: "max-content" }}
+                        style={{ maxWidth: 1100 }}
+                        columns={columns}
+                        pagination={{
+                            placement: ['topEnd'],
+                            current: page,
+                            pageSize: limit,
+                            total: total,
+                            onChange: (page, pageSize) => {
+                                getDoctorSamplesData(page, pageSize);
+                                setPage(page)
+                                //setPage(lastPage)
+                            },
+                        }}
+                        dataSource={dataDoctorSamples || []} />
+        }
 
-        </div >
-    </div>
+    </div >
 }

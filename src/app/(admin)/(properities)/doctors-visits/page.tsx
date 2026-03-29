@@ -1,6 +1,6 @@
 "use client";
 
-import { AutoComplete, Button, Checkbox, DatePicker, Divider, Image, Input, InputNumber, Modal, Slider, SliderSingleProps, Space, Table, Tag, TimePicker, TimePickerProps } from "antd";
+import { AutoComplete, Button, Checkbox, DatePicker, Divider, Image, Input, InputNumber, Modal, Skeleton, Slider, SliderSingleProps, Space, Table, Tag, TimePicker, TimePickerProps } from "antd";
 import { useEffect, useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
@@ -231,8 +231,10 @@ export default function DoctorsVisitsPage() {
         documentTitle: "زيارة طبيب",
     });
 
+    const [pageLoading, setPageLoading] = useState(true);
 
     useEffect(() => {
+        setPageLoading(true)
         const fetchData = async () => {
             try {
                 const [
@@ -263,7 +265,8 @@ export default function DoctorsVisitsPage() {
                 console.error("Error fetching data:", error);
             }
         };
-        fetchData();
+        setPageLoading(true);
+        fetchData().finally(() => setPageLoading(false));
         getDoctorsVisitsData(page, limit);
     }, []);
 
@@ -466,7 +469,7 @@ export default function DoctorsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchVisitStatus(text);
-                            setFilterVisitStatusId(undefined); // clear ID while typing
+                            setFilterVisitStatusId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterVisitStatusId(option.value);
@@ -496,7 +499,7 @@ export default function DoctorsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextSalesman(text);
-                            setFilterSalesmanId(undefined); // clear ID while typing
+                            setFilterSalesmanId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterSalesmanId(option.value);
@@ -525,7 +528,7 @@ export default function DoctorsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextAssistant(text);
-                            setFilterAssistantId(undefined); // clear ID while typing
+                            setFilterAssistantId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterAssistantId(option.value);
@@ -554,7 +557,7 @@ export default function DoctorsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextDoctor(text);
-                            setFilterDoctorId(undefined); // clear ID while typing
+                            setFilterDoctorId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterDoctorId(option.value);
@@ -583,7 +586,7 @@ export default function DoctorsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setFilterTypeId(undefined); // clear ID while typing
+                            setFilterTypeId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterTypeId(option.value);
@@ -614,7 +617,7 @@ export default function DoctorsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextSalesman(text);
-                            setFilterSalesmanId(undefined); // clear ID while typing
+                            setFilterSalesmanId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterSalesmanId(option.value);
@@ -660,10 +663,10 @@ export default function DoctorsVisitsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setFilterGovernorateId(undefined); // clear ID while typing
-                            setFilterCityId(undefined); // clear ID while typing
-                            setFilterAreaId(undefined); // clear ID while typing
-                            setFilterStreetId(undefined); // clear ID while typing
+                            setFilterGovernorateId(undefined); 
+                            setFilterCityId(undefined); 
+                            setFilterAreaId(undefined); 
+                            setFilterStreetId(undefined); 
                             const governorate = dataGovernorates?.find(
                                 item => item.id === filter_governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -701,9 +704,9 @@ export default function DoctorsVisitsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setFilterCityId(undefined); // clear ID while typing
-                            setFilterAreaId(undefined); // clear ID while typing
-                            setFilterStreetId(undefined); // clear ID while typing
+                            setFilterCityId(undefined); 
+                            setFilterAreaId(undefined); 
+                            setFilterStreetId(undefined); 
                             const city = dataCities?.find(
                                 item => item.id === filter_city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -741,8 +744,8 @@ export default function DoctorsVisitsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setFilterAreaId(undefined); // clear ID while typing
-                            setFilterStreetId(undefined); // clear ID while typing
+                            setFilterAreaId(undefined); 
+                            setFilterStreetId(undefined); 
                             const area = dataAreas?.find(
                                 item => item.id === filter_area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -779,7 +782,7 @@ export default function DoctorsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setFilterStreetId(undefined); // clear ID while typing
+                            setFilterStreetId(undefined); 
                         }}
                         onSelect={(value, option) => {
                             setFilterStreetId(option.value);
@@ -824,7 +827,7 @@ export default function DoctorsVisitsPage() {
                 </Button>
             ]
             }
-            confirmLoading={loading4}   // ✅ spinner on OK button
+            confirmLoading={loading4}   
             mask={false}
         >
 
@@ -1037,43 +1040,46 @@ export default function DoctorsVisitsPage() {
             <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
                 فلترة
             </Button>
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+            {/*       <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
                 تنزيل
-        </Button>
+        </Button> */}
         </div>
         <div className="max-w-full">
-            {filtered ? <Table
-                scroll={{ x: "max-content" }}
-                columns={columns}
-                pagination={{
-                    placement: ['topEnd'],
-                    current: filter_page,
-                    pageSize: limit,
-                    total: filter_total,
-                    onChange: (page, pageSize) => {
-                        setFilterPage(filter_page)
-                        getFilteredData(page, pageSize)
-                        // setPage(lastPage)
-                    },
-                }}
-                dataSource={filteredDataDoctorsVisits || []} />
-                :
-                <Table
-                    scroll={{ x: "max-content" }}
-                    style={{ maxWidth: 1100 }}
-                    columns={columns}
-                    pagination={{
-                        placement: ['topEnd'],
-                        current: page,
-                        pageSize: limit,
-                        total: total,
-                        onChange: (page, pageSize) => {
-                            getDoctorsVisitsData(page, pageSize);
-                            setPage(page)
-                            //setPage(lastPage)
-                        },
-                    }}
-                    dataSource={dataDoctorsVisits || []} />
+            {
+                (pageLoading) ? <Skeleton className="h-full w-full" paragraph={{ rows: 10 }} />
+                    :
+                    filtered ? <Table
+                        scroll={{ x: "max-content" }}
+                        columns={columns}
+                        pagination={{
+                            placement: ['topEnd'],
+                            current: filter_page,
+                            pageSize: limit,
+                            total: filter_total,
+                            onChange: (page, pageSize) => {
+                                setFilterPage(filter_page)
+                                getFilteredData(page, pageSize)
+                                // setPage(lastPage)
+                            },
+                        }}
+                        dataSource={filteredDataDoctorsVisits || []} />
+                        :
+                        <Table
+                            scroll={{ x: "max-content" }}
+                            style={{ maxWidth: 1100 }}
+                            columns={columns}
+                            pagination={{
+                                placement: ['topEnd'],
+                                current: page,
+                                pageSize: limit,
+                                total: total,
+                                onChange: (page, pageSize) => {
+                                    getDoctorsVisitsData(page, pageSize);
+                                    setPage(page)
+                                    //setPage(lastPage)
+                                },
+                            }}
+                            dataSource={dataDoctorsVisits || []} />
             }
 
         </div>

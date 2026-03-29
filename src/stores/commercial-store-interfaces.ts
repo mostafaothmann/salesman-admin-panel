@@ -1,8 +1,8 @@
 export interface Order {
     id: number;
-    note:string;
+    note: string;
     validated_at: string;
-    created_at:string;
+    created_at: string;
     base_total_price: number;
     lan: string;
     lat: string;
@@ -112,6 +112,7 @@ export interface AddingOnlineOffer {
 
 export interface Mall {
     id: number;
+    created_at: string;
     type: number;
     name: string;
     lan?: string;
@@ -162,8 +163,8 @@ export interface OnlineCustomer {
     phone_nmuber: string;
     assistant_id: number;
     salesman_id: number;
-    governorate_Id?: number;
-    city_Id?: number;
+    governorate_id?: number;
+    city_id?: number;
     area_id?: number;
 }
 
@@ -174,8 +175,8 @@ export interface AddingOnlineCustomer {
     phone_nmuber: string;
     assistant_id: number;
     salesman_id: number;
-    governorate_Id?: number;
-    city_Id?: number;
+    governorate_id?: number;
+    city_id?: number;
     area_id?: number;
 }
 
@@ -204,7 +205,6 @@ export interface AddingOffer {
 }
 
 export interface EditingOffer {
-    base_offer_id: number;
     order_id: number;
     type_id: number;
     price_for_piece: number;
@@ -241,15 +241,27 @@ export interface AddingProduct {
 }
 
 export interface EditingProduct {
+    id: number;
+    quantity: number;
+    total_delivery_percentage: number;
+    type_id: number;
+    order_id: number;
     price_for_piece: number;
+    total_percentage: number;
+    base_percentage: number;
+    return_percentage: number;
+    delivery_percentage: number;
+    base_total_price: number;
+    return_total_price?: number;
+    total_price: number;
     base_quantity: number;
     return_quantity: number;
     total_quantity: number;
-    return_discount: number;
-    total_delivery_percentage: number;
+    has_return: boolean;
+    return_discount?: number;
+    return_date?: Date;
     delivery_percentage_for_piece?: number;
     percentage_for_piece?: number;
-    //return_date?: Date;
 }
 
 export interface AddingOnlineOrder {
@@ -267,7 +279,7 @@ export interface AddingOnlineOrder {
 
 export interface AddingOrder {
     lan: string;
-    note:string;
+    note: string;
     lat: string;
     street_id: number;
     area_id: number;
