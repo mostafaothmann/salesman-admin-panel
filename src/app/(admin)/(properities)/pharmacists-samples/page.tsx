@@ -7,7 +7,7 @@ import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
 import { useRouter } from "next/navigation";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
-import { apiType } from "../../../../stores/apis";
+import { apiPharmacist, apiSalesman, apiType } from "../../../../stores/apis";
 
 
 export default function SamplePharmacistPage() {
@@ -67,6 +67,32 @@ export default function SamplePharmacistPage() {
 
 
 
+    const [salesmansNames, setSalesmansNames] = useState([])
+    const [pharmacistsNames, setPharmacistsNames] = useState([])
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [
+                    salesmanRes,
+                    pharmacistRes
+                ] = await Promise.all([
+                    apiSalesman.get('/fullname'),
+                    apiPharmacist.get('/fullname')
+                ]);
+                setSalesmansNames(salesmanRes.data);
+                setPharmacistsNames(pharmacistRes.data)
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+        fetchData().finally(() => setPageLoading(false));
+    }, []);
+
+
+
+
 
     //downloadExcele
     const downloadExcel = () => {
@@ -107,6 +133,24 @@ export default function SamplePharmacistPage() {
                 return `${type?.name}`
             }
         },
+        {
+            title: "المندوب",
+            dataIndex: "salesman_id",
+            sorter: (a: any, b: any) => Number(a.salesmna_id) - Number(b.salesmna_id),
+            render: (value: number) => {
+                const salesman = salesmansNames?.find(e => e.id == Number(value));
+                return `${salesman?.first_name} ${salesman?.last_name}`
+            }
+        },
+        {
+            title: "الصيدلي",
+            dataIndex: "pharmacist_id",
+            sorter: (a: any, b: any) => Number(a.pharmacist_id) - Number(b.pharmacist_id),
+            render: (value: number) => {
+                const pharmacist = pharmacistsNames?.find(e => e.id == Number(value));
+                return `${pharmacist?.first_name} ${pharmacist?.last_name}`
+            }
+        },
 
         {
             title: "الكمية",
@@ -126,9 +170,9 @@ export default function SamplePharmacistPage() {
             <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
                 فلترة
             </Button>
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+          {/*   <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
                 تنزيل
-            </Button>
+            </Button> */}
         </div>
 
         {/*Filter Modal*/}
@@ -159,7 +203,7 @@ export default function SamplePharmacistPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setFilterTypeId(undefined); 
+                            setFilterTypeId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterTypeId(option.value);

@@ -22,7 +22,7 @@ export default function PharmacistsVisitsPage() {
         dataCities, dataAreas, dataStreets } = usePlacesStore()
     const router = useRouter();
     const Map = dynamic(
-        () => import("../../../../sharedComponents/maps/map/Map"),
+        () => import("../../components/sharedComponents/maps/map/Map"),
         { ssr: false }
     );
     //table constants
@@ -242,16 +242,16 @@ export default function PharmacistsVisitsPage() {
             fixed: 'left',
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
-        {
-            title: 'الكوبون',
-            dataIndex: "photo",
-            render: (value: string) => {
-                return <Image
-                    height={50}
-                    width={50}
-                    src={value}></Image>
-            }
-        },
+        /*     {
+                title: 'الكوبون',
+                dataIndex: "photo",
+                render: (value: string) => {
+                    return <Image
+                        height={50}
+                        width={50}
+                        src={value}></Image>
+                }
+            }, */
         {
             title: "المندوب",
             dataIndex: "salesman_id",
@@ -352,8 +352,9 @@ export default function PharmacistsVisitsPage() {
                         variant="outlined"
                         onClick={() => { OpenLocationModal(record.id); }}
                     >
-                        Location
+                        موقع
                     </Button>
+              
                 </Space>
             ),
         },
@@ -368,7 +369,7 @@ export default function PharmacistsVisitsPage() {
                         color="cyan"
                         onClick={() => OpenShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),
@@ -434,7 +435,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchVisitStatus(text);
-                            setFilterVisitStatusId(undefined); 
+                            setFilterVisitStatusId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterVisitStatusId(option.value);
@@ -464,7 +465,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextSalesman(text);
-                            setFilterSalesmanId(undefined); 
+                            setFilterSalesmanId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterSalesmanId(option.value);
@@ -493,7 +494,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextAssistant(text);
-                            setFilterAssistantId(undefined); 
+                            setFilterAssistantId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterAssistantId(option.value);
@@ -522,7 +523,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextPharmacist(text);
-                            setFilterPharmacistId(undefined); 
+                            setFilterPharmacistId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterPharmacistId(option.value);
@@ -551,7 +552,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setFilterTypeId(undefined); 
+                            setFilterTypeId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterTypeId(option.value);
@@ -582,7 +583,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextSalesman(text);
-                            setFilterSalesmanId(undefined); 
+                            setFilterSalesmanId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterSalesmanId(option.value);
@@ -628,10 +629,10 @@ export default function PharmacistsVisitsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setFilterGovernorateId(undefined); 
-                            setFilterCityId(undefined); 
-                            setFilterAreaId(undefined); 
-                            setFilterStreetId(undefined); 
+                            setFilterGovernorateId(undefined);
+                            setFilterCityId(undefined);
+                            setFilterAreaId(undefined);
+                            setFilterStreetId(undefined);
                             const governorate = dataGovernorates?.find(
                                 item => item.id === filter_governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -669,9 +670,9 @@ export default function PharmacistsVisitsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setFilterCityId(undefined); 
-                            setFilterAreaId(undefined); 
-                            setFilterStreetId(undefined); 
+                            setFilterCityId(undefined);
+                            setFilterAreaId(undefined);
+                            setFilterStreetId(undefined);
                             const city = dataCities?.find(
                                 item => item.id === filter_city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -709,8 +710,8 @@ export default function PharmacistsVisitsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setFilterAreaId(undefined); 
-                            setFilterStreetId(undefined); 
+                            setFilterAreaId(undefined);
+                            setFilterStreetId(undefined);
                             const area = dataAreas?.find(
                                 item => item.id === filter_area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -747,7 +748,7 @@ export default function PharmacistsVisitsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setFilterStreetId(undefined); 
+                            setFilterStreetId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterStreetId(option.value);
@@ -786,7 +787,7 @@ export default function PharmacistsVisitsPage() {
                 </Button>
             ]
             }
-            confirmLoading={loading4}   
+            confirmLoading={loading4}
             mask={false}
         >
 
@@ -795,13 +796,13 @@ export default function PharmacistsVisitsPage() {
 
                 <div className="grid grid-cols-12 gap-2 col-span-12 md:col-span-6">
 
-                    <div className="col-span-12">
+                    {/*  <div className="col-span-12">
                         <Image
                             width={"100%"}
                             height={254}
                             src={pharmacistVisitD?.photo}></Image>
                     </div>
-
+ */}
                     <div className="col-span-12">
                         <h3>
                             ملاحظة الزيارة :
@@ -911,14 +912,14 @@ export default function PharmacistsVisitsPage() {
 
                     <div className="col-span-12 xl:col-span-6">
                         <h3>
-                            أقرب الصيدليات :
+                            أقرب الأطباء :
                         </h3>
                         <Input
                             disabled
                             value={
                                 `${pharmacistVisitD?.closest_pharmacy}`
                             }
-                            placeholder="أقرب الصيدليات"
+                            placeholder="أقرب الأطباء"
                         />
                     </div>
 

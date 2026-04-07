@@ -1,5 +1,20 @@
 
 // 🧩 Interfaces
+
+export interface SalesmanArea {
+    id: number,
+    area_id: number,
+    salesman_id: number,
+    assistant_id: number
+}
+
+export interface AddingSalesmanArea {
+    area_id: number,
+    salesman_id: number,
+    assistant_id: number
+}
+
+
 export interface Governorate {
     id: number,
     name: string,

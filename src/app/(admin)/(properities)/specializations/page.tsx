@@ -253,13 +253,13 @@ export default function SpecializationsPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         type="default"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
-                        Edit
+                        تعديل
                     </Button>
                 </Space>
             ),
@@ -275,7 +275,7 @@ export default function SpecializationsPage() {
                         color="cyan"
                         onClick={() => OpenShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),

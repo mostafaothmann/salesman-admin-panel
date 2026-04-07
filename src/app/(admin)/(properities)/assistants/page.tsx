@@ -326,15 +326,16 @@ export default function AssistantsPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         type="primary"
                         variant="outlined"
                         onClick={() => { OpenLocationModal(record.id); }}
                     >
-                        Location
+                        موقع
                     </Button>
+              
                 </Space>
             ),
         },
@@ -348,7 +349,7 @@ export default function AssistantsPage() {
                         color="cyan"
                         onClick={() => openShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),
@@ -360,7 +361,7 @@ export default function AssistantsPage() {
         <Modal
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
-                    <span> إضافة طبيب</span>
+                    <span> إضافة مساعد</span>
                 </div>
             }
             open={open}

@@ -1,3 +1,9 @@
+//for profile
+export interface profileComponent {
+    profile_id: number;
+}
+
+
 export interface GiftVisit {
     id: number,
     visit_id: number,

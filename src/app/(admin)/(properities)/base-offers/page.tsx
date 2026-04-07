@@ -268,14 +268,14 @@ export default function BaseOffersPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         variant="outlined"
                         color="cyan"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
-                        Edit
+                        تعديل
                     </Button>
                 </Space>
             ),
@@ -291,7 +291,7 @@ export default function BaseOffersPage() {
                         color="cyan"
                         onClick={() => OpenShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),

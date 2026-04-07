@@ -242,14 +242,14 @@ export default function StreetsPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         variant="outlined"
                         color="cyan"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
-                        Edit
+                        تعديل
                     </Button>
                 </Space>
             ),
@@ -264,7 +264,7 @@ export default function StreetsPage() {
                         color="cyan"
                         onClick={() => OpenShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),

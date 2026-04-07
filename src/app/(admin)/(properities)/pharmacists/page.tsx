@@ -18,7 +18,7 @@ export default function PharmacistsPage() {
     const { dataGovernorates, getGovernoratesData, getCitiesData, getAreasData, getStreetsData, dataCities, dataAreas, dataStreets } = usePlacesStore()
     const router = useRouter();
     const Map = dynamic(
-        () => import("../../../../sharedComponents/maps/map/Map"),
+        () => import("../../components/sharedComponents/maps/map/Map"),
         { ssr: false }
     );
     //table constants
@@ -40,8 +40,8 @@ export default function PharmacistsPage() {
     const [area_id, setAreaId] = useState(1);
     const [street_id, setStreetId] = useState(1);
     const [specialization_id, setSpecializationId] = useState(1);
-    const [classificationId, setClassificationId] = useState(1);
-    const [loyaltyId, setLoyaltyId] = useState(0);
+    const [classification_id, setClassificationId] = useState(1);
+    const [loyalty_id, setLoyaltyId] = useState(0);
     const [birth_date, setBirthDate] = useState("");
     const [gender_id, setSexId] = useState(0);
     const [phone_number, setPhoneNumber] = useState("");
@@ -175,13 +175,13 @@ export default function PharmacistsPage() {
                     graduation_country: graduation_country,
                     graduation_university: graduation_university,
                     birth_date: birth_date,
-                    classification: classificationId,
-                    loyalty: loyaltyId,
+                    classification_id: classification_id,
+                    loyalty_id: loyalty_id,
                     admin_description: admin_description,
                     salesman_description: salesman_description,
                     gender: gender_id,
-                    wife_husband_first_name: wife_husband_first_name,
-                    wife_husband_last_name: wife_husband_first_name,
+                    //   wife_husband_first_name: wife_husband_first_name,
+                    // wife_husband_last_name: wife_husband_first_name,
                     phone_number: phone_number,
                     telephone_number: telephone_number
                 })
@@ -507,14 +507,14 @@ export default function PharmacistsPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         type="primary"
                         variant="outlined"
                         onClick={() => { OpenLocationModal(record.id); }}
                     >
-                        Location
+                        موقع
                     </Button>
                 </Space>
             ),
@@ -530,7 +530,7 @@ export default function PharmacistsPage() {
                         color="cyan"
                         onClick={() => openShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),
@@ -590,7 +590,7 @@ export default function PharmacistsPage() {
 
                         onChange={(text) => {
                             setSearchTextClassification(text);
-                            setClassificationId(undefined); 
+                            setClassificationId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setClassificationId(option.value);
@@ -655,7 +655,7 @@ export default function PharmacistsPage() {
 
                         onChange={(text) => {
                             setSearchTextSex(text);
-                            setSexId(undefined); 
+                            setSexId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setSexId(option.value);
@@ -684,7 +684,7 @@ export default function PharmacistsPage() {
 
                         onChange={(text) => {
                             setSearchTextLoyalty(text);
-                            setLoyaltyId(undefined); 
+                            setLoyaltyId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setLoyaltyId(option.value);
@@ -765,10 +765,10 @@ export default function PharmacistsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setGovernorateId(undefined); 
-                            setCityId(undefined); 
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setGovernorateId(undefined);
+                            setCityId(undefined);
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -806,9 +806,9 @@ export default function PharmacistsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setCityId(undefined); 
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setCityId(undefined);
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -846,8 +846,8 @@ export default function PharmacistsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -884,7 +884,7 @@ export default function PharmacistsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setStreetId(undefined); 
+                            setStreetId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setStreetId(option.value);

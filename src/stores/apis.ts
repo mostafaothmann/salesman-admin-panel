@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = `http://10.205.253.158:4000`
+const url = `http://192.168.1.113:4000`
 
 //for RohAlarad
 
@@ -328,7 +328,7 @@ apiPharmacist.interceptors.request.use(
  */
 
 
-//for DoctorVisits
+//for Visits
 export const apiVisit = axios.create({
   baseURL: `${url}/visit`,
   headers: { 'Content-Type': 'application/json' },
@@ -349,6 +349,57 @@ apiVisit.interceptors.request.use(
   (error) => Promise.reject(error)
 );
  */
+
+
+
+
+//for DoctorVisits
+export const apiDoctorVisit = axios.create({
+  baseURL: `${url}/doctor-visit`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiVisit.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+//for Pharmacist Visit
+export const apiPharmacistVisit = axios.create({
+  baseURL: `${url}/pharmacist-visit`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiVisit.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
 
 
 
@@ -843,7 +894,7 @@ apiSample.interceptors.request.use(
 
 //for Association Doctor
 export const apiِAssociationDoctor = axios.create({
-  baseURL: `${url}/hospital-pharmacist`,
+  baseURL: `${url}/association-doctor`,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -922,9 +973,6 @@ apiGiftVisit.interceptors.request.use(
 
 
 
-
-
-
 //for Base Gift
 export const apiBaseGift = axios.create({
   baseURL: `${url}/base-gift`,
@@ -975,3 +1023,30 @@ apiVideoLink.interceptors.request.use(
   (error) => Promise.reject(error)
 );
  */
+
+
+//for Salesman Area
+export const apiSalesmanArea = axios.create({
+  baseURL: `${url}/salesman-area`,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+/*
+ // 🧠 Automatically attach the latest token before each request
+apiBaseGift.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().authData?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+ */
+
+
+
+

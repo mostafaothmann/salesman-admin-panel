@@ -180,7 +180,7 @@ export const useOtherStore = create<DataStore>()(
             getGiftVisitsData: async (page: number, limit: number) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiGiftVisit.get(`/gift-visits`, { params: { page, limit } });
+                    const res = await apiGiftVisit.get(``, { params: { page, limit } });
                     const dataGiftsVisits = res.data.data;
                     const total = res.data.total;
                     const lastPage = res.data.lastPage;

@@ -70,7 +70,7 @@ export default function SamplesPage() {
         const worksheet = XLSX.utils.json_to_sheet(dataSamples ?? []);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "المكونات");
-        XLSX.writeFile(workbook, "المكونات.xlsx");
+        XLSX.writeFile(workbook, "العينات.xlsx");
     };
     const [pageLoading, setPageLoading] = useState(true);
 
@@ -88,7 +88,7 @@ export default function SamplesPage() {
             }
         };
         setPageLoading(true);
-        fetchData().finally(() => setPageLoading(false));
+        fetchData().finally(() => setPageLoading(false))
         getSamplesData(page, limit);
     }, []);
 
@@ -150,7 +150,7 @@ export default function SamplesPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setFilterTypeId(undefined); 
+                            setFilterTypeId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterTypeId(option.value);

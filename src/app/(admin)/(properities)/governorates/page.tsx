@@ -227,14 +227,14 @@ export default function GovernoratesPage() {
             danger
             onClick={() => { OpenDeleteModal(record.id); }}
           >
-            Delete
+            حذف
           </Button>
           <Button
             variant="outlined"
             color="cyan"
             onClick={() => { OpenEditModal(record.id); }}
           >
-            Edit
+            تعديل
           </Button>
         </Space>
       ),
@@ -250,7 +250,7 @@ export default function GovernoratesPage() {
             color="cyan"
             onClick={() => OpenShowModal(record.id)}
           >
-            Show
+            عرض
           </Button>
         </Space>
       ),

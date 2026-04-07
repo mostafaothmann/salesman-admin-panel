@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
 import { ColumnsType } from "antd/es/table";
+import { useRouter } from "next/navigation";
 
 
 export default function AreasPage() {
@@ -145,15 +146,10 @@ export default function AreasPage() {
         setOpenDeleteModal(true);
     }
     //showModal
+    const router = useRouter();
+
     const openShowModal = (id: number) => {
-        const area = dataAreas?.find(
-            item => item.id === id
-        );
-        setName(area?.name || "");
-        setDescription(area?.description || "");
-        console.log(area)
-        setItems(area?.streets?.map(e => { return { key: e.id, label: e.name } }) || [])
-        setOpen3(true);
+        router.push(`/areas/${id}`);
     }
 
     //delete 
@@ -240,7 +236,7 @@ export default function AreasPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
 
                     <Button
@@ -248,14 +244,14 @@ export default function AreasPage() {
                         color="cyan"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
-                        Edit
+                        تعديل
                     </Button>
                     <Button
                         variant="solid"
                         color="cyan"
                         onClick={() => openShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),

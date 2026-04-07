@@ -1,11 +1,11 @@
 "use client";
 
-import { AutoComplete, Button, Divider, Input, InputNumber, Modal, Space, Table, Tag } from "antd";
+import { AutoComplete, Button, Divider, Input, InputNumber, Modal, notification, Space, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { ColumnsType } from "antd/es/table";
 import { useCommercialStore } from "../../../../stores/commercialStore/data.store";
-import { apiType } from "../../../../stores/apis";
+import { apiProduct, apiType } from "../../../../stores/apis";
 
 
 export default function ProductsPage() {
@@ -85,6 +85,7 @@ export default function ProductsPage() {
     //emptyFields function
     const emptyFields = () => {
         setName("");
+        setSearchTextType("");
         setFilterMaxQuantity(0);
         setFilterMinQuantity(0);
         setFitlerMaxTotalPrice(0);
@@ -159,13 +160,39 @@ export default function ProductsPage() {
         setOpenDeleteModal(false);
     }
 
+
     //downloadExcele
+    const [allData, setAllData] = useState([])
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataProducts ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "مبيعات الأصناف المفردة");
-        XLSX.writeFile(workbook, "مبيعات الأصناف المفردة.xlsx");
+        apiProduct.get('')
+            .then(res => {
+                setAllData(res.data.data);
+                const formattedData = (allData ?? []).map(item => ({
+                    "تاريخ البيع": item.created_at.slice(0, 10),
+                    "الكمية": item.base_quantity,
+                    "الصنف": typesNames?.find(e => e.id == Number(item.type_id))?.name,
+                }));
+                const worksheet = XLSX.utils.json_to_sheet(formattedData);
+                worksheet["!cols"] = [
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 10 },
+                    { wch: 10 },
+                ];
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "مبيعات الأصناف المفردة");
+                XLSX.writeFile(workbook, "مبيعات الأصناف المفردة.xlsx")
+            })
+            .catch(err => {
+                notification.error({
+                    message: "خطأ",
+                    description: "حدث خطأ في جلب البيانات",
+                    placement: 'bottomLeft'
+                });
+            });
     };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -236,28 +263,27 @@ export default function ProductsPage() {
                 );
             }
         }
-        ,
-        {
-            title: "سعر القطعة",
-            dataIndex: "price_for_piece",
-            sorter: (a: any, b: any) => Number(a.price_for_piece) - Number(b.price_for_piece),
-            render: (value: number) => {
-                if (value >= 1000000) {
-                    return <Tag color={"#355872"}>
-                        {value / 1000000} مليون
-                    </Tag>
-                }
-                else if (value >= 1000) {
-                    return <Tag color={"#1C0770"}>
-                        {value / 1000} ألف
-                    </Tag>
-                }
-                else return <Tag color={"#FF5A5A"}>
-                    {value} ليرة
-                </Tag>;
-            }
-        }
-        ,
+        /*  ,
+         {
+             title: "سعر القطعة",
+             dataIndex: "price_for_piece",
+             sorter: (a: any, b: any) => Number(a.price_for_piece) - Number(b.price_for_piece),
+             render: (value: number) => {
+                 if (value >= 1000000) {
+                     return <Tag color={"#355872"}>
+                         {value / 1000000} مليون
+                     </Tag>
+                 }
+                 else if (value >= 1000) {
+                     return <Tag color={"#1C0770"}>
+                         {value / 1000} ألف
+                     </Tag>
+                 }
+                 else return <Tag color={"#FF5A5A"}>
+                     {value} ليرة
+                 </Tag>;
+             }
+         ,*/,
         {
             title: "الكمية المباعة",
             dataIndex: "base_quantity",
@@ -265,158 +291,158 @@ export default function ProductsPage() {
             render: (value: number) => {
                 { return `${value} قطعة` }
             }
-        }
-        ,
-        {
-            title: "كميةالإرجاع",
-            dataIndex: "return_quantity",
-            sorter: (a: any, b: any) => Number(a.return_quantity) - Number(b.return_quantity),
-            render: (value: number) => {
-                { return `${value} قطعة` }
-            }
-        }
-        ,
-        {
-            title: "الكمية  بعد الإرجاع",
-            dataIndex: "total_quantity",
-            sorter: (a: any, b: any) => Number(a.total_quantity) - Number(b.total_quantity),
-            render: (value: number) => {
-                { return `${value} قطعة` }
-            }
-        }
-        ,
-        {
-            title: "القيمة المباعة",
-            dataIndex: "base_total_price",
-            sorter: (a: any, b: any) => Number(a.base_total_price) - Number(b.base_total_price),
-            render: (value: number) => {
-                if (value >= 1000000) {
-                    return <Tag color={"#355872"}>
-                        {value / 1000000} مليون
-                    </Tag>
-                }
-                else if (value >= 1000) {
-                    return <Tag color={"#1C0770"}>
-                        {value / 1000} ألف
-                    </Tag>
-                }
-                else return <Tag color={"#FF5A5A"}>
-                    {value} ليرة
-                </Tag>;
-            }
-        }
-        ,
-        {
-            title: "قيمة الإرجاع",
-            dataIndex: "return_total_price",
-            sorter: (a: any, b: any) => Number(a.return_total_price) - Number(b.return_total_price),
-            render: (value: number) => {
-                if (value >= 1000000) {
-                    return <Tag color={"#355872"}>
-                        {value / 1000000} مليون
-                    </Tag>
-                }
-                else if (value >= 1000) {
-                    return <Tag color={"#1C0770"}>
-                        {value / 1000} ألف
-                    </Tag>
-                }
-                else return <Tag color={"#FF5A5A"}>
-                    {value} ليرة
-                </Tag>;
-            }
-        }
-        ,
-        {
-            title: "القيمة  بعد الإرجاع",
-            dataIndex: "total_price",
-            sorter: (a: any, b: any) => Number(a.total_price) - Number(b.total_price),
-            render: (value: number) => {
-                if (value >= 1000000) {
-                    return <Tag color={"#355872"}>
-                        {value / 1000000} مليون
-                    </Tag>
-                }
-                else if (value >= 1000) {
-                    return <Tag color={"#1C0770"}>
-                        {value / 1000} ألف
-                    </Tag>
-                }
-                else return <Tag color={"#FF5A5A"}>
-                    {value} ليرة
-                </Tag>;
-            }
-        }
-        ,
-        {
-            title: "حسم الإرجاع",
-            dataIndex: "return_discount",
-            sorter: (a: any, b: any) => Number(a.return_discount) - Number(b.return_discount),
-
-        }
-        ,
-        {
-            title: "العمولة",
-            dataIndex: "base_percentage",
-            sorter: (a: any, b: any) => Number(a.base_percentage) - Number(b.base_percentage),
-            render: (value: number) => {
-                if (value >= 1000000) {
-                    return <Tag color={"#355872"}>
-                        {value / 1000000} مليون
-                    </Tag>
-                }
-                else if (value >= 1000) {
-                    return <Tag color={"#1C0770"}>
-                        {value / 1000} ألف
-                    </Tag>
-                }
-                else return <Tag color={"#FF5A5A"}>
-                    {value} ليرة
-                </Tag>;
-            }
-        }
-        ,
-        {
-            title: "عمولة المرجع",
-            dataIndex: "return_percentage",
-            sorter: (a: any, b: any) => Number(a.return_percentage) - Number(b.return_percentage),
-            render: (value: number) => {
-                if (value >= 1000000) {
-                    return <Tag color={"#355872"}>
-                        {value / 1000000} مليون
-                    </Tag>
-                }
-                else if (value >= 1000) {
-                    return <Tag color={"#1C0770"}>
-                        {value / 1000} ألف
-                    </Tag>
-                }
-                else return <Tag color={"#FF5A5A"}>
-                    {value} ليرة
-                </Tag>;
-            }
-        }
-        ,
-        {
-            title: "العمولة  بعد الإرجاع",
-            dataIndex: "total_percentage",
-            sorter: (a: any, b: any) => Number(a.total_quantity) - Number(b.total_quantity),
-            render: (value: number) => {
-                if (value >= 1000000) {
-                    return <Tag color={"#355872"}>
-                        {value / 1000000} مليون
-                    </Tag>
-                }
-                else if (value >= 1000) {
-                    return <Tag color={"#1C0770"}>
-                        {value / 1000} ألف
-                    </Tag>
-                }
-                else return <Tag color={"#FF5A5A"}>
-                    {value} ليرة
-                </Tag>;
-            }
-        }
+        }/*
+         ,
+         {
+             title: "كميةالإرجاع",
+             dataIndex: "return_quantity",
+             sorter: (a: any, b: any) => Number(a.return_quantity) - Number(b.return_quantity),
+             render: (value: number) => {
+                 { return `${value} قطعة` }
+             }
+         }
+         ,
+         {
+             title: "الكمية  بعد الإرجاع",
+             dataIndex: "total_quantity",
+             sorter: (a: any, b: any) => Number(a.total_quantity) - Number(b.total_quantity),
+             render: (value: number) => {
+                 { return `${value} قطعة` }
+             }
+         }
+         ,
+         {
+             title: "القيمة المباعة",
+             dataIndex: "base_total_price",
+             sorter: (a: any, b: any) => Number(a.base_total_price) - Number(b.base_total_price),
+             render: (value: number) => {
+                 if (value >= 1000000) {
+                     return <Tag color={"#355872"}>
+                         {value / 1000000} مليون
+                     </Tag>
+                 }
+                 else if (value >= 1000) {
+                     return <Tag color={"#1C0770"}>
+                         {value / 1000} ألف
+                     </Tag>
+                 }
+                 else return <Tag color={"#FF5A5A"}>
+                     {value} ليرة
+                 </Tag>;
+             }
+         }
+         ,
+         {
+             title: "قيمة الإرجاع",
+             dataIndex: "return_total_price",
+             sorter: (a: any, b: any) => Number(a.return_total_price) - Number(b.return_total_price),
+             render: (value: number) => {
+                 if (value >= 1000000) {
+                     return <Tag color={"#355872"}>
+                         {value / 1000000} مليون
+                     </Tag>
+                 }
+                 else if (value >= 1000) {
+                     return <Tag color={"#1C0770"}>
+                         {value / 1000} ألف
+                     </Tag>
+                 }
+                 else return <Tag color={"#FF5A5A"}>
+                     {value} ليرة
+                 </Tag>;
+             }
+         }
+         ,
+         {
+             title: "القيمة  بعد الإرجاع",
+             dataIndex: "total_price",
+             sorter: (a: any, b: any) => Number(a.total_price) - Number(b.total_price),
+             render: (value: number) => {
+                 if (value >= 1000000) {
+                     return <Tag color={"#355872"}>
+                         {value / 1000000} مليون
+                     </Tag>
+                 }
+                 else if (value >= 1000) {
+                     return <Tag color={"#1C0770"}>
+                         {value / 1000} ألف
+                     </Tag>
+                 }
+                 else return <Tag color={"#FF5A5A"}>
+                     {value} ليرة
+                 </Tag>;
+             }
+         }
+         ,
+         {
+             title: "حسم الإرجاع",
+             dataIndex: "return_discount",
+             sorter: (a: any, b: any) => Number(a.return_discount) - Number(b.return_discount),
+ 
+         }
+         ,
+         {
+             title: "العمولة",
+             dataIndex: "base_percentage",
+             sorter: (a: any, b: any) => Number(a.base_percentage) - Number(b.base_percentage),
+             render: (value: number) => {
+                 if (value >= 1000000) {
+                     return <Tag color={"#355872"}>
+                         {value / 1000000} مليون
+                     </Tag>
+                 }
+                 else if (value >= 1000) {
+                     return <Tag color={"#1C0770"}>
+                         {value / 1000} ألف
+                     </Tag>
+                 }
+                 else return <Tag color={"#FF5A5A"}>
+                     {value} ليرة
+                 </Tag>;
+             }
+         }
+         ,
+         {
+             title: "عمولة المرجع",
+             dataIndex: "return_percentage",
+             sorter: (a: any, b: any) => Number(a.return_percentage) - Number(b.return_percentage),
+             render: (value: number) => {
+                 if (value >= 1000000) {
+                     return <Tag color={"#355872"}>
+                         {value / 1000000} مليون
+                     </Tag>
+                 }
+                 else if (value >= 1000) {
+                     return <Tag color={"#1C0770"}>
+                         {value / 1000} ألف
+                     </Tag>
+                 }
+                 else return <Tag color={"#FF5A5A"}>
+                     {value} ليرة
+                 </Tag>;
+             }
+         }
+         ,
+         {
+             title: "العمولة  بعد الإرجاع",
+             dataIndex: "total_percentage",
+             sorter: (a: any, b: any) => Number(a.total_quantity) - Number(b.total_quantity),
+             render: (value: number) => {
+                 if (value >= 1000000) {
+                     return <Tag color={"#355872"}>
+                         {value / 1000000} مليون
+                     </Tag>
+                 }
+                 else if (value >= 1000) {
+                     return <Tag color={"#1C0770"}>
+                         {value / 1000} ألف
+                     </Tag>
+                 }
+                 else return <Tag color={"#FF5A5A"}>
+                     {value} ليرة
+                 </Tag>;
+             }
+         } */
         ,
         {
             title: "تاريخ الإضافة",
@@ -424,49 +450,49 @@ export default function ProductsPage() {
             sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
             render: (value: string) => { return value?.slice(0, 10) }
         },
-        {
-            title: "",
-            key: "id",
-            render: (_: any, record: any) => (
-                <Space size="middle">
-                    <Button
-                        type="default"
-                        danger
-                        onClick={() => { OpenDeleteModal(record.id); }}
-                    >
-                        Delete
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="cyan"
-                        onClick={() => { OpenEditModal(record.id); }}
-                    >
-                        Edit
-                    </Button>
-                </Space>
-            ),
-        }
-        ,
-        {
-            title: "",
-            fixed: "right",
-            render: (_: any, record: any) => (
-                <Space size="middle">
-                    <Button
-                        variant="solid"
-                        color="cyan"
-                        onClick={() => OpenShowModal(record.id)}
-                    >
-                        Show
-                    </Button>
-                </Space>
-            ),
-        }
+        /*   {
+              title: "",
+              key: "id",
+              render: (_: any, record: any) => (
+                  <Space size="middle">
+                      <Button
+                          type="default"
+                          danger
+                          onClick={() => { OpenDeleteModal(record.id); }}
+                      >
+                          حذف
+                      </Button>
+                      <Button
+                          variant="outlined"
+                          color="cyan"
+                          onClick={() => { OpenEditModal(record.id); }}
+                      >
+                          تعديل
+                      </Button>
+                  </Space>
+              ),
+          }*/
+        /*   ,
+          {
+              title: "",
+              fixed: "right",
+              render: (_: any, record: any) => (
+                  <Space size="middle">
+                      <Button
+                          variant="solid"
+                          color="cyan"
+                          onClick={() => OpenShowModal(record.id)}
+                      >
+                          عرض
+                      </Button>
+                  </Space>
+              ),
+          } */
     ];
 
     return <div>
 
-        <Modal
+        {/*   <Modal
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
                     <span>o:{order_id}:p:{id}</span>
@@ -685,7 +711,7 @@ export default function ProductsPage() {
                 </div>
             </div>
         </Modal>
-
+ */}
         {/* Show Modal */}
         <Modal
             title={
@@ -698,7 +724,7 @@ export default function ProductsPage() {
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   
+            confirmLoading={loading}
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">
@@ -721,7 +747,7 @@ export default function ProductsPage() {
                         placeholder="الأساسي"
                     />
                 </div>
-                <div className="col-span-6 md:col-span-3">
+                {/* <div className="col-span-6 md:col-span-3">
                     <div >
                         <h3>
                             المرتجع
@@ -909,7 +935,7 @@ export default function ProductsPage() {
                         onChange={(e) => setTotalPrice(e)}
                         placeholder="النهائي"
                     />
-                </div>
+                </div> */}
             </div>
         </Modal>
 
@@ -953,7 +979,7 @@ export default function ProductsPage() {
                         }
                     />
                 </div>
-                <div className="col-span-6 xl:col-span-6">
+                {/*  <div className="col-span-6 xl:col-span-6">
                     <div>
                         <h3>
                             أقل كمية :
@@ -1004,12 +1030,12 @@ export default function ProductsPage() {
                         onChange={(e) => setFitlerMaxTotalPrice(e)}
                         placeholder="أعلى مجموع سعر نهائي"
                     />
-                </div>
+                </div> */}
             </div>
         </Modal>
 
-        {/*Delete Modal*/}
-        <Modal
+
+        {/* <Modal
             title="تأكيد الحذف"
             open={openDeleteModal}
             onOk={() => handleDelete(delitedID)}
@@ -1018,8 +1044,9 @@ export default function ProductsPage() {
             mask={false}
             okType="danger"
             okButtonProps={{ type: "primary" }}
-        >
-        </Modal>
+        > 
+        </Modal> */}
+
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
             <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
                 فلترة

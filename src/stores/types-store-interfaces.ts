@@ -137,4 +137,5 @@ export interface AddingBaseOffer {
     type_id: number;
     number_of_gifts: number;
     number_of_pieces: number;
+    isActive: boolean;
 }

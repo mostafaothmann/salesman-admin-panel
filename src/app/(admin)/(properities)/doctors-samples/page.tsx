@@ -7,7 +7,7 @@ import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
 import { useRouter } from "next/navigation";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
-import { apiType } from "../../../../stores/apis";
+import { apiDoctor, apiSalesman, apiType } from "../../../../stores/apis";
 
 
 export default function SampleDoctorPage() {
@@ -17,10 +17,31 @@ export default function SampleDoctorPage() {
     const [page, setPage] = useState(1)
     const [filter_page, setFilterPage] = useState(1)
     const [limit, setLimit] = useState(10)
+
+    const [salesmansNames, setSalesmansNames] = useState([])
+    const [doctorsNames, setDoctorsNames] = useState([])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [
+                    salesmanRes,
+                    doctorRes
+                ] = await Promise.all([
+                    apiSalesman.get('/fullname'),
+                    apiDoctor.get('/fullname')
+                ]);
+                setSalesmansNames(salesmanRes.data);
+                setDoctorsNames(doctorRes.data)
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+        fetchData().finally(() => setPageLoading(false));
+    }, []);
+
     //showModal
     const OpenShowModal = (id: number) => {
-
-
     }
 
     //Filter Modal 
@@ -106,7 +127,24 @@ export default function SampleDoctorPage() {
                 return `${type?.name}`
             }
         },
-
+        {
+            title: "المندوب",
+            dataIndex: "salesman_id",
+            sorter: (a: any, b: any) => Number(a.salesmna_id) - Number(b.salesmna_id),
+            render: (value: number) => {
+                const salesman = salesmansNames?.find(e => e.id == Number(value));
+                return `${salesman?.first_name} ${salesman?.last_name}`
+            }
+        },
+        {
+            title: "الطبيب",
+            dataIndex: "doctor_id",
+            sorter: (a: any, b: any) => Number(a.doctor_id) - Number(b.doctor_id),
+            render: (value: number) => {
+                const doctor = doctorsNames?.find(e => e.id == Number(value));
+                return `${doctor?.first_name} ${doctor?.last_name}`
+            }
+        },
         {
             title: "الكمية",
             dataIndex: "quantity",
@@ -157,7 +195,7 @@ export default function SampleDoctorPage() {
 
                         onChange={(text) => {
                             setSearchTextType(text);
-                            setFilterTypeId(undefined); 
+                            setFilterTypeId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterTypeId(option.value);

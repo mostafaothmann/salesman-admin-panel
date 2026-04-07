@@ -254,10 +254,16 @@ export default function TypesPage() {
             }
         },
         {
+            title: "براند الصنف",
+            dataIndex: "brand",
+            sorter: (a: any, b: any) => a.brand.localeCompare(b.brand),
+
+        },
+        {
             title: "السعر",
             dataIndex: "price_for_piece",
             sorter: (a: any, b: any) => Number(a.price_for_piece) - Number(b.price_for_piece),
-        }
+        }, /* 
         ,
         {
             title: "الكمية",
@@ -283,7 +289,7 @@ export default function TypesPage() {
             title: "حسم الإرجاع",
             dataIndex: "return_discount",
             sorter: (a: any, b: any) => a.return_discount.localeCompare(b.return_discount),
-        },
+        }, */
         {
             title: "تاريخ الإضافة",
             dataIndex: "created_at",
@@ -301,7 +307,7 @@ export default function TypesPage() {
                             OpenDeleteModal(record.id)
                         }}
                     >
-                        Delete
+                        حذف
                     </Button>
                 </Space>
             ),
@@ -320,7 +326,7 @@ export default function TypesPage() {
                             openShowModal(record.id)
                         }}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),
@@ -402,7 +408,7 @@ export default function TypesPage() {
                         }
                     />
                 </div>
-
+{/* 
                 <div className="col-span-12 sm:col-span-6">
                     <h3>
                         الكمية  :
@@ -500,7 +506,7 @@ export default function TypesPage() {
                         placeholder="حسم الإرجاع"
                     />
                 </div>
-
+ */}
                 <div className="col-span-12 sm:col-span-6">
                     <h3>
                         تاريخ بداية الصنع :

@@ -22,7 +22,7 @@ export default function DoctorsVisitsPage() {
         dataCities, dataAreas, dataStreets } = usePlacesStore()
     const router = useRouter();
     const Map = dynamic(
-        () => import("../../../../sharedComponents/maps/map/Map"),
+        () => import("../../components/sharedComponents/maps/map/Map"),
         { ssr: false }
     );
     //table constants
@@ -51,7 +51,6 @@ export default function DoctorsVisitsPage() {
     const [searchTextType, setSearchTextType] = useState("");
 
     //for AddingModal 
-
     const optionsStatus = [
         { value: 1, label: 'قيد الإنشاء' },
         { value: 2, label: 'تحت المراجعة' },
@@ -387,8 +386,9 @@ export default function DoctorsVisitsPage() {
                         variant="outlined"
                         onClick={() => { OpenLocationModal(record.id); }}
                     >
-                        Location
+                        موقع
                     </Button>
+              
                 </Space>
             ),
         },
@@ -403,7 +403,7 @@ export default function DoctorsVisitsPage() {
                         color="cyan"
                         onClick={() => OpenShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),

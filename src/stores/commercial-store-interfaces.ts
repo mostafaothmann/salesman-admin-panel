@@ -153,6 +153,7 @@ export interface BaseOffer {
     number_of_gifts: number;
     number_of_pieces: number;
     type_id: number;
+    isActive:boolean;
 }
 
 export interface OnlineCustomer {

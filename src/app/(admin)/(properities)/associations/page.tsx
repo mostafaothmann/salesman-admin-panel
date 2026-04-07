@@ -15,7 +15,7 @@ export default function AssociationsPage() {
     const { dataAssociations, associationD, getAssociationData, getAssociationsData, editAssociation, deleteAssociation, addAssociation } = useMedicalStore()
 
     const Map = dynamic(
-        () => import("../../../../sharedComponents/maps/map/Map"),
+        () => import("../../components/sharedComponents/maps/map/Map"),
         { ssr: false }
     );
 
@@ -397,21 +397,22 @@ export default function AssociationsPage() {
                         variant="outlined"
                         onClick={() => { OpenLocationModal(record.id); }}
                     >
-                        Location
+                        موقع
                     </Button>
+              
                     <Button
                         type="default"
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         variant="outlined"
                         color="cyan"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
-                        Edit
+                        تعديل
                     </Button>
 
                 </Space>
@@ -427,7 +428,7 @@ export default function AssociationsPage() {
                         color="cyan"
                         onClick={() => OpenShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),

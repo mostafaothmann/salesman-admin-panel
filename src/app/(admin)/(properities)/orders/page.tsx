@@ -1,6 +1,6 @@
 "use client";
 
-import { AutoComplete, Button, Divider, Input, InputNumber, Modal, Space, Table, Tag, Tooltip } from "antd";
+import { AutoComplete, Button, Divider, Input, InputNumber, Modal, notification, Space, Table, Tag, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePlacesStore } from "../../../../stores/placesStore/data.store";
@@ -17,14 +17,14 @@ import { Edit, Info, Trash } from "lucide-react";
 import ButtonGroup from "antd/es/button/ButtonGroup";
 
 export default function OrdersPage() {
-    const { dataOrders, getOrdersData, deleteProduct, editOffer, editProduct, deleteOffer,
+    const { dataOrders, getOrdersData, deleteProduct, editProduct, deleteOffer,
         getOrderData, orderD, editOrder, getFilteredDataOrders, filteredDataOrders, total,
         filter_total } = useCommercialStore();
     const { dataGovernorates, getStreetsData,
         dataCities, dataAreas, dataStreets } = usePlacesStore()
     const router = useRouter();
     const Map = dynamic(
-        () => import("../../../../sharedComponents/maps/map/Map"),
+        () => import("../../components/sharedComponents/maps/map/Map"),
         { ssr: false }
     );
     //table constants
@@ -198,12 +198,46 @@ export default function OrdersPage() {
     }
 
 
-    //downloadExcele
-    const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataOrders ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "الفواتير");
-        XLSX.writeFile(workbook, "الفواتير.xlsx");
+    //downloadExcel
+    const downloadExcel = async () => {
+        try {
+            let dataToUse = [];
+
+            if (!filtered) {
+                dataToUse = dataOrders;
+            } else {
+                dataToUse = filteredDataOrders;
+            }
+
+            const formattedData = (dataToUse ?? []).map(item => ({
+                "تاريخ اخر مراجعة": item.created_at ? item.created_at.slice(0, 10) : "",
+                "توقيت البيع": item.created_at ? item.created_at.slice(11, 16) : "",
+                "تاريخ البيع": item.created_at ? item.created_at.slice(0, 10) : "",
+                "حالة الفاتورة": optionsStatus?.find(e => e.value == Number(item.order_status))?.label,
+                "المشرف الموثق": `${assistantsNames?.find(e => e.id == Number(item.assistant_id))?.first_name} ${pharmacistsNames?.find(e => e.id == Number(item.assistant_id))?.last_name}`,
+                "الصيدلي": `${pharmacistsNames?.find(e => e.id == Number(item.pharmacist_id))?.first_name} ${pharmacistsNames?.find(e => e.id == Number(item.pharmacist_id))?.last_name}`,
+                "المندوب": `${salesmansNames?.find(e => e.id == Number(item.salesman_id))?.first_name} ${salesmansNames?.find(e => e.id == Number(item.salesman_id))?.last_name}`,
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(formattedData);
+
+            worksheet["!cols"] = [
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 15 },
+            ];
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "الفواتير");
+            XLSX.writeFile(workbook, "الفواتير.xlsx");
+
+        } catch (error) {
+            notification.error({
+                message: "خطأ",
+                description: "حدث خطأ في جلب البيانات",
+                placement: 'bottomLeft'
+            });
+        }
     };
 
     //download Pdf Visit
@@ -287,6 +321,7 @@ export default function OrdersPage() {
 
     useEffect(() => {
         fetchData();
+        setFiltered(false)
         getOrdersData(page, limit);
     }, []);
 
@@ -384,8 +419,9 @@ export default function OrdersPage() {
                         variant="outlined"
                         onClick={() => { OpenLocationModal(record.id); }}
                     >
-                        Location
+                        موقع
                     </Button>
+
                 </Space>
             ),
         },
@@ -400,7 +436,7 @@ export default function OrdersPage() {
                         color="cyan"
                         onClick={() => OpenShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),
@@ -497,52 +533,52 @@ export default function OrdersPage() {
     const [openOfferEditModal, setOpenOfferEditModal] = useState(false);
     const [offerEditedId, setOfferEditedId] = useState(0)
 
-    //edit Offer Modal 
-    const OpenOfferEditModal = (id: number) => {
-        setOfferEditedId(id);
-        const offer = offers?.find(
-            item => item.id === id
-        );
-        setBaseQuantity(offer?.base_quantity || 0);
-        setReturnQuantity(offer?.return_quantity || 0);
-        setTotalQuantity(offer?.total_quantity || 0);
-        setPercentageForPiece(offer?.percentage_for_piece || 0);
-        setBasePercentage(offer?.base_percentage || 0);
-        setReturnPercentage(offer?.return_percentage);
-        setTotalPercentage(offer?.total_percentage || 0);
-        setPriceForPiece(offer?.price_for_piece || 0);
-        setBaseTotalPrice(offer?.base_total_price || 0);
-        setReturnTotalPrice(offer?.return_total_price || 0);
-        setTotalPrice(offer?.total_price || 0);
-        setDeliveryPercentageForPiece(offer?.delivery_percentage_for_piece || 0);
-        setTotalDeliveryPercentage(offer?.total_delivery_percentage || 0);
-        setRetunDiscount(offer?.return_discount || 0);
-        setOrderId(offer?.order_id || 0)
-        setId(offer?.id || 0);
-        setTotalPrice(offer?.total_price || 0);
-        setOpenOfferEditModal(true);
-    }
+    /*  //edit Offer Modal 
+     const OpenOfferEditModal = (id: number) => {
+         setOfferEditedId(id);
+         const offer = offers?.find(
+             item => item.id === id
+         );
+         setBaseQuantity(offer?.base_quantity || 0);
+         setReturnQuantity(offer?.return_quantity || 0);
+         setTotalQuantity(offer?.total_quantity || 0);
+         setPercentageForPiece(offer?.percentage_for_piece || 0);
+         setBasePercentage(offer?.base_percentage || 0);
+         setReturnPercentage(offer?.return_percentage);
+         setTotalPercentage(offer?.total_percentage || 0);
+         setPriceForPiece(offer?.price_for_piece || 0);
+         setBaseTotalPrice(offer?.base_total_price || 0);
+         setReturnTotalPrice(offer?.return_total_price || 0);
+         setTotalPrice(offer?.total_price || 0);
+         setDeliveryPercentageForPiece(offer?.delivery_percentage_for_piece || 0);
+         setTotalDeliveryPercentage(offer?.total_delivery_percentage || 0);
+         setRetunDiscount(offer?.return_discount || 0);
+         setOrderId(offer?.order_id || 0)
+         setId(offer?.id || 0);
+         setTotalPrice(offer?.total_price || 0);
+         setOpenOfferEditModal(true);
+     } */
 
-    //handle Offer Edit
-    async function handleOfferEdit() {
-        setLoading(true);
-        const offer = offers?.find(
-            item => item.id === id
-        );
-        await editOffer(offerEditedId, {
-            ...offer,
-            order_id,
-            price_for_piece,
-            base_quantity,
-            return_quantity,
-            return_discount,
-            delivery_percentage_for_piece,
-        });
-        setLoading(false);
-        setOpenOfferEditModal(false);
-        fetchDataForOrder(shownId);
-    }
-
+    /*  //handle Offer Edit
+     async function handleOfferEdit() {
+         setLoading(true);
+         const offer = offers?.find(
+             item => item.id === id
+         );
+         await editOffer(offerEditedId, {
+             ...offer,
+             order_id,
+             price_for_piece,
+             base_quantity,
+             return_quantity,
+             return_discount,
+             delivery_percentage_for_piece,
+         });
+         setLoading(false);
+         setOpenOfferEditModal(false);
+         fetchDataForOrder(shownId);
+     }
+  */
     return <div>
 
         {/*Location Modal*/}
@@ -595,7 +631,7 @@ export default function OrdersPage() {
 
                         onChange={(text) => {
                             setSearchVisitStatus(text);
-                            setFilterOrderStatus(undefined); 
+                            setFilterOrderStatus(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterOrderStatus(option.value);
@@ -625,7 +661,7 @@ export default function OrdersPage() {
 
                         onChange={(text) => {
                             setSearchTextSalesman(text);
-                            setFilterSalesmanId(undefined); 
+                            setFilterSalesmanId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterSalesmanId(option.value);
@@ -654,7 +690,7 @@ export default function OrdersPage() {
 
                         onChange={(text) => {
                             setSearchTextAssistant(text);
-                            setFilterAssistantId(undefined); 
+                            setFilterAssistantId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterAssistantId(option.value);
@@ -683,7 +719,7 @@ export default function OrdersPage() {
 
                         onChange={(text) => {
                             setSearchTextPharmacist(text);
-                            setFilterPharmacistId(undefined); 
+                            setFilterPharmacistId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterPharmacistId(option.value);
@@ -729,8 +765,8 @@ export default function OrdersPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setFilterAreaId(undefined); 
-                            setFilterStreetId(undefined); 
+                            setFilterAreaId(undefined);
+                            setFilterStreetId(undefined);
                             const area = dataAreas?.find(
                                 item => item.id === filter_area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -767,7 +803,7 @@ export default function OrdersPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setFilterStreetId(undefined); 
+                            setFilterStreetId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterStreetId(option.value);
@@ -786,7 +822,7 @@ export default function OrdersPage() {
 
         {/* Show Modal */}
         <Modal
-            width={1100}
+            width={600}
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#01B9B0]">
                     <span>NO:o{orderD?.id}</span>
@@ -796,12 +832,12 @@ export default function OrdersPage() {
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
             footer={[
                 <ButtonGroup>
-                    <Button key="print" variant="solid" color="purple" onClick={() => { handlePrint(); emptyFields() }}>
+                    {/*   <Button key="print" variant="solid" color="purple" onClick={() => { handlePrint(); emptyFields() }}>
                         طباعة
                     </Button>,
                     <Button key="download" variant="solid" color="purple" onClick={() => { downloadPDF(); emptyFields() }}>
                         تنزيل كملف
-                    </Button>,
+                    </Button>, */}
                     <Button key="accept" variant="solid" color="purple" onClick={() => handleValidation(2)}>
                         قبول
                     </Button>,
@@ -814,32 +850,35 @@ export default function OrdersPage() {
                 </ButtonGroup>
             ]
             }
-            confirmLoading={loading4}   
+            confirmLoading={loading4}
             mask={false}
         >
 
             <div className="grid grid-cols-12 gap-4" ref={showModalRef}>
-                <div className="col-span-12">
 
+                <div className="col-span-12">
+                    <h3>
+                        عروض  :
+                    </h3>
                     <div className=" w-full bg-[#01B9B0]  rounded-[4] p-[8] m-0">
                         <div className="grid grid-cols-12">
-                            <div className="col-span-1 text-white font-bold text-center">اسم المنتج</div>
+                            <div className="col-span-4 text-white font-bold text-center">اسم المنتج</div>
 
-                            <div className="col-span-1 text-white font-bold text-center">الكمية الأساسية</div>
-                            <div className="col-span-1 text-white font-bold text-center">الكمية المرجعة</div>
+                            <div className="col-span-2 text-white font-bold text-center">الكمية الأساسية</div>
+                            <div className="col-span-2 text-white font-bold text-center">البونص</div>
+
+                            {/*    <div className="col-span-1 text-white font-bold text-center">الكمية المرجعة</div>
                             <div className="col-span-1 text-white font-bold text-center">الكمية النهائية</div>
 
 
-                            <div className="col-span-1 text-white font-bold text-center">السعر الأساسي</div>
+                           <div className="col-span-1 text-white font-bold text-center">السعر الأساسي</div>
                             <div className="col-span-1 text-white font-bold text-center">السعر المرجع</div>
                             <div className="col-span-1 text-white font-bold text-center">السعر النهائي</div>
 
                             <div className="col-span-1 text-white font-bold text-center">النسبة الأساسية</div>
                             <div className="col-span-1 text-white font-bold text-center">النسبة المرجعة</div>
                             <div className="col-span-1 text-white font-bold text-center">النسبة النهائية</div>
-
-
-                            <div className="col-span-1 text-white font-bold text-center">نسبة التوصيل</div>
+                            <div className="col-span-1 text-white font-bold text-center">نسبة التوصيل</div> */}
                         </div>
                     </div>
 
@@ -848,17 +887,17 @@ export default function OrdersPage() {
                 <Divider type="horizontal" className="col-span-12" style={{ borderTop: '4px solid #d9d9d9', margin: '0' }} ></Divider>
 
                 <div className="col-span-12">
-                    <h3>
-                        عروض  :
-                    </h3>
+
                     {offers?.filter(e => e.order_id == shownId)?.map(f => {
                         return <div className=" w-full bg-[#01B9B0]  rounded-[4] p-[8] m-[2]">
                             <div className="grid grid-cols-12 gap-4">
 
-                                <div className="col-span-1 text-white font-bold text-center">{typesNames.find(e => e.id == f.type_id)?.name}</div>
+                                <div className="col-span-4 text-white font-bold text-center">{typesNames.find(e => e.id == f.type_id)?.name}</div>
 
-                                <div className="col-span-1 text-white font-bold text-center">{f.base_quantity}</div>
-                                <div className="col-span-1 text-white font-bold text-center">{f.return_quantity}</div>
+                                <div className="col-span-2 text-white font-bold text-center">{f.number_of_pieces}</div>
+                                <div className="col-span-2 text-white font-bold text-center">{f.number_of_gifts}</div>
+
+                                {/*    <div className="col-span-1 text-white font-bold text-center">{f.return_quantity}</div>
                                 <div className="col-span-1 text-white font-bold text-center">{f.total_quantity}</div>
                                 <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.base_total_price)} </div>
                                 <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.return_total_price)} </div>
@@ -866,19 +905,19 @@ export default function OrdersPage() {
                                 <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.base_percentage)} </div>
                                 <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.return_percentage)} </div>
                                 <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.total_percentage)} </div>
-                                <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.total_delivery_percentage)} </div>
-                                <div className="col-span-1 text-white font-bold text-center">
+                                <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.total_delivery_percentage)} </div> */}
+                                <div className="col-span-4 text-white font-bold text-center">
                                     <div className="grid grid-cols-12">
                                         <div className="col-span-6 gap-4">
                                             <Tooltip title="حذف">
                                                 <Button type="primary" danger onClick={() => { OpenOfferDeleteModal(f.id); }} shape="circle" icon={<Trash />} />
                                             </Tooltip>
                                         </div>
-                                        <div className="col-span-6">
+                                        {/*    <div className="col-span-6">
                                             <Tooltip title="تعديل">
                                                 <Button type="primary" onClick={() => { OpenOfferEditModal(f.id); }} shape="circle" icon={<Edit />} />
                                             </Tooltip>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>
@@ -886,18 +925,49 @@ export default function OrdersPage() {
                     })}
 
                 </div>
+                <Divider type="horizontal" className="col-span-12" style={{ borderTop: '4px solid #d9d9d9', margin: '0' }} ></Divider>
 
                 <div className="col-span-12">
                     <h3>
                         منتجات :
                     </h3>
+                    <div className=" w-full bg-[#01B9B0]  rounded-[4] p-[8] m-0">
+                        <div className="grid grid-cols-12">
+                            <div className="col-span-4 text-white font-bold text-center">اسم المنتج</div>
+
+                            <div className="col-span-2 text-white font-bold text-center">الكمية الأساسية</div>
+                            <div className="col-span-2 text-white font-bold text-center">البونص</div>
+
+                            {/*    <div className="col-span-1 text-white font-bold text-center">الكمية المرجعة</div>
+                            <div className="col-span-1 text-white font-bold text-center">الكمية النهائية</div>
+
+
+                           <div className="col-span-1 text-white font-bold text-center">السعر الأساسي</div>
+                            <div className="col-span-1 text-white font-bold text-center">السعر المرجع</div>
+                            <div className="col-span-1 text-white font-bold text-center">السعر النهائي</div>
+
+                            <div className="col-span-1 text-white font-bold text-center">النسبة الأساسية</div>
+                            <div className="col-span-1 text-white font-bold text-center">النسبة المرجعة</div>
+                            <div className="col-span-1 text-white font-bold text-center">النسبة النهائية</div>
+                            <div className="col-span-1 text-white font-bold text-center">نسبة التوصيل</div> */}
+                        </div>
+                    </div>
+
+
+                </div>
+                <Divider type="horizontal" className="col-span-12" style={{ borderTop: '4px solid #d9d9d9', margin: '0' }} ></Divider>
+
+                <div className="col-span-12">
+
                     {products?.filter(e => e.order_id == shownId)?.map(f => {
                         return <div className=" w-full bg-[#01B9B0]  rounded-[4] p-[8] m-[2]">
                             <div className="grid grid-cols-12 gap-4">
-                                <div className="col-span-1 text-white font-bold text-center">{typesNames.find(e => e.id == f.type_id)?.name}</div>
+                                <div className="col-span-4 text-white font-bold text-center">{typesNames.find(e => e.id == f.type_id)?.name}</div>
 
-                                <div className="col-span-1 text-white font-bold text-center">{f.base_quantity}</div>
-                                <div className="col-span-1 text-white font-bold text-center">{f.return_quantity}</div>
+                                <div className="col-span-2 text-white font-bold text-center">{f.base_quantity}</div>
+                                <div className="col-span-2 text-white font-bold text-center">0</div>
+
+                                {/*  <div className="col-span-1 text-white font-bold text-center">{f.return_quantity}</div>
                                 <div className="col-span-1 text-white font-bold text-center">{f.total_quantity}</div>
 
 
@@ -908,8 +978,8 @@ export default function OrdersPage() {
                                 <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.base_percentage)} </div>
                                 <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.return_percentage)} </div>
                                 <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.total_percentage)} </div>
-                                <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.total_delivery_percentage)} </div>
-                                <div className="col-span-1 text-white font-bold text-center">
+                                <div className="col-span-1 text-white font-bold text-center">{valueRenderer(f.total_delivery_percentage)} </div> */}
+                                <div className="col-span-4 text-white font-bold text-center">
                                     <div className="grid grid-cols-12">
                                         <div className="col-span-6 gap-4">
                                             <Tooltip title="حذف">
@@ -928,9 +998,8 @@ export default function OrdersPage() {
                     })}
 
                 </div>
-                <Divider type="horizontal" className="col-span-12" style={{ borderTop: '4px solid #d9d9d9', margin: '0' }} ></Divider>
 
-
+                {/* 
                 <div className="col-span-12">
 
                     <div className=" w-full bg-[#01B9B0]  rounded-[4] p-[8] m-0">
@@ -953,7 +1022,7 @@ export default function OrdersPage() {
                             <div className="col-span-1 text-white font-bold text-center">{valueRenderer(products?.reduce((acc, e) => acc + (e?.total_delivery_percentage || 0), 0) + offers?.reduce((acc, e) => acc + (e?.total_delivery_percentage || 0), 0))}</div>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
         </Modal >
 
@@ -1006,7 +1075,7 @@ export default function OrdersPage() {
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleProductEdit()}
             onCancel={() => { setOpenProductEditModal(false); emptyFields() }}
-            confirmLoading={loading}   
+            confirmLoading={loading}
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">
@@ -1230,7 +1299,7 @@ export default function OrdersPage() {
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleProductEdit()}
             onCancel={() => { setOpenProductEditModal(false); emptyFields() }}
-            confirmLoading={loading}   
+            confirmLoading={loading}
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">

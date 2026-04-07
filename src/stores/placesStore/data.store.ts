@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { apiArea, apiCity, apiGovernorate, apiStreet } from '../apis';
-import { Area, City, Governorate, Street, AddingArea, AddingBuilding, AddingCity, AddingGovernorate, AddingStreet } from '../places-store-Interfaces';
+import { apiArea, apiCity, apiGovernorate, apiSalesmanArea, apiStreet } from '../apis';
+import { Area, City, Governorate, Street, AddingArea, AddingBuilding, AddingCity, AddingGovernorate, AddingStreet, AddingSalesmanArea } from '../places-store-Interfaces';
 
 
 
@@ -49,6 +49,9 @@ interface DataStore {
     deleteStreet: (id: number) => Promise<any>;
     editStreet: (id: number, street: AddingStreet) => Promise<any>;
 
+    // for Salesman Areas
+    addSalesmanArea: (street: AddingSalesmanArea) => Promise<any>;
+    deleteSalesmanArea: (id: number) => Promise<any>;
 
 }
 //gettig the token from Auth Store 
@@ -373,6 +376,39 @@ export const usePlacesStore = create<DataStore>()(
                 set({ loading: true, error: null });
                 try {
                     const res = await apiStreet.post('', street);
+                    set({ loading: false });
+                    return res;
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Adding Street',
+                        loading: false,
+                    });
+                }
+            },
+
+            // Get Salesman Area
+
+            // Delete Salesman Area
+            deleteSalesmanArea: async (id: number) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiSalesmanArea.delete(`/${id}`);
+                    set((state) => ({
+                        loading: false,
+                    }));
+                    return res;
+                } catch (err: any) {
+                    set({
+                        error: err.response?.data?.message || 'Error Deleting Street',
+                        loading: false,
+                    });
+                }
+            },
+            // Add Salesman Area
+            addSalesmanArea: async (street: AddingSalesmanArea) => {
+                set({ loading: true, error: null });
+                try {
+                    const res = await apiSalesmanArea.post('', street);
                     set({ loading: false });
                     return res;
                 } catch (err: any) {

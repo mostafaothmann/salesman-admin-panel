@@ -239,14 +239,14 @@ export default function CititesPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         variant="outlined"
                         color="cyan"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
-                        Edit
+                        تعديل
                     </Button>
                 </Space>
             ),
@@ -260,9 +260,9 @@ export default function CititesPage() {
                     <Button
                         variant="solid"
                         color="cyan"
-                        onClick={() => openShowModal(record.id)}
+                        onClick={() => OpenShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),

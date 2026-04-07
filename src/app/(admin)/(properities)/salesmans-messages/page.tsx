@@ -302,14 +302,14 @@ export default function SalesmansMessagesPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         variant="outlined"
                         color="cyan"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
-                        Edit
+                        تعديل
                     </Button>
                 </Space>
             ),
@@ -323,9 +323,9 @@ export default function SalesmansMessagesPage() {
                     <Button
                         variant="solid"
                         color="cyan"
-                        onClick={() => openShowModal(record.id)}
+                        onClick={() => OpenShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),

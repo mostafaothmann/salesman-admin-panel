@@ -1,11 +1,11 @@
 "use client";
 
-import { AutoComplete, Button, Divider, Input, InputNumber, Modal, Space, Table, Tag } from "antd";
+import { AutoComplete, Button, Divider, Input, InputNumber, Modal, notification, Space, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { ColumnsType } from "antd/es/table";
 import { useCommercialStore } from "../../../../stores/commercialStore/data.store";
-import { apiType } from "../../../../stores/apis";
+import { apiOffer, apiType } from "../../../../stores/apis";
 
 
 export default function OffersPage() {
@@ -88,6 +88,7 @@ export default function OffersPage() {
     //emptyFields function
     const emptyFields = () => {
         setName("");
+        setSearchTextType("");
         setFilterMaxQuantity(0);
         setFilterMinQuantity(0);
         setFitlerMaxTotalPrice(0);
@@ -162,13 +163,40 @@ export default function OffersPage() {
         setOpenDeleteModal(false);
     }
 
+
     //downloadExcele
+    const [allData, setAllData] = useState([])
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataOffers ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "مبيعات الأصناف المفردة");
-        XLSX.writeFile(workbook, "مبيعات الأصناف المفردة.xlsx");
+        apiOffer.get('')
+            .then(res => {
+                setAllData(res.data.data);
+                const formattedData = (allData ?? []).map(item => ({
+                    "تاريخ البيع": item.created_at.slice(0, 10),
+                    "البونص": item.number_of_gifts,
+                    "الكمية المجانية": item.number_of_pieces,
+                    "الصنف": typesNames?.find(e => e.id == Number(item.type_id))?.name,
+                }));
+                const worksheet = XLSX.utils.json_to_sheet(formattedData);
+                worksheet["!cols"] = [
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 15 },
+                    { wch: 10 },
+                    { wch: 10 },
+                ];
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "العروض المباعة");
+                XLSX.writeFile(workbook, "العروض المباعة.xlsx")
+            })
+            .catch(err => {
+                notification.error({
+                    message: "خطأ",
+                    description: "حدث خطأ في جلب البيانات",
+                    placement: 'bottomLeft'
+                });
+            });
     };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -241,7 +269,7 @@ export default function OffersPage() {
                 );
             }
         }
-        ,
+        /* ,
         {
             title: "سعر القطعة",
             dataIndex: "price_for_piece",
@@ -261,16 +289,26 @@ export default function OffersPage() {
                     {value} ليرة
                 </Tag>;
             }
-        }
+        }*/
         ,
         {
-            title: "الكمية المباعة",
-            dataIndex: "base_quantity",
-            sorter: (a: any, b: any) => Number(a.base_quantity) - Number(b.base_quantity),
+            title: "الكمية الأساسية",
+            dataIndex: "number_of_pieces",
+            sorter: (a: any, b: any) => Number(a.number_of_pieces) - Number(b.number_of_pieces),
             render: (value: number) => {
                 { return `${value} قطعة` }
             }
         }
+        ,
+        {
+            title: "البونص",
+            dataIndex: "number_of_gifts",
+            sorter: (a: any, b: any) => Number(a.number_of_gifts) - Number(b.number_of_gifts),
+            render: (value: number) => {
+                { return `${value} قطعة` }
+            }
+        }
+        /*
         ,
         {
             title: "كميةالإرجاع",
@@ -442,7 +480,7 @@ export default function OffersPage() {
                     {value} ليرة
                 </Tag>;
             }
-        }
+        } */
         ,
         {
             title: "تاريخ البيع",
@@ -450,45 +488,46 @@ export default function OffersPage() {
             sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
             render: (value: string) => { return value?.slice(0, 10) }
         }
+        /*         ,
+                {
+                    title: "",
+                    key: "id",
+                    render: (_: any, record: any) => (
+                        <Space size="middle">
+                            <Button
+                                type="default"
+                                danger
+                                onClick={() => { OpenDeleteModal(record.id); }}
+                            >
+                                حذف
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="cyan"
+                                onClick={() => { OpenEditModal(record.id); }}
+                            >
+                                تعديل
+                            </Button>
+                        </Space>
+                    ),
+                }
+                , */
         ,
-        {
-            title: "",
-            key: "id",
-            render: (_: any, record: any) => (
-                <Space size="middle">
-                    <Button
-                        type="default"
-                        danger
-                        onClick={() => { OpenDeleteModal(record.id); }}
-                    >
-                        Delete
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="cyan"
-                        onClick={() => { OpenEditModal(record.id); }}
-                    >
-                        Edit
-                    </Button>
-                </Space>
-            ),
-        }
-        ,
-        {
-            title: "",
-            fixed: "right",
-            render: (_: any, record: any) => (
-                <Space size="middle">
-                    <Button
-                        variant="solid"
-                        color="cyan"
-                        onClick={() => OpenShowModal(record.id)}
-                    >
-                        Show
-                    </Button>
-                </Space>
-            ),
-        }
+        /*    {
+               title: "",
+               fixed: "right",
+               render: (_: any, record: any) => (
+                   <Space size="middle">
+                       <Button
+                           variant="solid"
+                           color="cyan"
+                           onClick={() => OpenShowModal(record.id)}
+                       >
+                           عرض
+                       </Button>
+                   </Space>
+               ),
+           } */
     ];
 
     return <div>
@@ -503,7 +542,7 @@ export default function OffersPage() {
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   
+            confirmLoading={loading}
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">
@@ -725,7 +764,7 @@ export default function OffersPage() {
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   
+            confirmLoading={loading}
             mask={false}
         >
             <div className="grid grid-cols-12 gap-4">
@@ -980,7 +1019,7 @@ export default function OffersPage() {
                         }
                     />
                 </div>
-                <div className="col-span-6 xl:col-span-6">
+                {/*  <div className="col-span-6 xl:col-span-6">
                     <div>
                         <h3>
                             أقل كمية :
@@ -1031,7 +1070,7 @@ export default function OffersPage() {
                         onChange={(e) => setFitlerMaxTotalPrice(e)}
                         placeholder="أعلى مجموع سعر نهائي"
                     />
-                </div>
+                </div> */}
             </div>
         </Modal>
 

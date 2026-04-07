@@ -17,7 +17,7 @@ export default function DoctorsPage() {
     const { dataGovernorates, getGovernoratesData, getCitiesData, getAreasData, getStreetsData, dataCities, dataAreas, dataStreets } = usePlacesStore()
     const router = useRouter();
     const Map = dynamic(
-        () => import("../../../../sharedComponents/maps/map/Map"),
+        () => import("../../components/sharedComponents/maps/map/Map"),
         { ssr: false }
     );
     //table constants
@@ -45,8 +45,8 @@ export default function DoctorsPage() {
     const [gender_id, setSexId] = useState(0);
     const [phone_number, setPhoneNumber] = useState("");
     const [telephone_number, setTelephoneNumber] = useState("");
-    const [wife_husband_first_name, setWifeHusbandFirstName] = useState("");
-    const [wife_husband_last_name, setWifeHusbandLastName] = useState("");
+/*     const [wife_husband_first_name, setWifeHusbandFirstName] = useState("");
+    const [wife_husband_last_name, setWifeHusbandLastName] = useState(""); */
     const [graduation_university, setGraduationUniversity] = useState("");
     const [graduation_country, setGraduationCountry] = useState("");
     const [searchTextSpecilization, setSearchTextSpecilization] = useState("");
@@ -141,6 +141,8 @@ export default function DoctorsPage() {
         router.push(`/doctors/${id}`);
     }
 
+
+
     async function changeOpenModalAdd() {
         await getSpecializationsData(); await getGovernoratesData();
         setOptionsSpecializations(dataSpecializations?.map(e => { return { value: e.id, label: e.name } }));
@@ -177,13 +179,13 @@ export default function DoctorsPage() {
                     graduation_country: graduation_country,
                     graduation_university: graduation_university,
                     birth_date: birth_date,
-                    classification: classificationId,
-                    loyalty: loyaltyId,
+                    classification_id: classificationId,
+                    loyalty_id: loyaltyId,
                     admin_description: admin_description,
                     salesman_description: salesman_description,
                     gender: gender_id,
-                    wife_husband_first_name: wife_husband_first_name,
-                    wife_husband_last_name: wife_husband_first_name,
+              /*       wife_husband_first_name: wife_husband_first_name,
+                    wife_husband_last_name: wife_husband_first_name, */
                     phone_number: phone_number,
                     telephone_number: telephone_number
                 })
@@ -221,8 +223,8 @@ export default function DoctorsPage() {
         setFirstName("");
         setLastName("");
         setGraduationUniversity("");
-        setWifeHusbandFirstName("");
-        setWifeHusbandLastName("");
+/*         setWifeHusbandFirstName("");
+        setWifeHusbandLastName(""); */
         setTelephoneNumber("");
         setPhoneNumber("");
         setSearchTextSpecilization("");
@@ -245,8 +247,8 @@ export default function DoctorsPage() {
         setLastName("");
         setBirthDate("")
         setGraduationUniversity("");
-        setWifeHusbandFirstName("")
-        setWifeHusbandLastName("")
+    /*     setWifeHusbandFirstName("")
+        setWifeHusbandLastName("") */
         setTelephoneNumber("");
         setPhoneNumber("");
         setSearchTextSpecilization("");
@@ -516,15 +518,16 @@ export default function DoctorsPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         type="primary"
                         variant="outlined"
                         onClick={() => { OpenLocationModal(record.id); }}
                     >
-                        Location
+                        موقع
                     </Button>
+              
                 </Space>
             ),
         },
@@ -538,7 +541,7 @@ export default function DoctorsPage() {
                         color="cyan"
                         onClick={() => openShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),
@@ -597,7 +600,7 @@ export default function DoctorsPage() {
 
                         onChange={(text) => {
                             setSearchTextSpecilization(text);
-                            setSpecializationId(undefined); 
+                            setSpecializationId(undefined);
                         }}
                         onSelect={(value, option) => {
 
@@ -628,7 +631,7 @@ export default function DoctorsPage() {
 
                         onChange={(text) => {
                             setSearchTextClassification(text);
-                            setClassificationId(undefined); 
+                            setClassificationId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setClassificationId(option.value);
@@ -693,7 +696,7 @@ export default function DoctorsPage() {
 
                         onChange={(text) => {
                             setSearchTextSex(text);
-                            setSexId(undefined); 
+                            setSexId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setSexId(option.value);
@@ -722,7 +725,7 @@ export default function DoctorsPage() {
 
                         onChange={(text) => {
                             setSearchTextLoyalty(text);
-                            setLoyaltyId(undefined); 
+                            setLoyaltyId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setLoyaltyId(option.value);
@@ -803,10 +806,10 @@ export default function DoctorsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setGovernorateId(undefined); 
-                            setCityId(undefined); 
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setGovernorateId(undefined);
+                            setCityId(undefined);
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -844,9 +847,9 @@ export default function DoctorsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setCityId(undefined); 
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setCityId(undefined);
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -884,8 +887,8 @@ export default function DoctorsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -922,7 +925,7 @@ export default function DoctorsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setStreetId(undefined); 
+                            setStreetId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setStreetId(option.value);
@@ -961,7 +964,7 @@ export default function DoctorsPage() {
                 </div>
 
 
-                <div className="col-span-6 xl:col-span-6">
+                {/* <div className="col-span-6 xl:col-span-6">
                     <h3>
                         اسم الزوج/الزوجة الأول:
                     </h3>
@@ -983,7 +986,7 @@ export default function DoctorsPage() {
                         onChange={(e) => setWifeHusbandLastName(e.target.value)}
                         placeholder="اسم الزوج/الزوجة الثاني"
                     />
-                </div>
+                </div> */}
 
                 <div className="col-span-12">
                     <h3>
@@ -1092,7 +1095,7 @@ export default function DoctorsPage() {
 
                         onChange={(text) => {
                             setSearchTextSpecilization(text);
-                            setFilterSpecializationId(undefined); 
+                            setFilterSpecializationId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setFilterSpecializationId(option.value);

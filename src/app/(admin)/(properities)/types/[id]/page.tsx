@@ -2,11 +2,19 @@
 
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
-import { TypeSpecializations } from "../../../../../sharedComponents/pagesComponents/typePage/typeSpecializations/TypeSpecializations";
+import { TypeSpecializations } from "../../../components/sharedComponents/pagesComponents/typePage/typeSpecializations/TypeSpecializations";
 import { Button, ConfigProvider, Tabs } from "antd";
 import { useEffect, useState } from "react";
-import TypesSpecifications from "../../../../../sharedComponents/pagesComponents/typePage/typeSpecifications/TypeSpecifications";
+import TypesSpecifications from "../../../components/sharedComponents/pagesComponents/typePage/typeSpecifications/TypeSpecifications";
 import { useTypeStore } from "../../../../../stores/typesStore/data.store";
+import TypeProducts from "../../../components/sharedComponents/pagesComponents/typePage/typeProducts/TypeProducts";
+import TypeDoctorsVisits from "../../../components/sharedComponents/pagesComponents/typePage/typeDoctorsVisits/TypeDoctorsVisits";
+import TypePharmacistsVisits from "../../../components/sharedComponents/pagesComponents/typePage/typePhramacistsVisits/TypePharmacistsVisits";
+import TypeDoctorsSamples from "../../../components/sharedComponents/pagesComponents/typePage/typeDoctorsSamples/TypeDoctorsSamples";
+import TypePharmacistsSamples from "../../../components/sharedComponents/pagesComponents/typePage/typePharmacistsSamples/TypePharmacistsSamples";
+import TypeBaseOffers from "../../../components/sharedComponents/pagesComponents/typePage/typeBaseOffers/TypeBaseOffers";
+import TypeOrdersPage from "../../../components/sharedComponents/pagesComponents/typePage/typeOrders/TypeOrders";
+import TypeOrders from "../../../components/sharedComponents/pagesComponents/typePage/typeOrders/TypeOrders";
 
 
 export default function TypePage() {
@@ -15,20 +23,43 @@ export default function TypePage() {
     const [activeKey, setActiveKey] = useState("1");
     const { typeD, getTypeData } = useTypeStore()
     useEffect(() => {
-         getTypeData(Number(params?.id)) }, [])
+        getTypeData(Number(params?.id))
+    }, [])
 
     const renderContent = () => {
         switch (activeKey) {
             case "1":
                 return <div>
-                    <TypesSpecifications {...typeD}></TypesSpecifications>
+                    <TypesSpecifications profile_id={Number(params.id)}></TypesSpecifications>
                 </div>;
             case "2":
                 return <div>
-                    <TypeSpecializations id={Number(params.id)}></TypeSpecializations>
+                    <TypeSpecializations profile_id={Number(params.id)}></TypeSpecializations>
                 </div>;
             case "3":
-                return <div>Content of Tab 4</div>;
+                return <div>
+                    <TypeBaseOffers profile_id={Number(params.id)}></TypeBaseOffers>
+                </div>
+            case "4":
+                return <div>
+                    <TypeOrders profile_id={Number(params.id)}></TypeOrders>
+                </div>
+            case "5":
+                return <div>
+                    <TypeDoctorsVisits profile_id={Number(params.id)}></TypeDoctorsVisits>
+                </div>
+            case "6":
+                return <div>
+                    <TypePharmacistsVisits profile_id={Number(params.id)}></TypePharmacistsVisits>
+                </div>
+            case "7":
+                return <div>
+                    <TypeDoctorsSamples profile_id={Number(params.id)}></TypeDoctorsSamples>
+                </div>
+            case "8":
+                return <div>
+                    <TypePharmacistsSamples profile_id={Number(params.id)}></TypePharmacistsSamples>
+                </div>
             default:
                 return null;
         }
@@ -36,36 +67,27 @@ export default function TypePage() {
     const tabsItems = [
         {
             label: <div>خصائص الصنف</div>, key: "1",
-
         },
         {
-            label: <div>  الاختصاصات </div>, key: "2",
-
+            label: <div>الاختصاصات</div>, key: "2",
         },
         {
-            label: <div>طلبات الصنف</div>, key: "3",
-
+            label: <div>العروض الأساسية</div>, key: "3",
         },
         {
-            label: <div>عروض الصنف</div>, key: "4",
-
+            label: <div>الطلبات</div>, key: "4",
         },
         {
-            label: <div>زيارات الأطباء بالصنف</div>, key: "5",
-
+            label: <div>زيارات الأطباء</div>, key: "5",
         },
         {
-            label: <div> زيارات الصيادلة بالصنف</div>, key: "6",
-
+            label: <div>زيارات الصيادلة</div>, key: "6",
         },
         {
-            label: <div>مكونات الصنف</div>, key: "7",
+            label: <div> عينات الأطباء</div>, key: "7",
         },
         {
             label: <div> عينات الصيادلة</div>, key: "8",
-        },
-        {
-            label: <div> عينات الأطباء</div>, key: "9",
         }
     ]
     return <div className="col-span-12">

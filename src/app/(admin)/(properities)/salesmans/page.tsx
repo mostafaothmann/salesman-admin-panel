@@ -21,7 +21,7 @@ export default function SalesmansPage() {
     const router = useRouter();
 
     const Map = dynamic(
-        () => import("../../../../sharedComponents/maps/map/Map"),
+        () => import("../../components/sharedComponents/maps/map/Map"),
         { ssr: false }
     );
 
@@ -112,7 +112,7 @@ export default function SalesmansPage() {
 
     //showModal
     const openShowModal = (id: number) => {
-        router.push(`/pharmacis/${id}`);
+        router.push(`/salesmans/${id}`);
     }
 
     async function changeOpenModalAdd() {
@@ -499,15 +499,16 @@ export default function SalesmansPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         type="primary"
                         variant="outlined"
                         onClick={() => { OpenLocationModal(record.id); }}
                     >
-                        Location
+                        موقع
                     </Button>
+              
                 </Space>
             ),
         },
@@ -522,7 +523,7 @@ export default function SalesmansPage() {
                         color="cyan"
                         onClick={() => openShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),

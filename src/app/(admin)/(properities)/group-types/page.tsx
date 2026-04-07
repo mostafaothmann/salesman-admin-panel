@@ -231,11 +231,10 @@ export default function GroupTypesPage() {
             dataIndex: "name",
             sorter: (a: any, b: any) => a.name.localeCompare(b.name),
         },
-        ,
-        {
-            title: "الوصف",
-            dataIndex: "description",
-        },
+        /*      {
+                 title: "الوصف",
+                 dataIndex: "description",
+             }, */
         {
             title: "الأصناف",
             dataIndex: "types",
@@ -258,13 +257,13 @@ export default function GroupTypesPage() {
                         danger
                         onClick={() => { OpenDeleteModal(record.id); }}
                     >
-                        Delete
+                        حذف
                     </Button>
                     <Button
                         type="default"
                         onClick={() => { OpenEditModal(record.id); }}
                     >
-                        Edit
+                        تعديل
                     </Button>
                 </Space>
             ),
@@ -280,7 +279,7 @@ export default function GroupTypesPage() {
                         color="cyan"
                         onClick={() => openShowModal(record.id)}
                     >
-                        Show
+                        عرض
                     </Button>
                 </Space>
             ),

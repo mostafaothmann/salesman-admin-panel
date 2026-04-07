@@ -44,8 +44,8 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "مجموعات الأصناف", path: "/group-types", pro: false },
       { name: "الأصناف", path: "/types", pro: false },
-      { name: "المكونات", path: "/ingredients", pro: false },
-    ],
+/*       { name: "المكونات", path: "/ingredients", pro: false },
+ */    ],
   },
   {
     icon: <FirstAidKitIcon />,
@@ -89,8 +89,8 @@ const navItems: NavItem[] = [
     icon: <DoctorVisit />,
     name: "الدعاية العلمية",
     subItems: [
-      { name: "إحصائيات الأطباء", path: "/doctors-analysis", pro: false },
-      { name: "زيارات الأطباء", path: "/doctors-visits", pro: false },
+/*       { name: "إحصائيات الأطباء", path: "/doctors-analysis", pro: false },
+ */      { name: "زيارات الأطباء", path: "/doctors-visits", pro: false },
       { name: "عينات الأطباء", path: "/doctors-samples", pro: false },
     ],
   }
@@ -99,8 +99,8 @@ const navItems: NavItem[] = [
     icon: <PharmacistVisit />,
     name: "الدعاية التجارية",
     subItems: [
-      { name: "إحصائيات الصيادلة", path: "/pharmacists-analysis", pro: false },
-      { name: "زيارات الصيادلة", path: "/pharmacists-visits", pro: false },
+/*       { name: "إحصائيات الصيادلة", path: "/pharmacists-analysis", pro: false },
+ */      { name: "زيارات الصيادلة", path: "/pharmacists-visits", pro: false },
       { name: "عينات الصيادلة", path: "/pharmacists-samples", pro: false },
     ],
   }

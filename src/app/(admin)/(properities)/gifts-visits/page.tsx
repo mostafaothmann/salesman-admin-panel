@@ -7,7 +7,7 @@ import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
 import { useRouter } from "next/navigation";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
-import { apiType } from "../../../../stores/apis";
+import { apiBaseGift, apiType } from "../../../../stores/apis";
 import { useOtherStore } from "../../../../stores/otherStore/data.store";
 
 
@@ -30,13 +30,10 @@ export default function GiftVisitsPage() {
     const [filtered, setFiltered] = useState(false)
     const [filter_min_quantity, setFilterMinQuantity] = useState(-1);
     const [filter_max_quantity, setFilterMaxQuantity] = useState(101);
-    const [filter_base_gift_id, setFilterBaseGiftId] = useState(101);
     const [filter_visit_id, setFilterVisitId] = useState(101);
-
-
-    const [filter_type_id, setFilterTypeId] = useState(0);
-    const [searchTextType, setSearchTextType] = useState("");
-    const [typesNames, setTypesNames] = useState([])
+    const [filter_base_gift_id, setFilterBaseGiftId] = useState(0);
+    const [searchTextType, setSearchTextBaseGift] = useState("");
+    const [giftsNames, setGiftsNames] = useState([])
 
     //Filter Modal Funcs
     const OpenFilterModal = () => {
@@ -67,7 +64,8 @@ export default function GiftVisitsPage() {
 
     //emptyFields function
     const emptyFields = () => {
-
+        setFilterBaseGiftId(null);
+        setSearchTextBaseGift(null);
     }
 
     //downloadExcele
@@ -84,11 +82,11 @@ export default function GiftVisitsPage() {
         const fetchData = async () => {
             try {
                 const [
-                    typeRes,
+                    res,
                 ] = await Promise.all([
-                    apiType.get('/names'),
+                    apiBaseGift.get('/names'),
                 ]);
-                setTypesNames(typeRes.data);
+                setGiftsNames(res.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -105,15 +103,10 @@ export default function GiftVisitsPage() {
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
         },
         {
-            title: "العينة",
-            dataIndex: "type_id",
-            sorter: (a: any, b: any) => Number(a.type_id) - Number(b.type_id),
-            render: (value: number) => {
-                const type = typesNames?.find(e => e.id == Number(value));
-                return `${type?.name}`
-            }
+            title: "الهدية",
+            dataIndex: "name",
+            sorter: (a: any, b: any) => Number(a.name) - Number(b.name),
         },
-
         {
             title: "الكمية",
             dataIndex: "quantity",
@@ -146,23 +139,23 @@ export default function GiftVisitsPage() {
                 <div className="col-span-6 xl:col-span-6">
                     <div>
                         <h3>
-                            صنف العينة :
+                            الهدية :
                         </h3>
                     </div>
                     <AutoComplete
                         style={{ width: '100%' }}
-                        options={typesNames?.map(e => { return { value: e.id, label: `${e.name} ` } })
+                        options={giftsNames?.map(e => { return { value: e.id, label: `${e.name} ` } })
                         }
-                        placeholder="صنف الزيارة"
+                        placeholder="الهدية"
                         value={searchTextType}
 
                         onChange={(text) => {
-                            setSearchTextType(text);
-                            setFilterTypeId(undefined); 
+                            setSearchTextBaseGift(text);
+                            setFilterBaseGiftId(undefined);
                         }}
                         onSelect={(value, option) => {
-                            setFilterTypeId(option.value);
-                            setSearchTextType(option?.label as string);
+                            setFilterBaseGiftId(option.value);
+                            setSearchTextBaseGift(option?.label as string);
                         }}
                         filterOption={(inputValue, option) =>
                             (option?.label as string)

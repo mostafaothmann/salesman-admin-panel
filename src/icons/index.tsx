@@ -75,9 +75,29 @@ import Online from "./online.svg"
 import Refresh from "./refresh.svg"
 import Mall from "./mall.svg"
 import Edit from "./edit-circle.svg"
+import Video from "./video.svg"
+import Area from "./area.svg"
+import Offer from "./offer.svg"
+import Gift from "./gift.svg"
+import BaseGift from "./base-gift.svg"
+import Sample from "./sample.svg"
+import BaseOffer from "./base-offer.svg"
+import Association from "./association.svg"
+import Hospital from "./hospital.svg"
+import BoldOrder from "./bold-order.svg"
 
 
 export {
+  BoldOrder,
+  Gift,
+  Association,
+  Hospital,
+  BaseOffer,
+  Sample,
+  BaseGift,
+  Offer,
+  Video,
+  Area,
   Edit,
   Online,
   TimeLine,
