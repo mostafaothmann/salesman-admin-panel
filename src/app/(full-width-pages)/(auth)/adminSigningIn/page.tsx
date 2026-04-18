@@ -1,12 +1,11 @@
 import { Metadata } from "next";
-import SignUpForm from "../../../../components/auth/SignUpForm";
-
+import AdminSignInForm from "../../../../components/auth/AdminSignInForm";
 
 export const metadata: Metadata = {
   title: "روح الأرض لوحة القيادة",
   description: "روح الأرض",
 };
 
-export default function SignUp() {
-  return <SignUpForm />;
+export default function SignIn() {
+  return <AdminSignInForm />;
 }

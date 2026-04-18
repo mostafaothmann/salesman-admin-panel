@@ -30,6 +30,7 @@ export default function DoctorsPage() {
     //Add Modal
     const { TextArea } = Input;
     const [first_name, setFirstName] = useState("");
+    const [second_name, setSecondName] = useState("");
     const [last_name, setLastName] = useState("");
     const [admin_description, setAdminDescription] = useState("");
     const [salesman_description, setSalesmanDescription] = useState("");
@@ -45,8 +46,8 @@ export default function DoctorsPage() {
     const [gender_id, setSexId] = useState(0);
     const [phone_number, setPhoneNumber] = useState("");
     const [telephone_number, setTelephoneNumber] = useState("");
-/*     const [wife_husband_first_name, setWifeHusbandFirstName] = useState("");
-    const [wife_husband_last_name, setWifeHusbandLastName] = useState(""); */
+    /*     const [wife_husband_first_name, setWifeHusbandFirstName] = useState("");
+        const [wife_husband_last_name, setWifeHusbandLastName] = useState(""); */
     const [graduation_university, setGraduationUniversity] = useState("");
     const [graduation_country, setGraduationCountry] = useState("");
     const [searchTextSpecilization, setSearchTextSpecilization] = useState("");
@@ -120,6 +121,7 @@ export default function DoctorsPage() {
 
 
 
+
     //Location Modal 
     const [locationId, setlocationId] = useState(0);
     const [openLocationModal, setOpenLocationModal] = useState(false);
@@ -150,7 +152,7 @@ export default function DoctorsPage() {
         setOpen(true);
     }
 
-    //addDoctor Function
+
     async function handleAdd() {
         setGovernorateId(governorate_id + 1);
         setSpecializationId(specialization_id + 1);
@@ -158,12 +160,11 @@ export default function DoctorsPage() {
         setAreaId(area_id + 1)
         setStreetId(street_id + 1)
 
-        if (first_name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(first_name) &&
-            last_name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(last_name)
-        ) {
+        if (first_name && last_name) {
             try {
                 const res = await addDoctor({
                     first_name: first_name,
+                    second_name: second_name,
                     last_name: last_name,
                     favourite_time_opening: favourite_time_opening,
                     favourite_time_closing: favourite_time_closing,
@@ -184,8 +185,8 @@ export default function DoctorsPage() {
                     admin_description: admin_description,
                     salesman_description: salesman_description,
                     gender: gender_id,
-              /*       wife_husband_first_name: wife_husband_first_name,
-                    wife_husband_last_name: wife_husband_first_name, */
+                    /*       wife_husband_first_name: wife_husband_first_name,
+                          wife_husband_last_name: wife_husband_first_name, */
                     phone_number: phone_number,
                     telephone_number: telephone_number
                 })
@@ -197,21 +198,21 @@ export default function DoctorsPage() {
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -223,8 +224,8 @@ export default function DoctorsPage() {
         setFirstName("");
         setLastName("");
         setGraduationUniversity("");
-/*         setWifeHusbandFirstName("");
-        setWifeHusbandLastName(""); */
+        /*         setWifeHusbandFirstName("");
+                setWifeHusbandLastName(""); */
         setTelephoneNumber("");
         setPhoneNumber("");
         setSearchTextSpecilization("");
@@ -241,14 +242,15 @@ export default function DoctorsPage() {
     }
 
 
+
     //emptyFields function
     const emptyFields = () => {
         setFirstName("");
         setLastName("");
         setBirthDate("")
         setGraduationUniversity("");
-    /*     setWifeHusbandFirstName("")
-        setWifeHusbandLastName("") */
+        /*     setWifeHusbandFirstName("")
+            setWifeHusbandLastName("") */
         setTelephoneNumber("");
         setPhoneNumber("");
         setSearchTextSpecilization("");
@@ -352,7 +354,7 @@ export default function DoctorsPage() {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -527,7 +529,7 @@ export default function DoctorsPage() {
                     >
                         موقع
                     </Button>
-              
+
                 </Space>
             ),
         },
@@ -574,15 +576,27 @@ export default function DoctorsPage() {
                         placeholder=" الاسم الأول "
                     />
                 </div>
+
                 <div className="col-span-6 xl:col-span-4">
                     <h3>
-                        الاسم الثاني :
+                        اسم الأب  :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={second_name}
+                        onChange={(e) => setSecondName(e.target.value)}
+                        placeholder="اسم الأب"
+                    />
+                </div>
+                <div className="col-span-6 xl:col-span-4">
+                    <h3>
+                        اسم العائلة :
                     </h3>
                     <Input
                         className="w-full"
                         value={last_name}
                         onChange={(e) => setLastName(e.target.value)}
-                        placeholder=" الاسم الثاني "
+                        placeholder=" اسم العائلة"
                     />
                 </div>
 

@@ -97,7 +97,6 @@ export const useOtherStore = create<DataStore>()(
                 try {
                     const res = await apiBaseGift.get(``);
                     const dataBaseGifts = res.data;
-
                     set({ dataBaseGifts, loading: false });
                     return dataBaseGifts;
                 } catch (err: any) {

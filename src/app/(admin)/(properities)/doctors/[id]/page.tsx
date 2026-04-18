@@ -3,8 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import { Button, ConfigProvider, Tabs } from "antd";
-import { useEffect, useState } from "react";
-import { useTypeStore } from "../../../../../stores/typesStore/data.store";
+import { useState } from "react";
 import DoctorSpecification from "../../../components/sharedComponents/pagesComponents/doctorPage/doctorSpecifications/DoctorSpecifications";
 import DoctorVisits from "../../../components/sharedComponents/pagesComponents/doctorPage/doctorVisits/DoctorVisits";
 import DoctorSamples from "../../../components/sharedComponents/pagesComponents/doctorPage/doctorSamples/DoctorSamples";
@@ -19,10 +18,7 @@ export default function DoctorPage() {
     const params = useParams()
     const router = useRouter()
     const [activeKey, setActiveKey] = useState("1");
-    const { typeD, getTypeData } = useTypeStore()
-    useEffect(() => {
-        getTypeData(Number(params?.id))
-    }, [])
+
 
     const renderContent = () => {
         switch (activeKey) {

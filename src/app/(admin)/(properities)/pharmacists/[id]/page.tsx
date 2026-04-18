@@ -17,11 +17,6 @@ export default function PharmacistPage() {
     const params = useParams()
     const router = useRouter()
     const [activeKey, setActiveKey] = useState("1");
-    const { typeD, getTypeData } = useTypeStore()
-    useEffect(() => {
-        getTypeData(Number(params?.id))
-    }, [])
-
     const renderContent = () => {
         switch (activeKey) {
             case "1":

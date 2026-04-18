@@ -1,12 +1,10 @@
 import { create } from 'zustand';
 import axios from 'axios';
-import { useAuthStore } from '../usersStore/auth.store';
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { apiGroupType, apiIngredient, apiType } from '../apis';
 import { AddingGroupType, AddingIngredient, AddingType, BaseOffer, GroupType, Ingredient, OnlineProduct, RecoveryCase, Type } from '../types-store-interfaces';
 import { Doctor, DoctorSample, Pharmacist, PharmacistSample } from '../medical-store-interfaces';
 import { Product } from '../commercial-store-interfaces';
-
 
 
 interface DataStore {

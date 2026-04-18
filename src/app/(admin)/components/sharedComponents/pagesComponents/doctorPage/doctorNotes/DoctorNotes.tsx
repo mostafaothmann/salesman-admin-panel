@@ -261,13 +261,13 @@ export default function DoctorNotes({ profile_id }: profileComponent) {
                 {/* LEFT SIDE */}
                 <div className="grid grid-cols-12 gap-2 col-span-12 md:col-span-6">
 
-                    <div className="col-span-12">
+                  {/*   <div className="col-span-12">
                         <Image
                             width="100%"
                             height={254}
                             src={doctorVisitD?.photo}
                         />
-                    </div>
+                    </div> */}
 
                     <div className="col-span-12">
                         <h3 className="font-bold text-gray-700">ملاحظة الزيارة:</h3>

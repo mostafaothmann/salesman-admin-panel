@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+"use client";
 import DoctorsCountStatistics from "../../homePage/statistics/DoctorsCountStatistics";
 import AreasCountStatistics from "../../homePage/statistics/AreasCountStatistics";
 import PharmacistsCountStatistics from "../../homePage/statistics/PharmacistsCountStatistics";
@@ -20,13 +20,10 @@ import UnderReviewDoctorsVisitsStatistics from "../../homePage/statistics/UnderR
 import UnderReviewPharmacistsVisitsStatistics from "../../homePage/statistics/UnderReviewPharmacistsVisitsCountStatistics";
 import AcceptedPharmacistsVisitsStatistics from "../../homePage/statistics/AcceptedPharmacistsVisitsCountStatistics";
 
-export const metadata: Metadata = {
-  title:
-    "Emaar Admin Panel",
-  description: "Emaar Admin Panel",
-};
-
 export default function GlobalStatistics() {
+
+
+
   return (
     <div className="grid grid-cols-12 gap-4 md:gap-6">
       {/* <!-- Statistics --> */}

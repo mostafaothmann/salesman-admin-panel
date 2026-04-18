@@ -75,8 +75,7 @@ export default function TypesPage() {
 
     //addType function
     async function handleAdd() {
-        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)
-        ) {
+        if (name) {
             try {
                 const res = await await addType({
                     name, admin_description, salesman_description, grouptype_id,
@@ -92,21 +91,21 @@ export default function TypesPage() {
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -133,7 +132,7 @@ export default function TypesPage() {
         setBrand("");
         setManufacturingDate("");
         setSearchTextType("");
-        setGroupTypeId(null);
+        setGroupTypeId(0);
         setOpen(false);
     }
     //editModal
@@ -174,7 +173,7 @@ export default function TypesPage() {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -347,6 +346,7 @@ export default function TypesPage() {
             onCancel={() => emptyFields()}
             mask={false}
         >
+
             <div className="grid grid-cols-12 gap-2">
                 <div className="col-span-12 sm:col-span-6">
                     <h3>
@@ -408,7 +408,7 @@ export default function TypesPage() {
                         }
                     />
                 </div>
-{/* 
+                {/* 
                 <div className="col-span-12 sm:col-span-6">
                     <h3>
                         الكمية  :

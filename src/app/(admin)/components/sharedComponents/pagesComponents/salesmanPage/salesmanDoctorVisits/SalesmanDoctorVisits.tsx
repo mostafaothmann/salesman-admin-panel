@@ -368,12 +368,12 @@ export default function SalesmanDoctorVisits({ profile_id }: profileComponent) {
 
                 <div className="grid grid-cols-12 gap-2 col-span-12 md:col-span-6" >
 
-                    <div className="col-span-12" >
+                   {/*  <div className="col-span-12" >
                         <Image
                             width={"100%"}
                             height={254}
                             src={doctorVisitD?.photo} > </Image>
-                    </div>
+                    </div> */}
 
                     < div className="col-span-12" >
                         <h3>

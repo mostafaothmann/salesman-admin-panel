@@ -31,6 +31,7 @@ export default function PharmacistsPage() {
     //Add Modal
     const { TextArea } = Input;
     const [first_name, setFirstName] = useState("");
+    const [second_name, setSecondName] = useState("");
     const [last_name, setLastName] = useState("");
     const [admin_description, setAdminDescription] = useState("");
     const [salesman_description, setSalesmanDescription] = useState("");
@@ -147,7 +148,7 @@ export default function PharmacistsPage() {
         setOpen(true);
     }
 
-    //addDoctor Function
+    //handle Adding
     async function handleAdd() {
         setGovernorateId(governorate_id + 1);
         setSpecializationId(specialization_id + 1);
@@ -155,12 +156,11 @@ export default function PharmacistsPage() {
         setAreaId(area_id + 1)
         setStreetId(street_id + 1)
 
-        if (first_name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(first_name) &&
-            last_name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(last_name)
-        ) {
+        if (first_name && last_name) {
             try {
                 const res = await addPharmacist({
                     first_name: first_name,
+                    second_name: second_name,
                     last_name: last_name,
                     favourite_time_opening: favourite_time_opening,
                     favourite_time_closing: favourite_time_closing,
@@ -193,21 +193,21 @@ export default function PharmacistsPage() {
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -234,7 +234,6 @@ export default function PharmacistsPage() {
         setSalesmanDescription("");
         setOpen(false)
     }
-
 
     //emptyFields function
     const emptyFields = () => {
@@ -349,7 +348,7 @@ export default function PharmacistsPage() {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -542,7 +541,7 @@ export default function PharmacistsPage() {
         <Modal
             title={
                 <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
-                    <span> إضافة طبيب</span>
+                    <span> إضافة صيدلي</span>
                 </div>
             }
             open={open}
@@ -563,15 +562,27 @@ export default function PharmacistsPage() {
                         placeholder=" الاسم الأول "
                     />
                 </div>
+
                 <div className="col-span-6 xl:col-span-4">
                     <h3>
-                        الاسم الثاني :
+                        اسم الأب  :
+                    </h3>
+                    <Input
+                        className="w-full"
+                        value={second_name}
+                        onChange={(e) => setSecondName(e.target.value)}
+                        placeholder="اسم الأب"
+                    />
+                </div>
+                <div className="col-span-6 xl:col-span-4">
+                    <h3>
+                        اسم العائلة  :
                     </h3>
                     <Input
                         className="w-full"
                         value={last_name}
                         onChange={(e) => setLastName(e.target.value)}
-                        placeholder=" الاسم الثاني "
+                        placeholder=" اسم العائلة "
                     />
                 </div>
 

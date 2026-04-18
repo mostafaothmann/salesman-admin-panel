@@ -112,7 +112,7 @@ export interface Doctor {
     close_place: string;
     email: string;
     second_name: string;
-    waiting_time_id: number;
+    waiting_time: string;
     stance_on_dietary_supp: string;
     /*     childs_under_12: number;
         childs_above_18: number;
@@ -126,9 +126,9 @@ export interface Doctor {
     competitive_types: string;
     personality_strengthens: string;
     interestes: string;
-    personality_type_id: number;
-    social_pattern_id: number;
-    salesman_relationship_id: number;
+    personality_type: string;
+    social_pattern: string;
+    salesman_relationship: string;
     secrtary_first_name: string;
 }
 
@@ -257,28 +257,29 @@ export interface Pharmacist {
     first_work_time_closing: string
     second_work_time_opening: string,
     second_work_time_closing: string,
-    waiting_time_id: number;
+    waiting_time: string;
     //Medical Info
     stance_on_dietary_supp: string;
     adopted_types: string;
     preffered_dietary_types: string;
     preffered_treatment_types: string;
     preffered_companies: string;
+    competitive_types: string;
     //Personaltiy Info
     personality_strengthens: string;
     interestes: string;
-    personality_type_id: number;
-    social_pattern_id: number;
-    salesman_relationship_id: number;
+    personality_type: number;
+    social_pattern: number;
+    salesman_relationship: string;
     //for Pharmacy only
     pharmacy_description: string;
-    pharmacy_name_id: number;
+    pharmacy_name: string;
     assistant_full_name: string;
     //Relation to our company
-    execute_prescription_id: number;
-    doctor_relationship_id: number;
-    average_sell_for_our_products: number;
-    our_products_existance_percentage_id: number;
+    execute_prescription: string;
+    doctor_relationship: string;
+    average_sell_for_our_products: string;
+    our_products_existance_percentage: string;
 }
 
 export interface SpecializationType {
@@ -435,111 +436,129 @@ export interface AddingPharmacistVisit {
     // photo: string,
     number_of_patients: number,
 }
-
 export interface AddingDoctor {
     governorate_id: number,
     city_id: number,
     area_id: number,
     street_id: number,
     specialization_id: number,
+
     first_name: string,
     last_name: string,
+
     classification_id: number,
     loyalty_id: number,
+
     birth_date: string,
+
     admin_description: string,
     salesman_description: string,
+
     favourite_time_opening: string,
     favourite_time_closing: string,
+
     first_work_time_opening: string,
-    first_work_time_closing: string
+    first_work_time_closing: string,
+
     second_work_time_opening: string,
     second_work_time_closing: string,
+
     graduation_country: string,
+    graduation_university: string,
     phone_number: string,
     telephone_number: string,
-    graduation_university: string,
     gender: number,
-    /*  wife_husband_first_name: string;
-     wife_husband_last_name: string; */
-    //added recently
-    full_place: string;
-    close_place: string;
-    email: string;
-    second_name: string;
-    waiting_time_id: number;
-    stance_on_dietary_supp: string;
-    /*    childs_under_12: number;
-       childs_above_18: number;
-       childs_between_12_18: number;
-    */
-    adopted_types: string;
-    expected_recipes: number;
-    preffered_dietary_types: string;
-    preffered_treatment_types: string;
-    preffered_companies: string;
-    competitive_types: string;
-    personality_strengthens: string;
-    interestes: string;
-    personality_type_id: number;
-    social_pattern_id: number;
-    salesman_relationship_id: number;
-    secrtary_first_name: string;
+    full_place?: string;
+    close_place?: string;
+    email?: string;
+    second_name?: string;
+    waiting_time?: string;
+    stance_on_dietary_supp?: string;
+    adopted_types?: string;
+    expected_recipes?: number;
+    preffered_dietary_types?: string;
+    preffered_treatment_types?: string;
+    preffered_companies?: string;
+    competitive_types?: string;
+    personality_strengthens?: string;
+    interestes?: string;
+    personality_type?: string;
+    social_pattern?: string;
+    salesman_relationship?: string;
+    secrtary_first_name?: string;
 }
 
-
 export interface AddingPharmacist {
-    //Personal Info
-    // // photo: string,
+    // Personal Info
     first_name: string,
-    second_name: string;
+    second_name?: string,
     last_name: string,
+
     classification_id: number,
     loyalty_id: number,
+
     birth_date: string,
+
     admin_description: string,
     salesman_description: string,
+
     graduation_country: string,
     graduation_university: string,
+
     phone_number: string,
     telephone_number: string,
+
     gender: number,
-    email: string;
-    //Place Info
+
+    email?: string,
+
+    // Place Info
     governorate_id: number,
     city_id: number,
     area_id: number,
     street_id: number,
-    full_place: string;
-    close_place: string;
-    //Work Time Info
+
+    full_place?: string,
+    close_place?: string,
+    competitve_types: string;
+
+    // Work Time Info
     favourite_time_opening: string,
     favourite_time_closing: string,
+
     first_work_time_opening: string,
-    first_work_time_closing: string
+    first_work_time_closing: string,
+    competitive_types: string;
+
+
     second_work_time_opening: string,
     second_work_time_closing: string,
-    waiting_time_id: number;
-    //Medical Info
-    stance_on_dietary_supp: string;
-    adopted_types: string;
-    preffered_dietary_types: string;
-    preffered_treatment_types: string;
-    preffered_companies: string;
-    //Personaltiy Info
-    personality_strengthens: string;
-    interestes: string;
-    personality_type_id: number;
-    social_pattern_id: number;
-    salesman_relationship_id: number;
-    //for Pharmacy only
-    pharmacy_description_id: number;
-    pharmacy_name: string;
-    assistant_full_name: string;
-    //Relation to our company
-    execute_prescription_id: number;
-    doctor_relationship_id: number;
-    our_products_existance_percentage_id: number;
+
+    waiting_time?: string,
+
+    // Medical Info
+    stance_on_dietary_supp?: string,
+    adopted_types?: string,
+    preffered_dietary_types?: string,
+    preffered_treatment_types?: string,
+    preffered_companies?: string,
+
+    // Personality Info
+    personality_strengthens?: string,
+    interestes?: string,
+    personality_type?: string,
+    social_pattern?: string,
+    salesman_relationship?: string,
+
+    // Pharmacy only
+    pharmacy_description?: string,
+    pharmacy_name?: string,
+    assistant_full_name?: string,
+
+    // Relation to company
+    execute_prescription?: string,
+    doctor_relationship?: string,
+    our_products_existance_percentage?: string,
 }
 
 export interface AddingSpecializationType {

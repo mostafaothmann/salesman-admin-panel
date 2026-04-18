@@ -48,27 +48,27 @@ export default function CititesPage() {
                 const res = await editCity(editedId, { name: name, description: description, governorate_id: governorate_id });
                 if (res?.status == 200 || res?.status == 204) {
                     notification.success({
-                        message: "نجاح",
+                        title: "نجاح",
                         description: "تمت العملية بنجاح",
                         placement: 'bottomLeft'
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -93,21 +93,21 @@ export default function CititesPage() {
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -175,7 +175,7 @@ export default function CititesPage() {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -218,11 +218,6 @@ export default function CititesPage() {
                 return dataGovernorates?.find(e => e.id == Number(value)).name;
             }
         },
-        ,
-        {
-            title: "الوصف",
-            dataIndex: "description",
-        },
         {
             title: "تاريخ الإضافة",
             dataIndex: "created_at",
@@ -260,7 +255,7 @@ export default function CititesPage() {
                     <Button
                         variant="solid"
                         color="cyan"
-                        onClick={() => OpenShowModal(record.id)}
+                        onClick={() => openShowModal(record.id)}
                     >
                         عرض
                     </Button>

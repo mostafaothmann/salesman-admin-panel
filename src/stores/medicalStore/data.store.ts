@@ -706,7 +706,7 @@ export const useMedicalStore = create<DataStore>()(
             ) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiDoctor.patch(
+                    const res = await apiPharmacist.patch(
                         `/${id}`,
                         pharmacist
                     );
@@ -756,7 +756,7 @@ export const useMedicalStore = create<DataStore>()(
             ) => {
                 set({ loading: true, error: null });
                 try {
-                    const res = await apiDoctor.post(
+                    const res = await apiPharmacist.post(
                         `/filter`,
                         filters
                     );

@@ -130,21 +130,21 @@ export default function AssistantsPage() {
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -226,7 +226,7 @@ export default function AssistantsPage() {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });

@@ -2,9 +2,10 @@ import { Metadata } from "next";
 import React from "react";
 import PageBreadcrumb from "../../../../components/common/PageBreadCrumb";
 
+
 export const metadata: Metadata = {
-  title: "Next.js Blank Page | EmaarAdmin - Next.js Dashboard Template",
-  description: "This is Next.js Blank Page EmaarAdmin Dashboard Template",
+  title: "روح الأرض لوحة القيادة",
+  description: "روح الأرض",
 };
 
 export default function BlankPage() {

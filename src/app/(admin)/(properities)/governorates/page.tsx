@@ -282,18 +282,6 @@ export default function GovernoratesPage() {
             placeholder="اسم المحافظة"
           />
         </div>
-        <div className="col-span-12">
-          <h3>
-            الوصف
-          </h3>
-          <TextArea
-            value={description}
-            style={{ maxWidth: '100%' }}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={4}
-            placeholder="الوصف"
-          />
-        </div>
       </div>
     </Modal>
     <Modal

@@ -46,27 +46,27 @@ export default function BaseGiftsPage() {
                 const res = await editBaseGift(editedId, { name: name, description: description, quantity: quantity });
                 if (res?.status == 200 || res?.status == 204) {
                     notification.success({
-                        message: "نجاح",
+                        title: "نجاح",
                         description: "تمت العملية بنجاح",
                         placement: 'bottomLeft'
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -90,21 +90,21 @@ export default function BaseGiftsPage() {
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -169,7 +169,7 @@ export default function BaseGiftsPage() {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -247,7 +247,7 @@ export default function BaseGiftsPage() {
                     <Button
                         variant="solid"
                         color="cyan"
-                        onClick={() => OpenShowModal(record.id)}
+                        onClick={() => openShowModal(record.id)}
                     >
                         عرض
                     </Button>

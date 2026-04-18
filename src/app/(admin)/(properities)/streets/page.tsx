@@ -48,27 +48,27 @@ export default function StreetsPage() {
                 const res = await editStreet(editedId, { name: name, description: description, area_id: area_id });
                 if (res?.status == 200 || res?.status == 204) {
                     notification.success({
-                        message: "نجاح",
+                        title: "نجاح",
                         description: "تمت العملية بنجاح",
                         placement: 'bottomLeft'
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -95,21 +95,21 @@ export default function StreetsPage() {
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -180,7 +180,7 @@ export default function StreetsPage() {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -220,17 +220,11 @@ export default function StreetsPage() {
                 return dataAreas?.find(e => e.id == Number(value))?.name;
             }
         },
-        ,
-        {
-            title: "الوصف",
-            dataIndex: "description",
-        },
         {
             title: "تاريخ الإضافة",
             dataIndex: "created_at",
             sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
             render: (value: string) => { return value.slice(0, 10) }
-
         },
         {
             title: "",

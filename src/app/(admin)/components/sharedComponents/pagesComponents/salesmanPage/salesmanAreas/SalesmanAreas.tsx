@@ -72,7 +72,7 @@ export default function SalesmanAreas({ profile_id }: profileComponent) {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -130,7 +130,7 @@ export default function SalesmanAreas({ profile_id }: profileComponent) {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });

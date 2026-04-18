@@ -22,12 +22,21 @@ import {
 
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
+import { useUserAuthStore } from "../stores/authStores/auth.user.store";
+import { User } from "lucide-react";
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[]
+  roles?: ("ADMIN" | "ASSISTANT")[];
+  subItems?: {
+    name: string;
+    path: string;
+    pro?: boolean;
+    new?: boolean;
+    roles?: ("ADMIN" | "ASSISTANT")[];
+  }[];
 };
 
 const navItems: NavItem[] = [
@@ -124,29 +133,53 @@ const navItems: NavItem[] = [
       { name: "المناطق", path: "/areas", pro: false },
       { name: "الشوراع", path: "/streets", pro: false },
     ],
-  }
-  ,
+  },
   {
     icon: <Licence />,
     name: "إداري",
+    //roles: ["ADMIN", "ASSISTANT"],
     subItems: [
-      { name: "المشرفين", path: "/assistants", pro: false },
-      { name: "رسائل المندوبين", path: "/salesmans-messages", pro: false },
-      { name: "فيديوهات الأطباء", path: "/videos-links", pro: false },
-      { name: "العروض الأساسية", path: "/base-offers", pro: false },
-      { name: "الهدايا الأساسية", path: "/base-gifts", pro: false },
+      { name: "المشرفين", path: "/assistants", roles: ["ADMIN"] },
+      { name: "رسائل المندوبين", path: "/salesmans-messages", roles: ["ADMIN"] }, 
+      { name: "فيديوهات الأطباء", path: "/videos-links", roles: ["ADMIN", "ASSISTANT"] },
+      { name: "العروض الأساسية", path: "/base-offers", roles: ["ADMIN"] }, 
+      { name: "الهدايا الأساسية", path: "/base-gifts", roles: ["ADMIN", "ASSISTANT"] },
     ],
   }
 ];
 const AppSidebar: React.FC = () => {
+  const { getRole, user } = useUserAuthStore();
+  const [role, setRole] = useState(null)
+  useEffect(() => { setRole(user?.role) })
+
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+
+
   const pathname = usePathname();
+
+  const filteredNavItems = navItems
+    .map((nav) => {
+      if (nav.subItems) {
+        const filteredSubItems = nav.subItems.filter(
+          (sub) => !sub.roles || sub.roles.includes(role as any)
+        );
+        if (filteredSubItems.length === 0) return null;
+        return {
+          ...nav,
+          subItems: filteredSubItems,
+        };
+      }
+
+      return nav;
+    })
+    .filter(Boolean) as NavItem[];
+
   const renderMenuItems = (
     navItems: NavItem[],
     menuType: "main"
   ) => (
     <ul className="flex flex-col gap-4">
-      {navItems.map((nav, index) => (
+      {filteredNavItems.map((nav, index) => (
         <li key={nav.name}>
           {nav.subItems ? (
             <button
@@ -272,9 +305,11 @@ const AppSidebar: React.FC = () => {
 
   useEffect(() => {
     // Check if the current path matches any submenu item
+
+    console.log("ROLE 👉", role);
     let submenuMatched = false;
     ["main"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : [];
+      const items = menuType === "main" ? filteredNavItems : [];
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
@@ -390,7 +425,7 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {renderMenuItems(filteredNavItems, "main")}
             </div>
 
           </div>

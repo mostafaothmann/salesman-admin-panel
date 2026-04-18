@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { useUserAuthStore } from "../../stores/authStores/auth.user.store";
 
-export default function SignInForm() {
+export default function AdminSignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,7 +14,7 @@ export default function SignInForm() {
   const router = useRouter();
 
   const {
-    loginAssistant,
+    loginAdmin,
     loading,
     error,
     isAuthenticated,
@@ -30,7 +30,7 @@ export default function SignInForm() {
       return;
     }
 
-    await loginAssistant(email, password);
+    await loginAdmin(email, password);
   };
 
   // =========================

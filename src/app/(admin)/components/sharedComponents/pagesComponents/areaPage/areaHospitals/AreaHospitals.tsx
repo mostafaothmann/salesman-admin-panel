@@ -167,7 +167,7 @@ export default function AreaHospitals({ profile_id }: profileComponent) {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });

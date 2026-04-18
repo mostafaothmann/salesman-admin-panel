@@ -134,7 +134,7 @@ export default function DoctorHospitals({ profile_id }: profileComponent) {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -215,7 +215,7 @@ export default function DoctorHospitals({ profile_id }: profileComponent) {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });

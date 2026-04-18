@@ -2,8 +2,8 @@ import { Metadata } from "next";
 import SignInForm from "../../../../components/auth/SignInForm";
 
 export const metadata: Metadata = {
-  title: "Next.js SignIn Page | EmaarAdmin - Next.js Dashboard Template",
-  description: "This is Next.js Signin Page EmaarAdmin Dashboard Template",
+  title: "روح الأرض لوحة القيادة",
+  description: "روح الأرض",
 };
 
 export default function SignIn() {

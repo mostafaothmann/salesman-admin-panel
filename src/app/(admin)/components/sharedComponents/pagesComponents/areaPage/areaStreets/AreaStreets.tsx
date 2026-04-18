@@ -65,27 +65,27 @@ export default function AreaStreets({ profile_id }: profileComponent) {
                 const res = await editStreet(editedId, { name: name, description: description, area_id: area_id });
                 if (res?.status == 200 || res?.status == 204) {
                     notification.success({
-                        message: "نجاح",
+                        title: "نجاح",
                         description: "تمت العملية بنجاح",
                         placement: 'bottomLeft'
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -173,135 +173,8 @@ export default function AreaStreets({ profile_id }: profileComponent) {
     ];
 
     return <div>
-        {/*Adding Modal*/}
-        <Modal
-            title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
-                    <span>
-                        إضافة شارع
-                    </span>
-                </div>
-            }
-            open={open}
-            onOk={() => handleAdd()}
-            okButtonProps={{ variant: "outlined", color: "purple" }}
-            onCancel={() => emptyFields()}
-            mask={false}
-        >
-            <div className="grid grid-cols-12 gap-2">
-                <div className="md:col-span-6 col-span-12">
-                    <h3>
-                        اسم الشارع
-                    </h3>
-                    <Input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="اسم الشارع"
-                    />
-                </div>
-                <div className="md:col-span-6 col-span-12">
-                    <h3>
-                        المنطقة
-                    </h3>
-                    <AutoComplete
-                        style={{ width: 200 }}
-                        options={options}
-                        placeholder="المنطقة"
-                        value={searchText}
-                        onChange={(text) => {
-                            setSearchText(text);
-                            setAreaId(undefined);
-                        }}
-                        onSelect={(value, option) => {
-                            setAreaId(option.value);
-                            setSearchText(option?.label as string);
-                        }}
-                        filterOption={(inputValue, option) =>
-                            (option?.label as string)
-                                ?.toLowerCase()
-                                .includes(inputValue.toLowerCase())
-                        }
-                    />
-                </div>
-                <div className="col-span-12">
-                    <h3>
-                        الوصف
-                    </h3>
-                    <TextArea
-                        value={description}
-                        style={{ maxWidth: '100%' }}
-                        onChange={(e) => setDescription(e.target.value)}
-                        rows={4}
-                        placeholder="الوصف"
-                    />
-                </div>
-            </div>
-        </Modal >
-        <Modal
-            title={
-                <div className="flex items-center gap-2 text-lg font-semibold text-[#592C46]">
-                    <span>
-                        تعديل شارع
-                    </span>
-                </div>
-            }
-            open={open1}
-            okButtonProps={{ variant: "outlined", color: "blue" }}
-            onOk={() => handleEdit()}
-            onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}
-            mask={false}
-        >
-            <div className="grid grid-cols-12 gap-2">
-                <div className="md:col-span-6 col-span-12">
-                    <h3>
-                        اسم الشارع
-                    </h3>
-                    <Input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="اسم الشارع"
-                    />
-                </div>
-
-                <div className="md:col-span-6 col-span-12">
-                    <h3>
-                        المدينة
-                    </h3>
-                    <AutoComplete
-                        style={{ width: 200 }}
-                        options={options}
-                        placeholder="المدينة"
-                        value={searchText}
-                        onChange={(text) => {
-                            setSearchText(text);
-                            setAreaId(undefined);
-                        }}
-                        onSelect={(value, option) => {
-                            setAreaId(option.value);
-                            setSearchText(option?.label as string);
-                        }}
-
-                        filterOption={(inputValue, option) =>
-                            (option?.label as string)
-                                ?.toLowerCase()
-                                .includes(inputValue.toLowerCase())
-                        }
-                    />
-                </div>
-                <div className=" col-span-12">
-                    <h3>
-                        الوصف
-                    </h3>
-                    <TextArea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        rows={4}
-                        placeholder="الوصف"
-                    />
-                </div>
-            </div>
-        </Modal>
+      
+      
 
         {/* Show Modal */}
         <Modal
@@ -347,18 +220,6 @@ export default function AreaStreets({ profile_id }: profileComponent) {
             </div>
         </Modal>
 
-        {/*Delete Modal*/}
-        <Modal
-            title="تأكيد الحذف"
-            open={openDeleteModal}
-            onOk={() => handleDelete(delitedID)}
-            onCancel={() => setOpenDeleteModal(false)}
-            confirmLoading={loading2}
-            mask={false}
-            okType="danger"
-            okButtonProps={{ type: "primary" }}
-        >
-        </Modal>
 
         <div className="grid grid-cols-12 gap-4 md:gap-6 w-full">
             <Button className="col-span-5" variant="solid" color="cyan" onClick={() => setOpen(true)}>

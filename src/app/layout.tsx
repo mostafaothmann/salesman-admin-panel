@@ -2,7 +2,12 @@ import { Outfit } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '../context/ThemeContext';
 import { SidebarProvider } from '../context/SidebarContext';
+import RoleGuard from '../hooks/useRoleGuard';
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -10,15 +15,15 @@ const outfit = Outfit({
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="ar" dir='rtl'>
-      <body className={`${outfit.className} dark:bg-gray-900 `}>
-        <ThemeProvider>
-          <SidebarProvider>{children}</SidebarProvider>
-        </ThemeProvider>
+    <html lang="ar" dir="rtl">
+      <body className={`${outfit.className} dark:bg-gray-900`}>
+          <ThemeProvider>
+            <SidebarProvider>{children}</SidebarProvider>
+          </ThemeProvider>
       </body>
     </html>
   );

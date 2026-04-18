@@ -89,27 +89,27 @@ export default function HospitalsPage() {
                 });
                 if (res?.status == 200 || res?.status == 204) {
                     notification.success({
-                        message: "نجاح",
+                        title: "نجاح",
                         description: "تمت العملية بنجاح",
                         placement: 'bottomLeft'
                     });
                 } else if (res?.status == 500) {
                     notification.error({
-                        message: "خطأ",
+                        title: "خطأ",
                         description: "حدث خطأ في الاتصال بالسيرفر",
                         placement: 'bottomLeft'
                     });
                 }
                 else {
                     notification.error({
-                        message: "فشل",
+                        title: "فشل",
                         description: "فشل العملية",
                         placement: 'bottomLeft'
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -127,20 +127,50 @@ export default function HospitalsPage() {
         setCityId(city_id + 1)
         setAreaId(area_id + 1)
         setStreetId(street_id + 1)
-        await addHospital({
-            name: name,
-            admin_description: admin_description,
-            type: type,
-            salesman_description: salesman_description,
-            phone_number: phone_number,
-            telephone_number: telephone_number,
-            governorate_id: governorate_id,
-            email: email,
-            city_id: city_id,
-            street_id: street_id,
-            area_id: area_id,
-        })
-
+        if (name && /^[A-Za-z\u0600-\u06FF\s]+$/.test(name)
+        ) {
+            try {
+                const res = await addHospital({
+                    name: name,
+                    admin_description: admin_description,
+                    type: type,
+                    salesman_description: salesman_description,
+                    phone_number: phone_number,
+                    telephone_number: telephone_number,
+                    governorate_id: governorate_id,
+                    email: email,
+                    city_id: city_id,
+                    street_id: street_id,
+                    area_id: area_id,
+                })
+                if (res?.status == 201) {
+                    notification.success({
+                        message: "نجاح",
+                        description: "تمت العملية بنجاح",
+                        placement: 'bottomLeft'
+                    });
+                } else if (res?.status == 500) {
+                    notification.error({
+                        title: "خطأ",
+                        description: "حدث خطأ في الاتصال بالسيرفر",
+                        placement: 'bottomLeft'
+                    });
+                }
+                else {
+                    notification.error({
+                        title: "فشل",
+                        description: "فشل العملية",
+                        placement: 'bottomLeft'
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    title: "فشل",
+                    description: "فشل العملية",
+                    placement: 'bottomLeft'
+                });
+            }
+        }
         getHospitalsData();
         setTelephoneNumber("");
         setPhoneNumber("");
@@ -166,8 +196,6 @@ export default function HospitalsPage() {
         setEmail("")
         setOpen(false);
     }
-
-
     //location 
     async function OpenLocationModal(id: number) {
         const hosplial = dataHospitals?.find(e => e.id == id)
@@ -257,7 +285,7 @@ export default function HospitalsPage() {
             }
             else {
                 notification.error({
-                    message: "فشل",
+                    title: "فشل",
                     description: "فشل العملية",
                     placement: 'bottomLeft'
                 });
@@ -368,7 +396,7 @@ export default function HospitalsPage() {
                     >
                         موقع
                     </Button>
-              
+
                     <Button
                         type="default"
                         danger
@@ -489,10 +517,10 @@ export default function HospitalsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setGovernorateId(undefined); 
-                            setCityId(undefined); 
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setGovernorateId(undefined);
+                            setCityId(undefined);
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -530,9 +558,9 @@ export default function HospitalsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setCityId(undefined); 
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setCityId(undefined);
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -570,8 +598,8 @@ export default function HospitalsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -608,7 +636,7 @@ export default function HospitalsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setStreetId(undefined); 
+                            setStreetId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setStreetId(option.value);
@@ -680,7 +708,7 @@ export default function HospitalsPage() {
             okButtonProps={{ variant: "outlined", color: "blue" }}
             onOk={() => handleEdit()}
             onCancel={() => { setOpenEditModal(false); emptyFields() }}
-            confirmLoading={loading}   
+            confirmLoading={loading}
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">
@@ -747,10 +775,10 @@ export default function HospitalsPage() {
                             setSearchTextCity("");
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setGovernorateId(undefined); 
-                            setCityId(undefined); 
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setGovernorateId(undefined);
+                            setCityId(undefined);
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const governorate = dataGovernorates?.find(
                                 item => item.id === governorate_id)
                             setOptionsCities(governorate?.cities?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -788,9 +816,9 @@ export default function HospitalsPage() {
                             setSearchTextCity(text);
                             setSearchTextArea("");
                             setSearchTextStreet("");
-                            setCityId(undefined); 
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setCityId(undefined);
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const city = dataCities?.find(
                                 item => item.id === city_id)
                             setOptionsAreas(city?.areas?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -828,8 +856,8 @@ export default function HospitalsPage() {
                             getStreetsData()
                             setSearchTextArea(text);
                             setSearchTextStreet("");
-                            setAreaId(undefined); 
-                            setStreetId(undefined); 
+                            setAreaId(undefined);
+                            setStreetId(undefined);
                             const area = dataAreas?.find(
                                 item => item.id === area_id)
                             setOptionsStreets(area?.streets?.map(e => { return { value: e.id, label: e.name } }) || [])
@@ -866,7 +894,7 @@ export default function HospitalsPage() {
 
                         onChange={(text) => {
                             setSearchTextStreet(text);
-                            setStreetId(undefined); 
+                            setStreetId(undefined);
                         }}
                         onSelect={(value, option) => {
                             setStreetId(option.value);
@@ -922,7 +950,7 @@ export default function HospitalsPage() {
             okButtonProps={{ variant: "outlined", color: "cyan" }}
 
             onCancel={() => { setOpenShowModal(false); emptyFields() }}
-            confirmLoading={loading}   
+            confirmLoading={loading}
             mask={false}
         >
             <div className="grid grid-cols-12 gap-2">

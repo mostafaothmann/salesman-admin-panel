@@ -25,7 +25,6 @@ export interface Salesman {
 
     gender: number;
 
-    governorate_id: number;
     level: number;
     team_profit: number;
     total_profit: number;
