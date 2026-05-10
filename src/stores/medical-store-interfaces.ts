@@ -86,8 +86,6 @@ export interface Doctor {
     last_name: string,
     classification_id: number,
     loyalty_id: number,
-    last_visit_note: string | null,
-    last_visit_date: Date,
     birth_date: string,
     average_patients_per_day: number,
     admin_description: string,
@@ -104,7 +102,7 @@ export interface Doctor {
     is_added_by_admin: boolean,
     phone_number: string,
     telephone_number: string,
-    gender: number,
+    gender_id: number,
     /*     wife_husband_first_name: string;
         wife_husband_last_name: string; */
     //added recently
@@ -233,7 +231,7 @@ export interface Pharmacist {
     graduation_university: string,
     phone_number: string,
     telephone_number: string,
-    gender: number,
+    gender_id: number,
     email: string;
     //Place Info
     lan: string | null,
@@ -245,9 +243,6 @@ export interface Pharmacist {
     full_place: string;
     close_place: string;
     //Administrative Info
-    last_visit_note: string | null,
-    last_visit_date: string | null,
-    last_order_date: string | null;
     average_patients_per_day: number,
     is_added_by_admin: boolean,
     //Work Time Info
@@ -467,7 +462,7 @@ export interface AddingDoctor {
     graduation_university: string,
     phone_number: string,
     telephone_number: string,
-    gender: number,
+    gender_id: number,
     full_place?: string;
     close_place?: string;
     email?: string;
@@ -486,6 +481,8 @@ export interface AddingDoctor {
     social_pattern?: string;
     salesman_relationship?: string;
     secrtary_first_name?: string;
+    average_patients_per_day?: number,
+    is_added_by_admin?: boolean,
 }
 
 export interface AddingPharmacist {
@@ -508,7 +505,7 @@ export interface AddingPharmacist {
     phone_number: string,
     telephone_number: string,
 
-    gender: number,
+    gender_id: number,
 
     email?: string,
 
@@ -520,7 +517,10 @@ export interface AddingPharmacist {
 
     full_place?: string,
     close_place?: string,
-    competitve_types: string;
+
+    // ⚠️ kept both (do not delete as requested)
+    competitve_types?: string,
+    competitive_types?: string,
 
     // Work Time Info
     favourite_time_opening: string,
@@ -528,13 +528,12 @@ export interface AddingPharmacist {
 
     first_work_time_opening: string,
     first_work_time_closing: string,
-    competitive_types: string;
-
 
     second_work_time_opening: string,
     second_work_time_closing: string,
 
     waiting_time?: string,
+    average_patients_per_day?: number,
 
     // Medical Info
     stance_on_dietary_supp?: string,
@@ -559,6 +558,7 @@ export interface AddingPharmacist {
     execute_prescription?: string,
     doctor_relationship?: string,
     our_products_existance_percentage?: string,
+    is_added_by_admin?: boolean,
 }
 
 export interface AddingSpecializationType {

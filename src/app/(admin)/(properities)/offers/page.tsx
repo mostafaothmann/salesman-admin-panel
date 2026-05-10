@@ -173,7 +173,7 @@ export default function OffersPage() {
                 const formattedData = (allData ?? []).map(item => ({
                     "تاريخ البيع": item.created_at.slice(0, 10),
                     "البونص": item.number_of_gifts,
-                    "الكمية المجانية": item.number_of_pieces,
+                    "الكمية الأساسية": item.number_of_pieces,
                     "الصنف": typesNames?.find(e => e.id == Number(item.type_id))?.name,
                 }));
                 const worksheet = XLSX.utils.json_to_sheet(formattedData);

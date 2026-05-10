@@ -140,9 +140,9 @@ const navItems: NavItem[] = [
     //roles: ["ADMIN", "ASSISTANT"],
     subItems: [
       { name: "المشرفين", path: "/assistants", roles: ["ADMIN"] },
-      { name: "رسائل المندوبين", path: "/salesmans-messages", roles: ["ADMIN"] }, 
+      { name: "رسائل المندوبين", path: "/salesmans-messages", roles: ["ADMIN"] },
       { name: "فيديوهات الأطباء", path: "/videos-links", roles: ["ADMIN", "ASSISTANT"] },
-      { name: "العروض الأساسية", path: "/base-offers", roles: ["ADMIN"] }, 
+      { name: "العروض الأساسية", path: "/base-offers", roles: ["ADMIN"] },
       { name: "الهدايا الأساسية", path: "/base-gifts", roles: ["ADMIN", "ASSISTANT"] },
     ],
   }
@@ -152,7 +152,7 @@ const AppSidebar: React.FC = () => {
   const [role, setRole] = useState(null)
   useEffect(() => { setRole(user?.role) })
 
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar();
 
 
   const pathname = usePathname();
@@ -251,6 +251,8 @@ const AppSidebar: React.FC = () => {
                 {nav.subItems.map((subItem) => (
                   <li key={subItem.name}>
                     <Link
+                      //for Closing the Sidebar 
+                      onClick={() => { if (isMobileOpen) { toggleMobileSidebar(); } }}
                       href={subItem.path}
                       className={`menu-dropdown-item ${isActive(subItem.path)
                         ? "menu-dropdown-item-active"
@@ -345,6 +347,7 @@ const AppSidebar: React.FC = () => {
   }, [openSubmenu]);
 
   const handleSubmenuToggle = (index: number, menuType: "main") => {
+    //for Closing the Side Bar
     setOpenSubmenu((prevOpenSubmenu) => {
       if (
         prevOpenSubmenu &&
@@ -384,20 +387,12 @@ const AppSidebar: React.FC = () => {
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <Image
-                className="dark:hidden"
+              {!isMobileOpen && <Image
                 src="/images/logo/logo.svg"
                 alt="Logo"
                 width={150}
                 height={40}
-              />
-              <Image
-                className="hidden dark:block"
-                src="/images/logo/logo.svg"
-                alt="Logo"
-                width={200}
-                height={40}
-              />
+              />}
             </>
           ) : (
             <Image

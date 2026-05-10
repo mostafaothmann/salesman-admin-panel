@@ -3,7 +3,7 @@
 import { Type } from "../../../../../../../stores/types-store-interfaces";
 import { useTypeStore } from "../../../../../../../stores/typesStore/data.store";
 import { useEffect, useState } from "react";
-import { AutoComplete, Button, ConfigProvider, DatePicker, Input, InputNumber, notification, Select, SelectProps, Skeleton, Tabs, TimePicker, TimePickerProps } from "antd";
+import { AutoComplete, Button, Checkbox, ConfigProvider, DatePicker, Input, InputNumber, notification, Select, SelectProps, Skeleton, Tabs, TimePicker, TimePickerProps } from "antd";
 import { profileComponent } from "../../../../../../../stores/other-store-interfaces";
 import { apiPharmacist, apiType } from "../../../../../../../stores/apis";
 import { useMedicalStore } from "../../../../../../../stores/medicalStore/data.store";
@@ -48,7 +48,7 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
     const [first_name, setFirstName] = useState("");
     const [second_name, setSecondName] = useState("");
     const [last_name, setLastName] = useState("");
-    const [gender, setGender] = useState<number | null>(null);
+    const [gender_id, setGenderId] = useState<number | null>(null);
     const [loyalty_id, setLoyaltyId] = useState<number | null>(null);
     const [birth_date, setBirthDate] = useState(null);
 
@@ -70,7 +70,6 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
     const [lan, setLan] = useState("");
     const [full_place, setFullPlace] = useState("");
     const [close_place, setClosePlace] = useState("");
-    const [close_locaiton, setclose_location] = useState("");
 
     // Professional
     const [classification_id, setClassificationId] = useState<number | null>(null);
@@ -113,7 +112,6 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
     };
 
     const [optionsAdoptedTypes, setOptionsAdoptedTypes] = useState<SelectProps['options']>([]);
-
 
     const optionsPrefferedTreatmentTypes: SelectProps['options'] = [
         {
@@ -207,8 +205,6 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
             ],
         }
     ]
-
-
 
     const optionsPrefferedDietaryTypes: SelectProps['options'] = [
         {
@@ -485,7 +481,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
     const [interestes, setInterestes] = useState<string | null>("");
     const [personality_type, setPersonalityType] = useState<string | null>(null);
     const [social_pattern, setSocialPattern] = useState<string | null>(null);
+    const [doctor_relationship, setDoctorRelationship] = useState<string | null>(null);
     const [salesman_relationship, setSalesmanRelationship] = useState<string | null>(null);
+    const [pharmacy_description, setPharmacyDescription] = useState<string | null>(null);
 
     // System / Extra
     const [photo, setPhoto] = useState("");
@@ -494,10 +492,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
     const [isAddedByAdmin, setIsAddedByAdmin] = useState<boolean>(false);
 
     //for Auto Complete
-    const [searchTextSpecilization, setSearchTextSpecilization] = useState("");
     const [searchTextClassification, setSearchTextClassification] = useState("");
     const [searchTextLoyalty, setSearchTextLoyalty] = useState("");
-    const [searchTextSex, setSearchTextSex] = useState("");
+    const [searchTextGender, setSearchTextGender] = useState("");
     const [searchTextGovernorate, setSearchTextGovernorate] = useState("");
     const [searchTextCity, setSearchTextCity] = useState("");
     const [searchTextArea, setSearchTextArea] = useState("");
@@ -505,7 +502,10 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
     const [searchTextPersonalityType, setSearchTextPersonalityType] = useState("");
     const [searchTextSocialPattern, setSearchTextSocialPattern] = useState("");
     const [searchTextSalesmanRelationship, setSearchTextSalesmanRelationship] = useState("");
+    const [searchTextDoctorRelationship, setSearchTextDoctorRelationship] = useState("");
     const [searchTextWaitingTime, setSearchTextWaitingTime] = useState("");
+    const [searchTextPharmacyDescription, setSearchTextPharmacyDescription] = useState("");
+    const [searchTextExecutePrescription, setSearchTextExecutePrescription] = useState("");
 
 
 
@@ -517,7 +517,7 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
         item => item.id === area_id)
     const [optionsStreets, setOptionsStreets] = useState([])
 
-    const optionsSex = [
+    const optionsGender = [
         { value: 1, label: 'ذكر' },
         { value: 2, label: 'أنثى' }]
     const optionsLoyalty = [
@@ -550,7 +550,15 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
         { value: 'observer', label: 'مراقب' }
     ];
 
-    const optionsSalesmanRelationships = [
+    const optionsSalesmanRelationship = [
+        { value: 'strong', label: 'علاقة قوية' },
+        { value: 'good', label: 'علاقة جيدة' },
+        { value: 'neutral', label: 'علاقة عادية' },
+        { value: 'weak', label: 'علاقة ضعيفة' },
+        { value: 'none', label: 'لا توجد علاقة' }
+    ];
+
+    const optionsDoctorRelationship = [
         { value: 'strong', label: 'علاقة قوية' },
         { value: 'good', label: 'علاقة جيدة' },
         { value: 'neutral', label: 'علاقة عادية' },
@@ -564,6 +572,22 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
         { value: 'halfHour', label: 'نصف ساعة' },
         { value: 'hour', label: 'ساعة' },
         { value: 'unspecified', label: 'غير محدد' }
+    ];
+
+
+    const optionsPharmacyDescription = [
+        { 'value': 'hospital', 'label': 'صيدلية تابعة لمشفى' },
+        { 'value': 'independent', 'label': 'صيدلية مستقلة' },
+        { 'value': 'chain_branch', 'label': 'صيدلية فرع (سلسلة)' },
+        { 'value': 'clinic', 'label': 'صيدلية ضمن عيادة' },
+        { 'value': 'online', 'label': 'صيدلية إلكترونية / توصيل' },
+    ];
+    const optionsExecutePrescription = [
+        { 'value': 'dispense', 'label': 'يصرف الوصفة' },
+        { 'value': 'modify', 'label': 'يغير في الوصفة' },
+        { 'value': 'substitute', 'label': 'يستبدل دواء' },
+        { 'value': 'reject', 'label': 'يرفض صرف الوصفة' },
+        { 'value': 'delay', 'label': 'يؤجل الصرف' },
     ];
 
 
@@ -583,6 +607,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
     const [favourite_time_opening, setFavouriteTimeOpening] = useState<string | null>("");
     const [favourite_time_closing, setFavouriteTimeClosing] = useState<string | null>("");
     const [average_patients_per_day, setAveragePatientsPerDay] = useState<number | null>(null);
+    const [assistant_full_name, setAssistantFullName] = useState<string | null>(null);
+    const [pharmacy_name, setPharmacyName] = useState<string | null>(null);
+    const [execute_prescription, setExecutePrescription] = useState<string | null>(null);
 
     const onChangeFirstTimeOpening: TimePickerProps['onChange'] = (time, timeString) => {
         setFirstWorkTimeOpening(timeString)
@@ -611,15 +638,18 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
         setFirstName(pharmacistD.first_name || "");
         setSecondName(pharmacistD.second_name || "");
         setLastName(pharmacistD.last_name || "");
-        setGender(pharmacistD.gender ?? null);
+        setGenderId(pharmacistD.gender_id ?? null);
         setLoyaltyId(pharmacistD.loyalty_id ?? null);
         setBirthDate(dayjs(pharmacistD.birth_date));
         setAdminDescription(pharmacistD.admin_description || "");
         setSalesmanDescription(pharmacistD.salesman_description || "");
+        setDoctorRelationship(pharmacistD.doctor_relatinoship || "")
 
         setPhoneNumber(pharmacistD.phone_number || "");
         setTelephoneNumber(pharmacistD.telephone_number || "");
         setEmail(pharmacistD.email || "");
+        setAssistantFullName(pharmacistD.assistant_full_name || "")
+        setPharmacyName(pharmacistD.pharmacy_name || "")
 
         setGovernorateId(pharmacistD.governorate_id ?? null);
         setCityId(pharmacistD.city_id ?? null);
@@ -629,7 +659,6 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
         setLan(pharmacistD.lan || "");
         setFullPlace(pharmacistD.full_place || "");
         setClosePlace(pharmacistD.close_place || "");
-        setclose_location(pharmacistD.close_location || "");
 
         setClassificationId(pharmacistD.classification_id || "");
         setLoyaltyId(pharmacistD?.loyalty_id || "")
@@ -657,11 +686,13 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
         setPersonalityType(pharmacistD.personality_type ?? null);
         setSocialPattern(pharmacistD.social_pattern ?? null);
         setSalesmanRelationship(pharmacistD.salesman_relationship ?? null);
+        setPharmacyDescription(pharmacistD.pharmacy_description)
 
         setPhoto(pharmacistD.photo || "");
         setLastVisitNote(pharmacistD.last_visit_note || "");
         setLastVisitDate(pharmacistD.last_visit_date ? new Date(pharmacistD.last_visit_date) : null);
         setIsAddedByAdmin(pharmacistD.is_added_by_admin ?? false);
+        setExecutePrescription(pharmacistD.execute_prescription || "")
     }, [pharmacistD]);
     useEffect(() => {
         setSearchTextLoyalty(
@@ -703,10 +734,22 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
     }, [pharmacistD])
 
     useEffect(() => {
-        setSearchTextSalesmanRelationship(optionsSalesmanRelationships.find(e => e.value == pharmacistD?.salesman_relationship)?.label)
+        setSearchTextPharmacyDescription(optionsPharmacyDescription.find(e => e.value == pharmacistD?.pharmacy_description)?.label)
+    }, [pharmacistD])
+    useEffect(() => {
+        setSearchTextSalesmanRelationship(optionsSalesmanRelationship.find(e => e.value == pharmacistD?.salesman_relationship)?.label)
+    }, [pharmacistD])
+    useEffect(() => {
+        setSearchTextDoctorRelationship(optionsDoctorRelationship.find(e => e.value == pharmacistD?.doctor_relationship)?.label)
     }, [pharmacistD])
     useEffect(() => {
         setSearchTextWaitingTime(optionsWaitingTime.find(e => e.value == pharmacistD?.waiting_time)?.label)
+    }, [pharmacistD])
+    useEffect(() => {
+        setSearchTextExecutePrescription(optionsExecutePrescription.find(e => e.value == pharmacistD?.execute_prescription)?.label)
+    }, [pharmacistD])
+    useEffect(() => {
+        setSearchTextGender(optionsGender.find(e => e.value == pharmacistD?.gender_id)?.label)
     }, [pharmacistD])
     //Edit Modal
     const [open1, setOpenEditModal] = useState(false);
@@ -744,7 +787,6 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                 phone_number,
                 telephone_number,
                 graduation_university,
-                gender,
                 /*  wife_husband_first_name: string;
                  wife_husband_last_name: string; */
                 //added recently
@@ -758,6 +800,7 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                    childs_above_18: number;
                    childs_between_12_18: number;
                 */
+                doctor_relationship,
                 adopted_types,
                 preffered_dietary_types,
                 preffered_treatment_types,
@@ -768,7 +811,12 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                 interestes,
                 personality_type,
                 social_pattern,
+                pharmacy_description,
+                gender_id,
                 salesman_relationship,
+                execute_prescription,
+                pharmacy_name,
+                assistant_full_name
             });
             if (res?.status == 200 || res?.status == 204) {
                 notification.success({
@@ -826,9 +874,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         ].map((field, i) => (
                             <div key={i} className="col-span-12 md:col-span-4 sm:col-span-6">
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                     {field.label}
-                                </h3>
+                                </h2>
                                 <Input
                                     value={field.value}
                                     onChange={(e) => field.set(e.target.value)}
@@ -840,9 +888,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                         {/*Loyalty*/}
                         <div className="col-span-12 md:col-span-4 sm:col-span-6">
                             <div>
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                     الولاء
-                                </h3>
+                                </h2>
                             </div>
                             <AutoComplete
                                 style={{ width: '100%' }}
@@ -866,13 +914,41 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                             />
                         </div>
 
+                        {/* Gender */}
+                        <div className="col-span-12 md:col-span-4 sm:col-span-6">
+                            <div>
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                    الجنس
+                                </h2>
+                            </div>
+                            <AutoComplete
+                                style={{ width: '100%' }}
+                                options={optionsGender}
+                                placeholder="الجنس"
+                                value={searchTextGender}
+
+                                onChange={(text) => {
+                                    setSearchTextGender(text);
+                                    setGenderId(undefined);
+                                }}
+                                onSelect={(value, option) => {
+                                    setGenderId(option.value);
+                                    setSearchTextGender(option?.label as string);
+                                }}
+                                filterOption={(inputValue, option) =>
+                                    (option?.label as string)
+                                        ?.toLowerCase()
+                                        .includes(inputValue.toLowerCase())
+                                }
+                            />
+                        </div>
 
                         {/*Classification*/}
                         <div className="col-span-12 md:col-span-4 sm:col-span-6">
                             <div>
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                     التصنيف
-                                </h3>
+                                </h2>
                             </div>
                             <AutoComplete
                                 style={{ width: '100%' }}
@@ -903,9 +979,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* DATE */}
                         <div className="col-span-12 md:col-span-4 sm:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
                                 تاريخ الميلاد
-                            </h3>
+                            </h2>
                             <DatePicker className="w-full"
                                 value={birth_date}
                                 onChange={(e) => setBirthDate(e)}
@@ -913,9 +989,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                         </div>
                         {/* Gmail */}
                         <div className="col-span-12 md:col-span-4 sm:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 البريد الإلكتروني
-                            </h3>
+                            </h2>
                             <Input
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -924,9 +1000,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                         </div>
                         {/* ADMIN DESCRIPTION */}
                         <div className="col-span-12 sm:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 وصف الإدارة
-                            </h3>
+                            </h2>
                             <TextArea
                                 rows={4}
                                 value={admin_description}
@@ -937,9 +1013,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* SALESMAN DESCRIPTION */}
                         <div className="col-span-12 sm:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 وصف المندوب
-                            </h3>
+                            </h2>
                             <TextArea
                                 rows={4}
                                 value={salesman_description}
@@ -947,15 +1023,23 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                                 className="bg-gray-50 border border-gray-200 text-gray-700"
                             />
                         </div>
-                        <div className="col-span-12 sm:col-span-6">
-                            <Button
-                                type="default"
-                                onClick={() => handleEdit()}
-                            >
-                                تعديل
-                            </Button>
-                        </div>
 
+                        {/* IS ADDED BY ADMIN */}
+                        <div className="col-span-12 sm:col-span-3">
+                            <div className="grid grid-cols-12">
+                                <div className="col-span-1">
+                                    <Checkbox disabled
+                                        checked={Boolean(isAddedByAdmin)}
+                                    >
+                                    </Checkbox>
+                                </div>
+                                <div className="col-span-9">
+                                    <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                        مضاف من قبل الإدارة
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -963,11 +1047,57 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                 return <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-12 grid grid-cols-12 gap-4 rounded-xl bg-white p-5 shadow-md border border-gray-100">
 
+                        {/* PHARMACY NAME */}
+                        <div className="col-span-12 md:col-span-4">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                اسم الصيدلية
+                            </h2>
+                            <Input
+                                value={pharmacy_name}
+                                onChange={(e) => setPharmacyName(e.target.value)}
+                                className="bg-gray-50 border border-gray-200 text-gray-700"
+                            />
+                        </div>
+
+                        {/* ASSISTANT FULL NAME */}
+                        <div className="col-span-12 md:col-span-4">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                اسم المساعد الكامل
+                            </h2>
+                            <Input
+                                value={assistant_full_name}
+                                onChange={(e) => setAssistantFullName(e.target.value)}
+                                className="bg-gray-50 border border-gray-200 text-gray-700"
+                            />
+                        </div>
+
+                        {/* PHARMACY DESCRIPTION */}
+                        <div className="col-span-12 md:col-span-4">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                نوع الصيدلية
+                            </h2>
+                            <AutoComplete
+                                style={{ width: '100%' }}
+                                options={optionsPharmacyDescription}
+                                placeholder="نوع الصيدلية"
+                                value={searchTextPharmacyDescription}
+
+                                onChange={(text) => {
+                                    setSearchTextPharmacyDescription(text);
+                                    setPharmacyDescription(undefined);
+                                }}
+                                onSelect={(value, option) => {
+                                    setPharmacyDescription(option.value);
+                                    setSearchTextPharmacyDescription(option?.label as string);
+                                }}
+                            />
+                        </div>
+
                         {/* GOVERNORATE */}
                         <div className="col-span-6 xl:col-span-3">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 المحافظة
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsGovernorates}
@@ -1006,9 +1136,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* CITY */}
                         <div className="col-span-6 xl:col-span-3">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 المدينة
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsCities}
@@ -1046,9 +1176,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* AREA */}
                         <div className="col-span-6 xl:col-span-3">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 المنطقة
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsAreas}
@@ -1085,9 +1215,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* STREET */}
                         <div className="col-span-6 xl:col-span-3">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الشارع
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsStreets}
@@ -1113,9 +1243,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* FULL PLACE */}
                         <div className="col-span-12">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 العنوان بالكامل
-                            </h3>
+                            </h2>
                             <TextArea
                                 rows={3}
                                 value={full_place}
@@ -1126,23 +1256,16 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* CLOSE PLACE */}
                         <div className="col-span-12">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 أقرب مكان
-                            </h3>
+                            </h2>
                             <TextArea
                                 value={close_place}
                                 onChange={(e) => setClosePlace(e.target.value)}
                                 className="bg-gray-50 border border-gray-200 text-gray-700"
                             />
                         </div>
-                        <div className="col-span-12 sm:col-span-6">
-                            <Button
-                                type="default"
-                                onClick={() => handleEdit()}
-                            >
-                                تعديل
-                            </Button>
-                        </div>
+
                     </div>
                 </div>
             case "3":
@@ -1151,9 +1274,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* WAITING TIME */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 مدة الانتظار
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsWaitingTime}
@@ -1178,9 +1301,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* AVERAGE PATIENTS */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 عدد المرضى يومياً
-                            </h3>
+                            </h2>
                             <Input
                                 value={average_patients_per_day ?? ""}
                                 onChange={(e) => setAveragePatientsPerDay(Number(e.target.value))}
@@ -1190,60 +1313,53 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
                             <div className="col-span-12">
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
                                     موعد الدوام  الأول
-                                </h3>
+                                </h2>
                             </div>
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>من</h3>
+                                <h2>من</h2>
                                 <TimePicker value={dayjs(first_work_time_opening, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeFirstTimeOpening} />
                             </div>
 
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>إلى</h3>
+                                <h2>إلى</h2>
                                 <TimePicker value={dayjs(first_work_time_closing, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeFirstTimeClosing} />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
                             <div className="col-span-12">
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
                                     موعد الدوام  الثاني
-                                </h3>
+                                </h2>
                             </div>
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>من</h3>
+                                <h2>من</h2>
                                 <TimePicker value={dayjs(second_work_time_opening, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeSecondTimeOpening} />
                             </div>
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>إلى</h3>
+                                <h2>إلى</h2>
                                 <TimePicker value={dayjs(second_work_time_closing, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeSecondTimeClosing} />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
                             <div className="col-span-12">
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
                                     موعد الزيارة المفضل
-                                </h3>
+                                </h2>
                             </div>
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>من</h3>
+                                <h2>من</h2>
                                 <TimePicker value={dayjs(favourite_time_opening, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeFavouriteTimeOpening} />
                             </div>
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>إلى</h3>
+                                <h2>إلى</h2>
                                 <TimePicker value={dayjs(favourite_time_closing, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeFavouriteTimeClosing} />
                             </div>
                         </div>
-                        <div className="col-span-12 sm:col-span-6">
-                            <Button
-                                type="default"
-                                onClick={() => handleEdit()}
-                            >
-                                تعديل
-                            </Button>
-                        </div>
+
                     </div>
                 </div>
             case "4":
@@ -1252,9 +1368,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* PERSONALITY STRENGTHS */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 نقاط القوة في الشخصية
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1268,9 +1384,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* INTERESTS */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الاهتمامات
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1283,11 +1399,11 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                         </div>
 
                         {/* PERSONALITY TYPE */}
-                        <div className="col-span-6 xl:col-span-4">
+                        <div className="col-span-6 xl:col-span-3">
                             <div>
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                     نوع الشخصية
-                                </h3>
+                                </h2>
                             </div>
                             <AutoComplete
                                 style={{ width: '100%' }}
@@ -1312,10 +1428,10 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                         </div>
 
                         {/* SOCIAL PATTERN */}
-                        <div className="col-span-12 md:col-span-4">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                        <div className="col-span-6 xl:col-span-3">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 النمط الاجتماعي
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsSocialPatterns}
@@ -1335,13 +1451,36 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                         </div>
 
                         {/* SALESMAN RELATIONSHIP */}
-                        <div className="col-span-12 md:col-span-4">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
-                                علاقته بالمندوب
-                            </h3>
+                        <div className="col-span-6 xl:col-span-3">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                علاقته بالأطباء من حوله
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
-                                options={optionsSalesmanRelationships}
+                                options={optionsDoctorRelationship}
+                                placeholder="علاقته بالأطباء من حوله"
+                                value={searchTextDoctorRelationship}
+
+                                onChange={(text) => {
+                                    setSearchTextDoctorRelationship(text);
+                                    setDoctorRelationship(undefined);
+                                }}
+                                onSelect={(value, option) => {
+                                    setDoctorRelationship(option.value);
+                                    setSearchTextDoctorRelationship(option.label as string);
+                                }}
+
+                            />
+                        </div>
+
+                        {/* SALESMAN RELATIONSHIP */}
+                        <div className="col-span-6 xl:col-span-3">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                علاقته بالمندوب
+                            </h2>
+                            <AutoComplete
+                                style={{ width: '100%' }}
+                                options={optionsSalesmanRelationship}
                                 placeholder="علاقته بالمندوب"
                                 value={searchTextSalesmanRelationship}
 
@@ -1357,14 +1496,7 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                             />
                         </div>
 
-                        <div className="col-span-12 sm:col-span-6">
-                            <Button
-                                type="default"
-                                onClick={() => handleEdit()}
-                            >
-                                تعديل
-                            </Button>
-                        </div>
+
 
                     </div>
                 </div>
@@ -1372,13 +1504,38 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                 return <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-12 grid grid-cols-12 gap-4 rounded-xl bg-white p-5 shadow-md border border-gray-100">
 
+                        {/* WAITING TIME */}
+                        <div className="col-span-12 md:col-span-6">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                طريقة صرف الوصفة
+                            </h2>
+                            <AutoComplete
+                                style={{ width: '100%' }}
+                                options={optionsExecutePrescription}
+                                placeholder="طريقة صرف الوصفة"
+                                value={searchTextExecutePrescription}
 
+                                onChange={(text) => {
+                                    setSearchTextExecutePrescription(text);
+                                    setWaitingTime(undefined);
+                                }}
+                                onSelect={(value, option) => {
+                                    setExecutePrescription(option.value);
+                                    setSearchTextExecutePrescription(option?.label as string);
+                                }}
+                                filterOption={(inputValue, option) =>
+                                    (option?.label as string)
+                                        ?.toLowerCase()
+                                        .includes(inputValue.toLowerCase())
+                                }
+                            />
+                        </div>
 
                         {/* ADOPTED TYPES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الأنواع المعتمدة
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1392,9 +1549,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* PREFERRED TREATMENT TYPES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الأنواع العلاجية المفضلة
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1408,9 +1565,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* PREFERRED DIETARY TYPES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 أنواع المكملات المفضلة
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1424,9 +1581,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* PREFERRED COMPANIES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الشركات المفضلة
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1440,9 +1597,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* COMPETITIVE TYPES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الأنواع المنافسة
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1456,9 +1613,9 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
                         {/* STANCE ON DIETARY SUPPLEMENTS */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 موقفه من المكملات الغذائية
-                            </h3>
+                            </h2>
                             <TextArea
                                 rows={3}
                                 value={stance_on_dietary_supp}
@@ -1466,14 +1623,7 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
                                 className="bg-gray-50 border border-gray-200 text-gray-700"
                             />
                         </div>
-                        <div className="col-span-12 sm:col-span-6">
-                            <Button
-                                type="default"
-                                onClick={() => handleEdit()}
-                            >
-                                تعديل
-                            </Button>
-                        </div>
+
                     </div>
                 </div >
             default:
@@ -1485,7 +1635,7 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
             label: <div>معلومات شخصية</div>, key: "1",
         },
         {
-            label: <div>معلومات العيادة</div>, key: "2",
+            label: <div>معلومات الصيدلية</div>, key: "2",
         },
         {
             label: <div>مواعيد الدوام</div>, key: "3",
@@ -1500,15 +1650,15 @@ export default function PharmacistSpecification({ profile_id }: profileComponent
 
     return (
         <div className="col-span-12">
+            <div className="col-span-12 sm:col-span-6">
+                <Button
+                    type="default"
+                    onClick={() => handleEdit()}
+                >
+                    تعديل
+                </Button>
+            </div>
             <ConfigProvider direction="rtl" >
-                <div className="col-span-12 sm:col-span-6">
-                    <Button
-                        type="default"
-                        onClick={() => handleEdit()}
-                    >
-                        تعديل
-                    </Button>
-                </div>
                 <Tabs
                     defaultActiveKey="1"
                     tabPlacement="top"

@@ -3,7 +3,7 @@
 import { Type } from "../../../../../../../stores/types-store-interfaces";
 import { useTypeStore } from "../../../../../../../stores/typesStore/data.store";
 import { useEffect, useState } from "react";
-import { AutoComplete, Button, ConfigProvider, DatePicker, Input, InputNumber, notification, Select, SelectProps, Skeleton, Tabs, TimePicker, TimePickerProps } from "antd";
+import { AutoComplete, Button, Checkbox, ConfigProvider, DatePicker, Input, InputNumber, notification, Select, SelectProps, Skeleton, Tabs, TimePicker, TimePickerProps } from "antd";
 import { profileComponent } from "../../../../../../../stores/other-store-interfaces";
 import { apiDoctor, apiType } from "../../../../../../../stores/apis";
 import { useMedicalStore } from "../../../../../../../stores/medicalStore/data.store";
@@ -50,9 +50,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
     const [first_name, setFirstName] = useState("");
     const [second_name, setSecondName] = useState("");
     const [last_name, setLastName] = useState("");
-    const [gender, setGender] = useState<number | null>(null);
     const [loyalty_id, setLoyaltyId] = useState<number | null>(null);
     const [birth_date, setBirthDate] = useState(null);
+    const [gender_id, setGenderId] = useState(0);
 
     // Descriptions
     const [admin_description, setAdminDescription] = useState("");
@@ -501,7 +501,7 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
     const [searchTextSpecilization, setSearchTextSpecilization] = useState("");
     const [searchTextClassification, setSearchTextClassification] = useState("");
     const [searchTextLoyalty, setSearchTextLoyalty] = useState("");
-    const [searchTextSex, setSearchTextSex] = useState("");
+    const [searchTextGender, setSearchTextGender] = useState("");
     const [searchTextGovernorate, setSearchTextGovernorate] = useState("");
     const [searchTextCity, setSearchTextCity] = useState("");
     const [searchTextArea, setSearchTextArea] = useState("");
@@ -522,7 +522,7 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
         item => item.id === area_id)
     const [optionsStreets, setOptionsStreets] = useState([])
 
-    const optionsSex = [
+    const optionsGender = [
         { value: 1, label: 'ذكر' },
         { value: 2, label: 'أنثى' }]
     const optionsLoyalty = [
@@ -617,7 +617,7 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
         setFirstName(doctorD.first_name || "");
         setSecondName(doctorD.second_name || "");
         setLastName(doctorD.last_name || "");
-        setGender(doctorD.gender ?? null);
+        setGenderId(doctorD.gender_id ?? null);
         setLoyaltyId(doctorD.loyalty_id ?? null);
         setBirthDate(dayjs(doctorD.birth_date));
         setAdminDescription(doctorD.admin_description || "");
@@ -688,6 +688,7 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
             optionsClassification?.find(e => e.value == classification_id)?.label || ""
         )
     }, [classification_id])
+
     useEffect(() => {
         setSearchTextGovernorate(
             dataGovernorates?.find(e => e.id == governorate_id)?.name || ""
@@ -715,7 +716,11 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
     useEffect(() => {
         setSearchTextSocialPattern(optionsSocialPatterns.find(e => e.value == doctorD?.social_pattern)?.label)
     }, [doctorD])
-
+    useEffect(() => {
+        setSearchTextGender(
+            optionsGender?.find(e => e.value == doctorD?.gender_id)?.label || ""
+        )
+    }, [doctorD])
     useEffect(() => {
         setSearchTextSalesmanRelationship(optionsSalesmanRelationships.find(e => e.value == doctorD?.salesman_relationship)?.label)
     }, [doctorD])
@@ -738,6 +743,7 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
         try {
             const res = await editDoctor(profile_id, {
                 governorate_id,
+                gender_id,
                 city_id,
                 area_id,
                 street_id,
@@ -758,9 +764,7 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                 graduation_country,
                 phone_number,
                 telephone_number,
-                graduation_university,
-                gender,
-                /*  wife_husband_first_name: string;
+                graduation_university,                /*  wife_husband_first_name: string;
                  wife_husband_last_name: string; */
                 //added recently
                 full_place,
@@ -785,6 +789,7 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                 social_pattern,
                 salesman_relationship,
                 secrtary_first_name,
+                average_patients_per_day
             });
             if (res?.status == 200 || res?.status == 204) {
                 notification.success({
@@ -842,9 +847,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         ].map((field, i) => (
                             <div key={i} className="col-span-12 md:col-span-4 sm:col-span-6">
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                     {field.label}
-                                </h3>
+                                </h2>
                                 <Input
                                     value={field.value}
                                     onChange={(e) => field.set(e.target.value)}
@@ -854,11 +859,11 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                         ))}
 
                         {/*Loyalty*/}
-                        <div className="col-span-6 xl:col-span-4">
+                        <div className="col-span-12 md:col-span-4 sm:col-span-6">
                             <div>
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                     الولاء
-                                </h3>
+                                </h2>
                             </div>
                             <AutoComplete
                                 style={{ width: '100%' }}
@@ -882,13 +887,41 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                             />
                         </div>
 
+                        {/* Gender */}
+                        <div className="col-span-12 md:col-span-4 sm:col-span-6">
+                            <div>
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                    الجنس
+                                </h2>
+                            </div>
+                            <AutoComplete
+                                style={{ width: '100%' }}
+                                options={optionsGender}
+                                placeholder="الجنس"
+                                value={searchTextGender}
+
+                                onChange={(text) => {
+                                    setSearchTextGender(text);
+                                    setGenderId(undefined);
+                                }}
+                                onSelect={(value, option) => {
+                                    setGenderId(option.value);
+                                    setSearchTextGender(option?.label as string);
+                                }}
+                                filterOption={(inputValue, option) =>
+                                    (option?.label as string)
+                                        ?.toLowerCase()
+                                        .includes(inputValue.toLowerCase())
+                                }
+                            />
+                        </div>
 
                         {/*Classification*/}
-                        <div className="col-span-6 xl:col-span-4">
+                        <div className="col-span-12 md:col-span-4 sm:col-span-6">
                             <div>
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                     التصنيف
-                                </h3>
+                                </h2>
                             </div>
                             <AutoComplete
                                 style={{ width: '100%' }}
@@ -914,11 +947,11 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                         </div>
 
                         {/*Specialization*/}
-                        <div className="col-span-6 xl:col-span-4">
+                        <div className="col-span-12 md:col-span-4 sm:col-span-6">
                             <div>
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                     الاختصاص
-                                </h3>
+                                </h2>
                             </div>
                             <AutoComplete
                                 style={{ width: '100%' }}
@@ -948,9 +981,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* DATE */}
                         <div className="col-span-12 md:col-span-6 ">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
                                 تاريخ الميلاد
-                            </h3>
+                            </h2>
                             <DatePicker className="w-full"
                                 value={birth_date}
                                 onChange={(e) => setBirthDate(e)}
@@ -958,9 +991,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                         </div>
                         {/* Gmail */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 البريد الإلكتروني
-                            </h3>
+                            </h2>
                             <Input
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -969,9 +1002,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                         </div>
                         {/* ADMIN DESCRIPTION */}
                         <div className="col-span-12 sm:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 وصف الإدارة
-                            </h3>
+                            </h2>
                             <TextArea
                                 rows={4}
                                 value={admin_description}
@@ -982,9 +1015,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* SALESMAN DESCRIPTION */}
                         <div className="col-span-12 sm:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 وصف المندوب
-                            </h3>
+                            </h2>
                             <TextArea
                                 rows={4}
                                 value={salesman_description}
@@ -992,14 +1025,24 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                                 className="bg-gray-50 border border-gray-200 text-gray-700"
                             />
                         </div>
-                        <div className="col-span-12 sm:col-span-6">
-                            <Button
-                                type="default"
-                                onClick={() => handleEdit()}
-                            >
-                                تعديل
-                            </Button>
+
+                        {/* IS ADDED BY ADMIN */}
+                        <div className="col-span-12 sm:col-span-3">
+                            <div className="grid grid-cols-12">
+                                <div className="col-span-1">
+                                    <Checkbox disabled
+                                        checked={Boolean(isAddedByAdmin)}
+                                    >
+                                    </Checkbox>
+                                </div>
+                                <div className="col-span-9">
+                                    <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                        مضاف من قبل الإدارة
+                                    </h2>
+                                </div>
+                            </div>
                         </div>
+
 
                     </div>
                 </div>
@@ -1009,21 +1052,22 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                     <div className="col-span-12 grid grid-cols-12 gap-4 rounded-xl bg-white p-5 shadow-md border border-gray-100">
 
                         {/* SECRTARY FIRST NAME */}
-                        <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                        <div className="col-span-6 xl:col-span-3">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 اسم السكرتيرة الأول
-                            </h3>
+                            </h2>
                             <Input
                                 value={secrtary_first_name}
                                 onChange={(e) => setSecrtaryFirstName(e.target.value)}
                                 className="bg-gray-50 border border-gray-200 text-gray-700"
                             />
                         </div>
+
                         {/* GOVERNORATE */}
                         <div className="col-span-6 xl:col-span-3">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 المحافظة
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsGovernorates}
@@ -1062,9 +1106,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* CITY */}
                         <div className="col-span-6 xl:col-span-3">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 المدينة
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsCities}
@@ -1102,9 +1146,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* AREA */}
                         <div className="col-span-6 xl:col-span-3">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 المنطقة
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsAreas}
@@ -1141,9 +1185,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* STREET */}
                         <div className="col-span-6 xl:col-span-3">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الشارع
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsStreets}
@@ -1169,9 +1213,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* FULL PLACE */}
                         <div className="col-span-12">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 العنوان بالكامل
-                            </h3>
+                            </h2>
                             <TextArea
                                 rows={3}
                                 value={full_place}
@@ -1182,23 +1226,16 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* CLOSE PLACE */}
                         <div className="col-span-12">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 أقرب مكان
-                            </h3>
+                            </h2>
                             <TextArea
                                 value={close_place}
                                 onChange={(e) => setClosePlace(e.target.value)}
                                 className="bg-gray-50 border border-gray-200 text-gray-700"
                             />
                         </div>
-                        <div className="col-span-12 sm:col-span-6">
-                            <Button
-                                type="default"
-                                onClick={() => handleEdit()}
-                            >
-                                تعديل
-                            </Button>
-                        </div>
+
                     </div>
                 </div>
             case "3":
@@ -1207,9 +1244,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* WAITING TIME */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 مدة الانتظار
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsWaitingTime}
@@ -1234,9 +1271,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* AVERAGE PATIENTS */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 عدد المرضى يومياً
-                            </h3>
+                            </h2>
                             <Input
                                 value={average_patients_per_day ?? ""}
                                 onChange={(e) => setAveragePatientsPerDay(Number(e.target.value))}
@@ -1246,60 +1283,53 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
                             <div className="col-span-12">
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
                                     موعد الدوام  الأول
-                                </h3>
+                                </h2>
                             </div>
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>من</h3>
+                                <h2>من</h2>
                                 <TimePicker value={dayjs(first_work_time_opening, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeFirstTimeOpening} />
                             </div>
 
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>إلى</h3>
+                                <h2>إلى</h2>
                                 <TimePicker value={dayjs(first_work_time_closing, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeFirstTimeClosing} />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
                             <div className="col-span-12">
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
                                     موعد الدوام  الثاني
-                                </h3>
+                                </h2>
                             </div>
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>من</h3>
+                                <h2>من</h2>
                                 <TimePicker value={dayjs(second_work_time_opening, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeSecondTimeOpening} />
                             </div>
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>إلى</h3>
+                                <h2>إلى</h2>
                                 <TimePicker value={dayjs(second_work_time_closing, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeSecondTimeClosing} />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-12 gap-2 col-span-12 xl:col-span-12">
                             <div className="col-span-12">
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1 w-full">
                                     موعد الزيارة المفضل
-                                </h3>
+                                </h2>
                             </div>
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>من</h3>
+                                <h2>من</h2>
                                 <TimePicker value={dayjs(favourite_time_opening, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeFavouriteTimeOpening} />
                             </div>
                             <div className="col-span-6 xl:col-span-6">
-                                <h3>إلى</h3>
+                                <h2>إلى</h2>
                                 <TimePicker value={dayjs(favourite_time_closing, 'HH:mm a')} className="w-full" use12Hours format="h:mm a" onChange={onChangeFavouriteTimeClosing} />
                             </div>
                         </div>
-                        <div className="col-span-12 sm:col-span-6">
-                            <Button
-                                type="default"
-                                onClick={() => handleEdit()}
-                            >
-                                تعديل
-                            </Button>
-                        </div>
+
                     </div>
                 </div>
             case "4":
@@ -1308,9 +1338,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* PERSONALITY STRENGTHS */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 نقاط القوة في الشخصية
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1324,9 +1354,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* INTERESTS */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الاهتمامات
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1339,11 +1369,11 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                         </div>
 
                         {/* PERSONALITY TYPE */}
-                        <div className="col-span-6 xl:col-span-4">
+                        <div className="col-span-12 md:col-span-4">
                             <div>
-                                <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                                <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                     نوع الشخصية
-                                </h3>
+                                </h2>
                             </div>
                             <AutoComplete
                                 style={{ width: '100%' }}
@@ -1369,9 +1399,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* SOCIAL PATTERN */}
                         <div className="col-span-12 md:col-span-4">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 النمط الاجتماعي
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsSocialPatterns}
@@ -1392,9 +1422,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* SALESMAN RELATIONSHIP */}
                         <div className="col-span-12 md:col-span-4">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 علاقته بالمندوب
-                            </h3>
+                            </h2>
                             <AutoComplete
                                 style={{ width: '100%' }}
                                 options={optionsSalesmanRelationships}
@@ -1413,14 +1443,7 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                             />
                         </div>
 
-                        <div className="col-span-12 sm:col-span-6">
-                            <Button
-                                type="default"
-                                onClick={() => handleEdit()}
-                            >
-                                تعديل
-                            </Button>
-                        </div>
+
 
                     </div>
                 </div>
@@ -1430,9 +1453,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* EXPECTED RECIPES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 عدد الروشتات المتوقعة
-                            </h3>
+                            </h2>
                             <Input
                                 value={expected_recipes ?? ""}
                                 onChange={(e) => setExpectedRecipes(Number(e.target.value))}
@@ -1443,9 +1466,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* ADOPTED TYPES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الأنواع المعتمدة
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1459,9 +1482,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* PREFERRED TREATMENT TYPES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الأنواع العلاجية المفضلة
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1475,9 +1498,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* PREFERRED DIETARY TYPES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 أنواع المكملات المفضلة
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1491,9 +1514,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* PREFERRED COMPANIES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الشركات المفضلة
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1507,9 +1530,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* COMPETITIVE TYPES */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 الأنواع المنافسة
-                            </h3>
+                            </h2>
                             <Select
                                 mode="tags"
                                 size={size}
@@ -1523,9 +1546,9 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
                         {/* STANCE ON DIETARY SUPPLEMENTS */}
                         <div className="col-span-12 md:col-span-6">
-                            <h3 className="text-sm font-semibold text-[#01B9B0] mb-1">
+                            <h2 className="text-sm font-semibold text-[#01B9B0] mb-1">
                                 موقفه من المكملات الغذائية
-                            </h3>
+                            </h2>
                             <TextArea
                                 rows={3}
                                 value={stance_on_dietary_supp}
@@ -1533,14 +1556,7 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
                                 className="bg-gray-50 border border-gray-200 text-gray-700"
                             />
                         </div>
-                        <div className="col-span-12 sm:col-span-6">
-                            <Button
-                                type="default"
-                                onClick={() => handleEdit()}
-                            >
-                                تعديل
-                            </Button>
-                        </div>
+
                     </div>
                 </div >
             default:
@@ -1567,6 +1583,14 @@ export default function DoctorSpecification({ profile_id }: profileComponent) {
 
     return (
         <div className="col-span-12">
+            <div className="col-span-12 sm:col-span-6">
+                <Button
+                    type="default"
+                    onClick={() => handleEdit()}
+                >
+                    تعديل
+                </Button>
+            </div>
             <ConfigProvider direction="rtl" >
                 <Tabs
                     defaultActiveKey="1"

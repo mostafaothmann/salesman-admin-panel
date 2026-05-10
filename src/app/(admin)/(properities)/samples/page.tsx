@@ -1,13 +1,13 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, InputNumber, Modal, Skeleton, Space, Table } from "antd";
+import { AutoComplete, Button, Dropdown, Input, InputNumber, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
 import { useRouter } from "next/navigation";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
-import { apiType } from "../../../../stores/apis";
+import { apiSalesman, apiSample, apiType } from "../../../../stores/apis";
 
 
 export default function SamplesPage() {
@@ -33,6 +33,7 @@ export default function SamplesPage() {
     const [filter_type_id, setFilterTypeId] = useState(0);
     const [searchTextType, setSearchTextType] = useState("");
     const [typesNames, setTypesNames] = useState([])
+    const [salesmansNames, setSalesmansNames] = useState([])
 
     //Filter Modal Funcs
     const OpenFilterModal = () => {
@@ -66,12 +67,37 @@ export default function SamplesPage() {
     }
 
     //downloadExcele
+    const [allData, setAllData] = useState([])
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataSamples ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "المكونات");
-        XLSX.writeFile(workbook, "العينات.xlsx");
+        apiSample.get('/all')
+            .then(res => {
+                setAllData(res.data.data);
+                const formattedData = (allData ?? []).map(item => ({
+                    "تاريخ البيع": item.created_at.slice(0, 10),
+                    "الكمية": item.base_quantity,
+                    "العينة": typesNames?.find(e => e.id == Number(item.type_id))?.name,
+                    "المندوب": salesmansNames?.find(e => e.id == Number(item.salesman_id)).map(e => { return `${e.first_name} ${e.last_name}` }),
+                }));
+                const worksheet = XLSX.utils.json_to_sheet(formattedData);
+                worksheet["!cols"] = [
+                    { wch: 15 },
+                    { wch: 10 },
+                    { wch: 10 },
+                    { wch: 15 },
+                ];
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "العينات المقدمة");
+                XLSX.writeFile(workbook, "العينات المقدمة.xlsx")
+            })
+            .catch(err => {
+                notification.error({
+                    message: "خطأ",
+                    description: "حدث خطأ في جلب البيانات",
+                    placement: 'bottomLeft'
+                });
+            });
     };
+
     const [pageLoading, setPageLoading] = useState(true);
 
     useEffect(() => {
@@ -79,10 +105,14 @@ export default function SamplesPage() {
             try {
                 const [
                     typeRes,
+                    salesmanRes
                 ] = await Promise.all([
                     apiType.get('/names'),
+                    apiSalesman.get('/fullname'),
+
                 ]);
                 setTypesNames(typeRes.data);
+                setSalesmansNames(salesmanRes.data)
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -97,6 +127,15 @@ export default function SamplesPage() {
             title: "الرقم",
             dataIndex: "id",
             sorter: (a: any, b: any) => Number(a.id) - Number(b.id),
+        },
+        {
+            title: "المندوب",
+            dataIndex: "salesman_id",
+            sorter: (a: any, b: any) => Number(a.salesmna_id) - Number(b.salesmna_id),
+            render: (value: number) => {
+                const salesman = salesmansNames?.find(e => e.id == Number(value));
+                return `${salesman?.first_name} ${salesman?.last_name}`
+            }
         },
         {
             title: "العينة",

@@ -31,12 +31,10 @@ export default function AssistantsPage() {
     const [account_status_id, setAccountStatusId] = useState(1);
     const [birth_date, setBirthDate] = useState("");
     const [email, setEmail] = useState("");
-    const [gender_id, setSexId] = useState(0);
     const [phone_number, setPhoneNumber] = useState("");
     const [telephone_number, setTelephoneNumber] = useState("");
     const [password, setPassword] = useState("");
     const [searchTextAccountStatus, setSearchTextAccountStatus] = useState("");
-    const [searchTextSex, setSearchTextSex] = useState("");
     const [searchTextGovernorate, setSearchTextGovernorate] = useState("");
     const [searchTextCity, setSearchTextCity] = useState("");
     const [searchTextArea, setSearchTextArea] = useState("");
@@ -58,10 +56,6 @@ export default function AssistantsPage() {
         { value: 3, label: 'تحت المراجعة' },
         { value: 4, label: 'متوقف' },
     ]
-    const optionsSex = [
-        { value: 1, label: 'ذكر' },
-        { value: 2, label: 'أنثى' }]
-
 
 
 
@@ -115,7 +109,6 @@ export default function AssistantsPage() {
                     account_status_id: account_status_id,
                     birth_date: birth_date,
                     admin_description: admin_description,
-                    gender: gender_id,
                     phone_number: phone_number,
                     telephone_number: telephone_number,
                     email: email,
@@ -158,7 +151,6 @@ export default function AssistantsPage() {
         setTelephoneNumber("");
         setPhoneNumber("");
         setSearchTextAccountStatus("");
-        setSearchTextSex("");
         setSearchTextGovernorate("");
         setSearchTextCity("");
         setSearchTextArea("");
@@ -176,7 +168,6 @@ export default function AssistantsPage() {
         setTelephoneNumber("");
         setPhoneNumber("");
         setSearchTextAccountStatus("");
-        setSearchTextSex("");
         setSearchTextGovernorate("");
         setSearchTextCity("");
         setSearchTextArea("");
@@ -461,34 +452,7 @@ export default function AssistantsPage() {
                 </div>
 
 
-                <div className="col-span-6 xl:col-span-3">
-                    <div>
-                        <h3>
-                            الجنس :
-                        </h3>
-                    </div>
-                    <AutoComplete
-                        style={{ width: '100%' }}
-                        options={optionsSex}
-                        placeholder="الجنس"
-                        value={searchTextSex}
-
-                        onChange={(text) => {
-                            setSearchTextSex(text);
-                            setSexId(undefined); // clear ID while typing
-                        }}
-                        onSelect={(value, option) => {
-                            setSexId(option.value);
-                            setSearchTextSex(option?.label as string);
-                        }}
-                        filterOption={(inputValue, option) =>
-                            (option?.label as string)
-                                ?.toLowerCase()
-                                .includes(inputValue.toLowerCase())
-                        }
-                    />
-                </div>
-
+                
 
                 <div className="col-span-6 xl:col-span-3">
                     <div>

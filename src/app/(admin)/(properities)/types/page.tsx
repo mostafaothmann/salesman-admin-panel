@@ -436,21 +436,21 @@ export default function TypesPage() {
                         placeholder="السعر للمندوب"
                     />
                 </div>
-
-                <div className="col-span-12 sm:col-span-6">
-                    <h3>
-                        سعر المبيع :
-                    </h3>
-                    <InputNumber
-                        value={price_for_sale}
-                        type={"number"}
-                        style={{ width: '100%' }}
-                        min={0}
-                        onChange={(e) => setPriceForSale(e)}
-                        placeholder="سعر المبيع"
-                    />
-                </div>
-
+*/
+                    <div className="col-span-12 sm:col-span-6">
+                        <h3>
+                            سعر المبيع :
+                        </h3>
+                        <InputNumber
+                            value={price_for_sale}
+                            type={"number"}
+                            style={{ width: '100%' }}
+                            min={0}
+                            onChange={(e) => setPriceForSale(e)}
+                            placeholder="سعر المبيع"
+                        />
+                    </div>
+/*
                 <div className="col-span-12 sm:col-span-6">
                     <h3>
                         نسبة المندوب  :

@@ -1,6 +1,6 @@
 "use client";
 
-import { AutoComplete, Button, DatePicker, Divider, Dropdown, Input, Menu, Modal, notification, Skeleton, Slider, SliderSingleProps, Space, Table, Tag, TimePicker, TimePickerProps, Upload } from "antd";
+import { AutoComplete, Button, DatePicker, Input, Modal, notification, Skeleton, Slider, SliderSingleProps, Space, Table, Tag, TimePicker, TimePickerProps, Upload } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
@@ -47,8 +47,6 @@ export default function PharmacistsPage() {
     const [gender_id, setSexId] = useState(0);
     const [phone_number, setPhoneNumber] = useState("");
     const [telephone_number, setTelephoneNumber] = useState("");
-    const [wife_husband_first_name, setWifeHusbandFirstName] = useState("");
-    const [wife_husband_last_name, setWifeHusbandLastName] = useState("");
     const [graduation_university, setGraduationUniversity] = useState("");
     const [graduation_country, setGraduationCountry] = useState("");
     const [searchTextSpecilization, setSearchTextSpecilization] = useState("");
@@ -179,7 +177,8 @@ export default function PharmacistsPage() {
                     loyalty_id: loyalty_id,
                     admin_description: admin_description,
                     salesman_description: salesman_description,
-                    gender: gender_id,
+                    gender_id: gender_id,
+                    is_added_by_admin: true,
                     //   wife_husband_first_name: wife_husband_first_name,
                     // wife_husband_last_name: wife_husband_first_name,
                     phone_number: phone_number,
@@ -218,8 +217,6 @@ export default function PharmacistsPage() {
         setFirstName("");
         setLastName("");
         setGraduationUniversity("");
-        setWifeHusbandFirstName("");
-        setWifeHusbandLastName("");
         setTelephoneNumber("");
         setPhoneNumber("");
         setSearchTextSpecilization("");
@@ -241,8 +238,6 @@ export default function PharmacistsPage() {
         setLastName("");
         setBirthDate("")
         setGraduationUniversity("");
-        setWifeHusbandFirstName("")
-        setWifeHusbandLastName("")
         setTelephoneNumber("");
         setPhoneNumber("");
         setSearchTextSpecilization("");
@@ -930,31 +925,6 @@ export default function PharmacistsPage() {
                         value={graduation_university}
                         onChange={(e) => setGraduationUniversity(e.target.value)}
                         placeholder="جامعة التخرج"
-                    />
-                </div>
-
-
-                <div className="col-span-6 xl:col-span-6">
-                    <h3>
-                        اسم الزوج/الزوجة الأول:
-                    </h3>
-                    <Input
-                        className="w-full"
-                        value={wife_husband_first_name}
-                        onChange={(e) => setWifeHusbandFirstName(e.target.value)}
-                        placeholder="اسم الزوج/الزوجة الأول"
-                    />
-                </div>
-
-                <div className="col-span-6 xl:col-span-6">
-                    <h3>
-                        اسم الزوج/الزوجة الثاني:
-                    </h3>
-                    <Input
-                        className="w-full"
-                        value={wife_husband_last_name}
-                        onChange={(e) => setWifeHusbandLastName(e.target.value)}
-                        placeholder="اسم الزوج/الزوجة الثاني"
                     />
                 </div>
 

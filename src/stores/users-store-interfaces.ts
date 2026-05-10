@@ -51,7 +51,6 @@ export interface Assistant {
 
     admin_description: string;
 
-    gender: number;
 
     email: string;
     password: string;
@@ -114,7 +113,6 @@ export interface AddingAssistant {
 
     admin_description: string;
 
-    gender: number;
 
     email: string;
     password: string;

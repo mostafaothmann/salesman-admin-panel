@@ -184,11 +184,12 @@ export default function DoctorsPage() {
                     loyalty_id: loyaltyId,
                     admin_description: admin_description,
                     salesman_description: salesman_description,
-                    gender: gender_id,
+                    gender_id: gender_id,
                     /*       wife_husband_first_name: wife_husband_first_name,
                           wife_husband_last_name: wife_husband_first_name, */
                     phone_number: phone_number,
-                    telephone_number: telephone_number
+                    telephone_number: telephone_number,
+                    is_added_by_admin:true
                 })
                 if (res?.status == 201) {
                     notification.success({

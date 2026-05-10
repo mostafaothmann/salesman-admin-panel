@@ -354,7 +354,7 @@ export default function PharmacistsVisitsPage() {
                     >
                         موقع
                     </Button>
-              
+
                 </Space>
             ),
         },
@@ -996,9 +996,9 @@ export default function PharmacistsVisitsPage() {
             <Button className="col-span-5" variant="solid" color="purple" onClick={() => OpenFilterModal()}>
                 فلترة
             </Button>
-            <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
+            {/* <Button className="col-span-5" variant="solid" color="green" onClick={() => downloadExcel()}>
                 تنزيل
-            </Button>
+            </Button>*/}
         </div>
         <div className="max-w-full">
             {filtered ? <Table

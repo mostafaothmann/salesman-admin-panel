@@ -1,13 +1,13 @@
 "use client";
 
 
-import { AutoComplete, Button, Dropdown, Input, InputNumber, Modal, Skeleton, Space, Table } from "antd";
+import { AutoComplete, Button, Dropdown, Input, InputNumber, Modal, notification, Skeleton, Space, Table } from "antd";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { useTypeStore } from "../../../../stores/typesStore/data.store";
 import { useRouter } from "next/navigation";
 import { useMedicalStore } from "../../../../stores/medicalStore/data.store";
-import { apiBaseGift, apiType } from "../../../../stores/apis";
+import { apiBaseGift, apiGiftVisit, apiType } from "../../../../stores/apis";
 import { useOtherStore } from "../../../../stores/otherStore/data.store";
 
 
@@ -69,11 +69,33 @@ export default function GiftVisitsPage() {
     }
 
     //downloadExcele
+    const [allData, setAllData] = useState([])
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(dataGiftsVisits ?? []);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "المكونات");
-        XLSX.writeFile(workbook, "المكونات.xlsx");
+        apiGiftVisit.get('/all')
+            .then(res => {
+                setAllData(res.data.data);
+                const formattedData = (allData ?? []).map(item => ({
+                    "تاريخ البيع": item.created_at.slice(0, 10),
+                    "الكمية": item.base_quantity,
+                    "الهدية":giftsNames?.find(e => e.id == Number(item.type_id))?.name,
+                }));
+                const worksheet = XLSX.utils.json_to_sheet(formattedData);
+                worksheet["!cols"] = [
+                    { wch: 15 },
+                    { wch: 10 },
+                    { wch: 10 },
+                ];
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "الهدايا المقدمة");
+                XLSX.writeFile(workbook, "الهدايا المقدمة.xlsx")
+            })
+            .catch(err => {
+                notification.error({
+                    message: "خطأ",
+                    description: "حدث خطأ في جلب البيانات",
+                    placement: 'bottomLeft'
+                });
+            });
     };
 
     const [pageLoading, setPageLoading] = useState(true);
